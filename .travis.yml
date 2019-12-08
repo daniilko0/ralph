@@ -6,6 +6,8 @@ script: pytest -q test/tests.py
 before_deploy:
   - "sed -i '/config.py/d' .gitignore > .gitignore"
   - "sed -i '/credentials.json/d' .gitignore > .gitignore"
+  - "git add .gitignore"
+  - "git commit -m 'Update .gitignore.'"
 deploy:
   provider: heroku
   api_key:

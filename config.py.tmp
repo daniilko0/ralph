@@ -1,0 +1,7 @@
+auth = {
+    'token': 'YOUR AUTH TOKEN',
+    'cid': 2000000001,
+    'gid': 'YOUR_GROUP_ID (AS A NUMBER)',
+    'table': 'YOUR GOOGLE TABLE ID',
+    'admins': 'LIST_OF_ADMINS_OF_BOT [id,id,id]',
+}

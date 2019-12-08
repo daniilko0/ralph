@@ -3,6 +3,7 @@ venv/
 new/
 old/
 **/__pycache__/
+test/__pycache__
 **/.pytest_cache/
 .vscode/
 config.py

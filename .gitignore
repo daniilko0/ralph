@@ -1,0 +1,8 @@
+venv/
+.idea/
+new/
+old/
+__pycache__/
+.vscode/
+config.py
+credentials.json

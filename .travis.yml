@@ -3,6 +3,9 @@ python: "3.7.5"
 cache: pip
 install: pip install -r requirements.txt
 script: pytest -q test/tests.py
+before_deploy:
+  - "sed /config.py/d .gitignore > .gitignore"
+  - "sed /credentials.json/d .gitignore > .gitignore"
 deploy:
   provider: heroku
   api_key:

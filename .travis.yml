@@ -4,8 +4,8 @@ cache: pip
 install: pip install -r requirements.txt
 script: pytest -q test/tests.py
 before_deploy:
-  - "sed /config.py/d .gitignore > .gitignore"
-  - "sed /credentials.json/d .gitignore > .gitignore"
+  - "sed -i '/config.py/d' .gitignore > .gitignore"
+  - "sed -i '/credentials.json/d' .gitignore > .gitignore"
 deploy:
   provider: heroku
   api_key:

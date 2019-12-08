@@ -1,0 +1,21 @@
+{
+  "one_time": false,
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Подтвердить"
+        },
+        "color": "positive"
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "В главное меню"
+        },
+        "color": "negative"
+      }
+    ]
+  ]
+}

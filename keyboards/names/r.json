@@ -1,0 +1,27 @@
+{
+  "one_time": false,
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Руденко Д."
+        }
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "Румянцев А."
+        }
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Назад"
+        }
+      }
+    ]
+  ]
+}

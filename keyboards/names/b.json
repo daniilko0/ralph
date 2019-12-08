@@ -1,0 +1,35 @@
+{
+  "one_time": false,
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Белов А."
+        }
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "Белоус Д."
+        }
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Бобылев Д."
+        }
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Назад"
+        }
+      }
+    ]
+  ]
+}

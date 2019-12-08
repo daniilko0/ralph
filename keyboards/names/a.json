@@ -1,0 +1,35 @@
+{
+  "one_time": false,
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Алёшин Т."
+        }
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "Алиев С."
+        }
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Астахов С."
+        }
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Назад"
+        }
+      }
+    ]
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "one_time": false,
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Гавриленко А."
+        }
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "Глазкова А."
+        }
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Голубев Д."
+        }
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Назад"
+        }
+      }
+    ]
+  ]
+}

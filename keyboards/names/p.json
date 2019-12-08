@@ -1,0 +1,35 @@
+{
+  "one_time": false,
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Перелётов Р."
+        }
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "Петров Р."
+        }
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Попов Н."
+        }
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Назад"
+        }
+      }
+    ]
+  ]
+}

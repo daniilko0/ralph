@@ -1,0 +1,69 @@
+{
+  "one_time": false,
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Кириллов Н."
+        }
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "Комаров А."
+        }
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Королёв Е."
+        }
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "Королёв Р."
+        }
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Королевская А."
+        }
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "Кошкина Е."
+        }
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Куликова Е."
+        }
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "Курзин Н."
+        }
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Назад"
+        }
+      }
+    ]
+  ]
+}

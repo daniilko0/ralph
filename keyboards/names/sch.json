@@ -1,0 +1,27 @@
+{
+  "one_time": false,
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Шаранин И."
+        }
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "Широков И."
+        }
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Назад"
+        }
+      }
+    ]
+  ]
+}

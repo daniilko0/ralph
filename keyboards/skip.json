@@ -1,0 +1,13 @@
+{
+  "one_time": true,
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Пропустить"
+        }
+      }
+    ]
+  ]
+}

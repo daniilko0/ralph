@@ -1,0 +1,111 @@
+{
+  "one_time": false,
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "А"
+        }
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "Б"
+        }
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "Г"
+        }
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "Д"
+        }
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "Е"
+        }
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Ж"
+        }
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "З"
+        }
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "К"
+        }
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "Л"
+        }
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "М"
+        }
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "П"
+        }
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "Р"
+        }
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "С"
+        }
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "Ш"
+        }
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Отмена"
+        },
+        "color": "negative"
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "Сохранить"
+        },
+        "color": "positive"
+      }
+    ]
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "one_time": false,
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Расписание на сегодня"
+        },
+        "color": "primary"
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Расписание на завтра"
+        },
+        "color": "primary"
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Подписаться на рассылку расписания"
+        },
+        "color": "primary"
+      }
+    ]
+  ]
+}

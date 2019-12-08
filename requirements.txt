@@ -18,7 +18,7 @@ pytzdata==2019.3
 requests==2.22.0
 rsa==4.0
 six==1.13.0
-soupsieve==1.9.4
+soupsieve==1.9.5
 tzlocal==2.0.0
 urllib3==1.25.6
-vk-api==11.5.1
+vk-api==11.6.1

@@ -2,7 +2,8 @@ venv/
 .idea/
 new/
 old/
-__pycache__/
+**/__pycache__/
+**/.pytest_cache/
 .vscode/
 config.py
 credentials.json

@@ -9,7 +9,7 @@ License: [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](
 
 Code Quality: [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/dadyarri/ralph/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/dadyarri/ralph/?branch=master)
 
-Travic CI: [![Build Status](https://travis-ci.org/dadyarri/ralph.svg?branch=master)](https://travis-ci.org/dadyarri/ralph)
+Travis CI: [![Build Status](https://travis-ci.org/dadyarri/ralph.svg?branch=master)](https://travis-ci.org/dadyarri/ralph)
 ### О проекте
 RALPH - это платформа, созданная для того, чтобы упросить нелёгкий труд старост в студенческих групах.
 

@@ -9,7 +9,7 @@ before_deploy:
   - sleep 5
   - git add .gitignore
   - git add config.py credentials.json
-- git commit -m 'Update .gitignore.'
+  - git commit -m 'Update .gitignore.'
 deploy:
   provider: heroku
   api_key:

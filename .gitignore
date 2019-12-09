@@ -6,5 +6,3 @@ old/
 test/__pycache__
 **/.pytest_cache/
 .vscode/
-config.py
-credentials.json

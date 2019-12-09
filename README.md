@@ -1,15 +1,10 @@
 # RALPH
 ## Бот – платформа, призванный управлять студеческой беседой и упростить работу старост.
-
-Info: ![Code style](https://img.shields.io/static/v1?label=Code%20style&message=PEP8&color=informational)
-
-Dependences: ![Pyup](https://pyup.io/repos/github/dadyarri/ralph/shield.svg)
-
-License: [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-Code Quality: [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/dadyarri/ralph/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/dadyarri/ralph/?branch=master)
-
-Travis CI: [![Build Status](https://travis-ci.org/dadyarri/ralph.svg?branch=master)](https://travis-ci.org/dadyarri/ralph)
+![Code style](https://img.shields.io/static/v1?label=Code%20style&message=PEP8&color=informational)
+![Pyup](https://pyup.io/repos/github/dadyarri/ralph/shield.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/dadyarri/ralph/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/dadyarri/ralph/?branch=master)
+[![Build Status](https://travis-ci.org/dadyarri/ralph.svg?branch=master)](https://travis-ci.org/dadyarri/ralph)
 ### О проекте
 RALPH - это платформа, созданная для того, чтобы упросить нелёгкий труд старост в студенческих групах.
 

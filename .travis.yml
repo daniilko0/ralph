@@ -1,17 +1,17 @@
 language: python
-python: "3.7.5"
+python: 3.7.5
 cache: pip
 install: pip install -r requirements.txt
 script: pytest -q test/tests.py
 before_deploy:
-  - "sed -i '/config.py/d' .gitignore > .gitignore"
-  - "sed -i '/credentials.json/d' .gitignore > .gitignore"
-  - "git add .gitignore config.py credentials.json"
-  - "git commit -m 'Update .gitignore.'"
+- sed -i '/config.py/d' .gitignore > .gitignore
+- sed -i '/credentials.json/d' .gitignore > .gitignore
+- git add .gitignore config.py credentials.json
+- git commit -m 'Update .gitignore.'
 deploy:
   provider: heroku
   api_key:
-    secure: oCwQIM42EITTLRYH2E1Chndr1n2jr80D394rPZkvbLphWDJvftX6ExJiGcgQbWfOBnG4BHzh0hM/Stcx9a6W/F+5SovVPz8c5Ou2dn9yoPV6+ZrLr0MQGQTQItIz3ZD+w2jFiMii+2MhHAYHtQi5ajePbgUXVggp40IO0ScGHFlSwZhG45GD9FdllAATGIzzq9Hn+TLB2NL94b236M+szcxUw7h4RteesgUeJ6/a08BFFa1xdmaSZYmmhE+0B4cksz9lwH1EMOWmI6AO1ZqDxtHb6xC9k8zA4Kv/9FFDHii3NUMz8Ndk+TbybJoK7oULxM2joWcvD+U2y84J1E3ScIcPBpZ6lhj4KeCDlQwC6thw0mNSpBqr0+dBmVLybnSOg2PRB78BBX2Ze3Rmb//ccVnSj/EdBlYmqyB5bJ2+mNqdvEaawXdCV8ghKnafIJRxLMQO9oc76NnE+dOcp9PwbcHILJOWZtp51+RWNCE6qmWxr+TpBbGehuhfRuCyhZiokCQHmSKIODWKHmR7wDM4lJJpQc7UKAL0vcVoFxhrPQKQ20uW3ygbZHrAnw74vvhlOrKAH/MtZN24DkTbGh4yI+Nox8scPJ37cSwNQgGvchY8+iGv139Kz+eO5SHVzUMFhqf99w69ddQUfT0UHIPiUiJCx0RHzpF1XNAOV6sZ5MA=
+    secure: d7f5gCZKcQ+y2VU9mmXDOg4b2Kg8uin1hnuWru07bKdUywCRTVNL47JIhpv3YCFFVi9GJYyUO9TvTY2R6nA3CltXs8kTs3XR3sQ5cEO+MBFjjrpzuJdhU56FceN+Grg8Gaa1kCDF0+zAII9GSIezos+HG21D2uMvpImM0zmLq3wu5dPrhwc8NuxCocTHxFsWv77aUOACgxyQTL/0m8x1YQf+OR0IrY/c+vs31SVVRWXPY6JRp8uYNHapLnkUQejEG0OMmSuP+MDxKiWyh1kVCmpEiTsU7FnWhZwLOFOrBQXuonK6GSzU1Sg7FXHgLWvaWTZFP1+gr2e8QY61sTBYb75LBSGpgOy+bPgrcmbCji3ZABT7X67aslQjbPB/nHZyYUNQWZPd0xvSJiNlDUudSx3+Uy3nLwUhDIHFtFqeYAENQJ3mbGnFU32TsyDXk5G56QF1no1HMPnid+qjMZcp/rR0kSk/vXBlO43EfJrHuVp+EmCTnJhvxOdOlsULpj/ezARKJTGAmEW+creYnzQMh3R5u7PwvC29lN5aBzwGt2ZRNXtTtinWamS8v2SpRb0dk/Q5dJihG6P40e88S3JyjdJhmMrkaDGVYOi7iyktshxI/mlLbIxFn/G8wMXN86KxnBFYOYsKANOC0tvce4TJNYHp5P4swbnxKsXyt/sH3e8=
   app: dadyarri-ralph-2
 notifications:
   email:
@@ -19,4 +19,3 @@ notifications:
     - dadyarri@gmail.com
     on_success: never
     on_failure: always
-

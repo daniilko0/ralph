@@ -3,21 +3,3 @@ python: 3.7.5
 cache: pip
 install: pip install -r requirements.txt
 script: pytest -q test/tests.py
-before_deploy:
-  - sed -i '/config.py/d' .gitignore
-  - sed -i '/credentials.json/d' .gitignore
-  - sleep 5
-  - git add .gitignore
-  - git add config.py credentials.json
-  - git commit -m 'Update .gitignore.'
-deploy:
-  provider: heroku
-  api_key:
-    secure: AgIJhHhs2IAskgzIE4Q1UMhljMv9fbfEWoS4zn2YTEOpwSZ1l94L7O6/TjxfD4evBCgR+tmhvvZTEewFDfevTEGd+e0c2tDYcI479so8fDdblAxUhkCywxknTsIyD71KIMD2cqLsKPwEnuLeFarfNvfa27+r7sxrtrXGWuq8Gwvx4O9+CdMgwvqiI6P/fSOLpe1R3/PqHwIrwtjcl0KLULN4KDpm+hLxX5WBVbZIBrT1r16czMfK8xksWXlvLFDnIjnZS+j+BEu5e97NTdSgSS8j2IMw/bKfHP1/aKgeuUjrmNiKkOYzifU/lhzmOzLQiGZuJWg3JtNWu6fexnNksF5vjc0MfnBjdSnyZ3/P2b98qjUeOCBjopy0ox77c3UosvBP4zrdTBOdDWjNY7O+XR+o4EeAXUlJ+351pL65EOrkMwg5fqvqEErwpsj9MUnL7oI0GKOH5nmwRGeIN0cE+k+7B31EDQ0GU8wmxDWgzVpgFOot/a8bhR4RbBYNBJH4mYgGcVrYAsDYNcWTsuUdQ1vItbovd9FANFACpBdVDQgt4Hllwp3OCaBkZfW6DLsbqX+rvWbfAcHkrVYakxWJFt6NYcL66649z8u+XPAfy3z7Pv+lgdtNroot96vK/fPSkWQAQPZ6RBE5WpqjWPKrkhKgaUy296mlFS8/IvCbhR0=
-  app: dadyarri-ralph-2
-notifications:
-  email:
-    recipients:
-    - dadyarri@gmail.com
-    on_success: never
-    on_failure: always

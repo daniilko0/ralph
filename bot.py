@@ -160,20 +160,6 @@ class Bot:
             self.send_message(pid=self.event.object.from_id, msg='{}, у тебя нет доступа к этой функции.'
                               .format(self.appeal))
 
-    def get_appeal(self, admin: bool = False) -> str:
-
-        """
-        Создает обращение
-        """
-        if admin:
-            gender = self.get_user_info(identifier=self.event.object.from_id)['sex']
-            if gender == 1:
-                return 'Хозяйка'
-            if gender == 2:
-                return 'Хозяин'
-        else:
-            return 'Человек'
-
     def get_schedule_for_tomorrow(self) -> None:
         """
         Получает строку с завтрашней датой (послезавтрашней, если сегодня суббота) и вызывает self.get_schedule()

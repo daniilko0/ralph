@@ -21,7 +21,6 @@ def update_table():
             bot.sh_sch.update_cell(index + 1, 2, f'=SUM(B{index - 5}:B{index})')
     except gsprex.APIError as e:
         print(f'[ERROR]: [{e.response.error.code}] – {e.response.error.message}')
-        update_table()
     except (AttributeError, KeyError, ValueError):
         print('Херню ты натворил, Даня!')
     else:
@@ -96,7 +95,7 @@ while True:
                 msg = 'Расписание на {}:\n'.format(msg_date) + msg
                 bot.send_mailing(ids=bot.sch_maillist, msg=msg)
                 bot.send_message(pid=bot.cid, msg=msg)
-                update_table()
+                # update_table()
 
             hour = datetime.now().hour
             pause = 0

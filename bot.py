@@ -1,6 +1,6 @@
 """
 :project: dia-bot
-:version: v5.12.0
+:version: v5.12.1
 :authors: dadyarri
 :contact: https://vk.me/dadyarri
 :license: Creative Commons NC-BY-SA v4.0

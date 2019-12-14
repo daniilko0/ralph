@@ -95,11 +95,11 @@ while True:
                 msg = 'Расписание на {}:\n'.format(msg_date) + msg
                 bot.send_mailing(ids=bot.sch_maillist, msg=msg)
                 bot.send_message(pid=bot.cid, msg=msg)
-                # update_table()
+                update_table()
 
             hour = datetime.now().hour
             pause = 0
-            if 0 < hour < 5:
+            if 0 <= hour <= 5:
                 pause = 5
             if 5 < hour < 10:
                 pause = 24
@@ -107,6 +107,6 @@ while True:
                 pause = 19
             if 14 < hour < 19:
                 pause = 15
-            if 18 < hour < 23:
+            if 18 < hour <= 23:
                 pause = 11
             sleep(pause * 3600)

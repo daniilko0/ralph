@@ -21,7 +21,6 @@ def update_table():
             bot.sh_sch.update_cell(index + 1, 2, f'=SUM(B{index - 5}:B{index})')
     except gsprex.APIError as e:
         print(f'[ERROR]: [{e.response.error.code}] – {e.response.error.message}')
-        update_table()
     except (AttributeError, KeyError, ValueError):
         print('Херню ты натворил, Даня!')
     else:
@@ -100,7 +99,7 @@ while True:
 
             hour = datetime.now().hour
             pause = 0
-            if 0 < hour < 5:
+            if 0 <= hour <= 5:
                 pause = 5
             if 5 < hour < 10:
                 pause = 24
@@ -108,6 +107,6 @@ while True:
                 pause = 19
             if 14 < hour < 19:
                 pause = 15
-            if 18 < hour < 23:
+            if 18 < hour <= 23:
                 pause = 11
             sleep(pause * 3600)

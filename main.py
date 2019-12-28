@@ -8,6 +8,9 @@ for event in bot.longpoll.listen():
 
         if 'начать' in text:
             bot.send_gui()
+
+        elif 'q' in text:
+            bot.get_conversations()
         elif 'общий призыв' in text and bot.mode == 'wait_for_command':
             bot.send_call()
         elif 'призыв с сообщением' in text and bot.mode == 'wait_for_command':

@@ -1,6 +1,6 @@
 """
 :project: dia-bot
-:version: v5.12.1
+:version: v5.13.0
 :authors: dadyarri
 :contact: https://vk.me/dadyarri
 :license: Creative Commons NC-BY-SA v4.0
@@ -117,12 +117,21 @@ class Bot:
         except vk_api.exceptions.ApiError as e:
             print(f'[ОШИБКА]: {e.__str__()}')
 
-    def send_mailing(self, ids: list, msg: str = '', attach: str = None):
+    def send_mailing(self, msg: str = '', attach: str = None):
         if msg == '':
             msg = 'Это просто тест.'
-        pids = ','.join(ids)
+        pids = ','.join(self.get_conversations_ids())
         self.send_message(msg=msg,
                           attachments=attach, user_ids=pids)
+
+    def get_conversations(self):
+        q = self.vk.messages.getConversations(count=200, group_id=self.gid)
+        _l = []
+        for i in range(len(q['items'])):
+            if q['items'][i]['conversation']['can_write']['allowed']:
+                _l.append(q['items'][i]['conversation']['peer']['id'])
+        print(_l)
+        return _l
 
     def send_call(self) -> None:
 
@@ -179,7 +188,7 @@ class Bot:
             date = pendulum.now('Europe/Moscow').format('YYYY-MM-DD')
         pid = self.event.object.from_id
         req = requests.get(f'http://rating.ivpek.ru/timetable/timetable/show?gid=324&date={date}')
-        soup = BeautifulSoup(req.text, 'lxml')
+        soup = BeautifulSoup(req.text)
         msg_w = soup.find_all('div', {'class': 'msg warning'})
         msg_e = soup.find_all('div', {'class': 'msg error'})
         if msg_w != [] and msg_w is not None:

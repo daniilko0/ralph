@@ -18,15 +18,6 @@
         },
         "color": "primary"
       }
-    ],
-    [
-      {
-        "action": {
-          "type": "text",
-          "label": "Подписаться на рассылку расписания"
-        },
-        "color": "primary"
-      }
     ]
   ]
 }

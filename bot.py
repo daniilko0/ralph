@@ -1,6 +1,6 @@
 """
 :project: dia-bot
-:version: v5.13.0
+:version: v5.13.1
 :authors: dadyarri
 :contact: https://vk.me/dadyarri
 :license: Creative Commons NC-BY-SA v4.0
@@ -124,7 +124,7 @@ class Bot:
         self.send_message(msg=msg,
                           attachments=attach, user_ids=pids)
 
-    def get_conversations(self):
+    def get_conversations_ids(self):
         q = self.vk.messages.getConversations(count=200, group_id=self.gid)
         _l = []
         for i in range(len(q['items'])):

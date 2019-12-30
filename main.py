@@ -34,18 +34,6 @@ for event in bot.longpoll.listen():
             bot.send_message(pid=bot.event.object.from_id, msg='Отправка клавиатуры с алфавитом...',
                              keyboard=open('keyboards/alphabet.json', 'r', encoding='utf-8').read())
             bot.mode = 'select_letter'
-        elif 'подписаться на рассылку расписания' in text:
-            bot.sch_maillist.append(bot.event.object.from_id)
-            with open('sch_maillist.txt', 'w') as f:
-                f.write(f',{bot.event.object.from_id}')
-            bot.send_message(pid=bot.event.object.from_id, msg='Вы были успешно добавлены в рассылку расписания.')
-        elif 'отписаться от рассылки расписания' in text:
-            bot.sch_maillist.remove(bot.event.object.from_id)
-            with open('sch_maillist.txt', 'r+') as f:
-                f.seek(0)
-                for l in bot.sch_maillist:
-                    f.write(str(l) + '\n')
-            bot.send_message(pid=bot.event.object.from_id, msg='Вы были успешно отписаны от рассылки расписания.')
         elif bot.mode == 'ask_for_msg':
             bot.send_message(pid=bot.event.object.from_id, msg='Будет отправлено такое сообщение. Подтвердить?')
             t = bot.get_conversation_members() + '\n' + bot.event.object.text

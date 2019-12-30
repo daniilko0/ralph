@@ -341,14 +341,9 @@ class Bot:
                                   msg=text,
                                   keyboard=open('keyboards/admin_w_select_test.json', 'r', encoding="UTF-8").read())
         else:
-            if self.event.object.from_id in self.sch_maillist:
-                self.send_message(pid=self.event.object.from_id,
-                                  msg=text,
-                                  keyboard=open('keyboards/user_sch_w_subscribe.json', 'r', encoding="UTF-8").read())
-            else:
-                self.send_message(pid=self.event.object.from_id,
-                                  msg=text,
-                                  keyboard=open('keyboards/user_sch_w_unsubscribe.json', 'r', encoding="UTF-8").read())
+            self.send_message(pid=self.event.object.from_id,
+                              msg=text,
+                              keyboard=open('keyboards/user.json', 'r', encoding="UTF-8").read())
         self.mode = 'wait_for_command'
 
     def ask_for_msg(self):

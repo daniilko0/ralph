@@ -76,9 +76,6 @@ class Bot:
         # Инициализация дополнительных переменных
         self.event = {}
         self.admins = os.environ['ADMINS_IDS'].split(',')
-        print(os.environ['ADMINS_IDS'])
-        print(type(os.environ['ADMINS_IDS']))
-        print(self.admins)
         self.appeal = ''
 
         self.mode = ''
@@ -347,7 +344,7 @@ class Bot:
         """
         Проверяет, является ли текущий пользователь администратором бота
         """
-        return self.event.object.from_id in self.admins
+        return str(self.event.object.from_id) in self.admins
 
     def send_gui(self, text: str = 'Привет!'):
         if self.current_is_admin():

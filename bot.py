@@ -1,6 +1,6 @@
 """
 :project: dia-bot
-:version: v5.13.1
+:version: v5.14.0
 :authors: dadyarri
 :contact: https://vk.me/dadyarri
 :license: Creative Commons NC-BY-SA v4.0
@@ -23,6 +23,7 @@ todo:
 
 """
 import binascii
+import os
 import random
 import re
 from typing import NoReturn
@@ -50,10 +51,10 @@ class Bot:
 
         print('Инициализация...')
 
-        self.token = a.get('token')
-        self.gid = a.get('gid')
-        self.cid = a.get('cid')
-        self.table = a.get('table')
+        self.token = os.environ['VK_TOKEN']
+        self.gid = os.environ['GID_ID']
+        self.cid = os.environ['CID_ID']
+        self.table = os.environ['TABLE_ID']
 
         # Авторизация в API ВКонтакте
         print('Авторизация ВКонтакте...', end=' ')
@@ -74,7 +75,7 @@ class Bot:
 
         # Инициализация дополнительных переменных
         self.event = {}
-        self.admins = a.get('admins')
+        self.admins = os.environ['ADMINS_IDS'].split(',')
         self.appeal = ''
 
         self.mode = ''
@@ -110,6 +111,7 @@ class Bot:
         self.NEW_POST = VkBotEventType.WALL_POST_NEW
 
         print('Беседа...', end=' ')
+        print(self.cid)
         if self.cid == 2000000001:
             print('Тестовая.')
         if self.cid == 2000000002:

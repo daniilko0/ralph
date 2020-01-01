@@ -1,6 +1,6 @@
 """
 :project: dia-bot
-:version: v5.14.1
+:version: v5.14.2
 :authors: dadyarri
 :contact: https://vk.me/dadyarri
 :license: Creative Commons NC-BY-SA v4.0
@@ -111,7 +111,6 @@ class Bot:
         self.NEW_POST = VkBotEventType.WALL_POST_NEW
 
         print('Беседа...', end=' ')
-        print(self.cid)
         if self.cid == '2000000001':
             print('Тестовая.')
         if self.cid == '2000000002':

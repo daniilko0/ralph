@@ -1,6 +1,6 @@
 """
 :project: dia-bot
-:version: v5.14.2
+:version: v5.14.3
 :authors: dadyarri
 :contact: https://vk.me/dadyarri
 :license: Creative Commons NC-BY-SA v4.0
@@ -12,6 +12,11 @@
 todo:
     v5.14.0: [released]
         - Перенести конфиденциальные данные в переменные окружения
+    v5.14.3: [released]
+        - Перенести содержимое файла credentials.json как переменную в .envrc и добавить ее в переменные проекта на He-
+        roku
+        - Распарсить переменную с гугловскми кредами как словарь
+        - Использовать авторизацию через метод from_json_keyfile_dict()
     v5.15.0:
         - Изменить формат кнопок в панели администратора
     v5.16.0:
@@ -23,6 +28,7 @@ todo:
 
 """
 import binascii
+import json
 import os
 import random
 import re
@@ -37,7 +43,6 @@ from bs4 import BeautifulSoup
 from oauth2client.service_account import ServiceAccountCredentials
 from vk_api.bot_longpoll import VkBotEventType
 
-from config import auth
 from students import students
 from vkbotlongpoll import RalphVkBotLongPoll
 
@@ -47,7 +52,7 @@ class Bot:
     Класс, описывающий объект бота, включая авторизацию в API, и все методы бота.
     """
 
-    def __init__(self, a: dict) -> None:
+    def __init__(self) -> None:
 
         print('Инициализация...')
 
@@ -95,8 +100,8 @@ class Bot:
             'https://spreadsheets.google.com/feeds',
             'https://www.googleapis.com/auth/drive']
         try:
-            credentials = ServiceAccountCredentials.from_json_keyfile_name(filename='credentials.json',
-                                                                           scopes=self.scope)
+            credentials = ServiceAccountCredentials.from_json_keyfile_dict(keyfile_dict=json.loads(
+                os.environ['GOOGLE_CREDS']), scopes=self.scope)
         except binascii.Error:
             print('Неудача.')
         else:
@@ -376,4 +381,4 @@ class Bot:
         self.mode = 'confirm_msg_w_call'
 
 
-bot = Bot(auth)
+bot = Bot()

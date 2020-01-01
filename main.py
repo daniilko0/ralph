@@ -6,6 +6,9 @@ for event in bot.longpoll.listen():
             bot.event.object.from_id == bot.event.object.peer_id:
         text = bot.event.object.text.lower()
 
+        if bot.current_is_admin():
+            print('admin')
+
         if 'начать' in text:
             bot.send_gui()
 

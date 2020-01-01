@@ -2,7 +2,7 @@
 ## Бот – платформа, призванный управлять студеческой беседой и упростить работу старост.
 ![Code style](https://img.shields.io/static/v1?label=Code%20style&message=PEP8&color=informational)
 ![Pyup](https://pyup.io/repos/github/dadyarri/ralph/shield.svg)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/dadyarri/ralph/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/dadyarri/ralph/?branch=master)
 [![Build Status](https://travis-ci.org/dadyarri/ralph.svg?branch=master)](https://travis-ci.org/dadyarri/ralph)
 ### О проекте

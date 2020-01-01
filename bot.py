@@ -1,6 +1,6 @@
 """
 :project: dia-bot
-:version: v5.14.0
+:version: v5.14.1
 :authors: dadyarri
 :contact: https://vk.me/dadyarri
 :license: Creative Commons NC-BY-SA v4.0
@@ -112,9 +112,9 @@ class Bot:
 
         print('Беседа...', end=' ')
         print(self.cid)
-        if self.cid == 2000000001:
+        if self.cid == '2000000001':
             print('Тестовая.')
-        if self.cid == 2000000002:
+        if self.cid == '2000000002':
             print('Основная.')
 
         print('Инициализация завершена.')
@@ -348,11 +348,11 @@ class Bot:
 
     def send_gui(self, text: str = 'Привет!'):
         if self.current_is_admin():
-            if self.cid == 2000000001:
+            if self.cid == '2000000001':
                 self.send_message(pid=self.event.object.from_id,
                                   msg=text,
                                   keyboard=open('keyboards/admin_w_select_main.json', 'r', encoding="UTF-8").read())
-            if self.cid == 2000000002:
+            if self.cid == '2000000002':
                 self.send_message(pid=self.event.object.from_id,
                                   msg=text,
                                   keyboard=open('keyboards/admin_w_select_test.json', 'r', encoding="UTF-8").read())

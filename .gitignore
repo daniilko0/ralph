@@ -8,4 +8,3 @@ test/__pycache__
 .vscode/
 .pytest_cache/
 .envrc
-credentials.json

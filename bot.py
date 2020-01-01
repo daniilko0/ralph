@@ -76,6 +76,7 @@ class Bot:
         # Инициализация дополнительных переменных
         self.event = {}
         self.admins = os.environ['ADMINS_IDS'].split(',')
+        print(self.admins)
         self.appeal = ''
 
         self.mode = ''

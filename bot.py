@@ -1,6 +1,6 @@
 """
 :project: ralph
-:version: v5.15.1
+:version: v5.15.2
 :authors: dadyarri
 :contact: https://vk.me/dadyarri
 :license: MIT
@@ -77,13 +77,6 @@ class Bot:
         self.mode = ''
         self.text = ''
         self.ids = []
-
-        self.sch_maillist = []
-        with open('sch_maillist.txt', 'r') as f:
-            self.sch_maillist = f.readlines()
-        for i in range(len(self.sch_maillist)):
-            if self.sch_maillist[i].endswith('\n'):
-                self.sch_maillist[i] = self.sch_maillist[i].replace('\n', '')
 
         # Авторизация в API Google Sheets и подключение к заданной таблице
         print('Авторизация в Google Cloud...', end=' ')

@@ -3,7 +3,7 @@
 :version: v5.14.3
 :authors: dadyarri
 :contact: https://vk.me/dadyarri
-:license: Creative Commons NC-BY-SA v4.0
+:license: MIT
 
 :copyright: (c) 2019 dadyarri
 

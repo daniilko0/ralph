@@ -5,12 +5,10 @@
       {
         "action": {
           "type": "text",
-          "label": "Общий призыв"
+          "label": "Призыв"
         },
         "color": "secondary"
-      }
-    ],
-    [
+      },
       {
         "action": {
           "type": "text",
@@ -23,16 +21,14 @@
       {
         "action": {
           "type": "text",
-          "label": "Призыв должников"
+          "label": "Должники"
         },
         "color": "secondary"
-      }
-    ],
-    [
+      },
       {
         "action": {
           "type": "text",
-          "label": "Призыв выбранных"
+          "label": "Выбранные"
         }
       }
     ],
@@ -40,7 +36,14 @@
       {
         "action": {
           "type": "text",
-          "label": "Расписание на сегодня"
+          "label": "Что сегодня?"
+        },
+        "color": "primary"
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "Что будет завтра?"
         },
         "color": "primary"
       }
@@ -49,18 +52,9 @@
       {
         "action": {
           "type": "text",
-          "label": "Расписание на завтра"
+          "label": "Сменить беседу"
         },
-        "color": "primary"
-      }
-    ],
-    [
-      {
-        "action": {
-          "type": "text",
-          "label": "Переключиться на тестовую беседу"
-        },
-        "color": "primary"
+        "color": "negative"
       }
     ]
   ]

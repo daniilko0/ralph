@@ -5,16 +5,14 @@
       {
         "action": {
           "type": "text",
-          "label": "Расписание на сегодня"
+          "label": "Что сегодня?"
         },
         "color": "primary"
-      }
-    ],
-    [
+      },
       {
         "action": {
           "type": "text",
-          "label": "Расписание на завтра"
+          "label": "Что будет завтра?"
         },
         "color": "primary"
       }

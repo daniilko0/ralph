@@ -12,7 +12,7 @@
       {
         "action": {
           "type": "text",
-          "label": "В главное меню"
+          "label": "Отмена"
         },
         "color": "negative"
       }

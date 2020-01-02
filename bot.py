@@ -1,6 +1,6 @@
 """
 :project: ralph
-:version: v5.15.2
+:version: v5.15.3
 :authors: dadyarri
 :contact: https://vk.me/dadyarri
 :license: MIT
@@ -70,6 +70,7 @@ class Bot:
                 print('Неудача. Ошибка доступа.')
             else:
                 print('Успех.')
+                print(f'Версия API ВКонтакте: {self.bot_session.api_version}.')
 
         # Инициализация дополнительных переменных
         self.event = {}
@@ -102,10 +103,7 @@ class Bot:
         self.NEW_POST = VkBotEventType.WALL_POST_NEW
 
         print('Беседа...', end=' ')
-        if self.cid == '2000000001':
-            print('Тестовая.')
-        if self.cid == '2000000002':
-            print('Основная.')
+        print('Тестовая' if self.cid == '2000000001' else 'Основная')
 
         print('Инициализация завершена.')
 

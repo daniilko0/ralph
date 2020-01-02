@@ -1,6 +1,6 @@
 """
 :project: dia-bot
-:version: v5.14.3
+:version: v5.15.1
 :authors: dadyarri
 :contact: https://vk.me/dadyarri
 :license: MIT
@@ -172,13 +172,12 @@ class Bot:
         Важно: Требует права администратора.
         """
         if self.current_is_admin():
-            if self.cid == 2000000001:
-                self.send_message(pid=self.event.object.from_id, msg='{}, тестовая беседа активна.'.format(self.appeal))
-            if self.cid == 2000000002:
-                self.send_message(pid=self.event.object.from_id, msg='{}, основная беседа активна.'.format(self.appeal))
+            if self.cid == '2000000001':
+                self.send_message(pid=self.event.object.from_id, msg='Тестовая беседа активна.')
+            if self.cid == '2000000002':
+                self.send_message(pid=self.event.object.from_id, msg='Основная беседа активна.')
         else:
-            self.send_message(pid=self.event.object.from_id, msg='{}, у тебя нет доступа к этой функции.'
-                              .format(self.appeal))
+            self.send_message(pid=self.event.object.from_id, msg='У тебя нет доступа к этой функции.')
 
     def get_schedule_for_tomorrow(self) -> None:
         """
@@ -315,25 +314,19 @@ class Bot:
                 result += '@id{}(!)'.format(ids[i])
         return result
 
-    def set_active_conv_as_test(self) -> None:
-        """
-        Делает тестовую беседу активной
-        """
+    def change_conversation(self) -> str:
         if self.current_is_admin():
-            self.cid = 2000000001
-            self.send_conversation()
+            if self.cid == '2000000001':
+                self.cid = '2000000002'
+                self.send_conversation()
+                return self.cid
+            elif self.cid == '2000000002':
+                self.cid = '2000000001'
+                self.send_conversation()
+                return self.cid
         else:
             self.send_message(pid=self.event.object.from_id,
-                              msg='{}, у тебя нет доступа к этой функции.'.format(self.appeal))
-
-    def set_active_conv_as_main(self) -> None:
-        """Делает основную беседу активной"""
-        if self.current_is_admin():
-            self.cid = 2000000002
-            self.send_conversation()
-        else:
-            self.send_message(pid=self.event.object.from_id,
-                              msg='{}, у тебя нет доступа к этой функции.'.format(self.appeal))
+                              msg='У тебя нет доступа к этой функции.')
 
     def current_is_admin(self) -> bool:
         """
@@ -343,14 +336,9 @@ class Bot:
 
     def send_gui(self, text: str = 'Привет!'):
         if self.current_is_admin():
-            if self.cid == '2000000001':
-                self.send_message(pid=self.event.object.from_id,
-                                  msg=text,
-                                  keyboard=open('keyboards/admin_w_select_main.json', 'r', encoding="UTF-8").read())
-            if self.cid == '2000000002':
-                self.send_message(pid=self.event.object.from_id,
-                                  msg=text,
-                                  keyboard=open('keyboards/admin_w_select_test.json', 'r', encoding="UTF-8").read())
+            self.send_message(pid=self.event.object.from_id,
+                              msg=text,
+                              keyboard=open('keyboards/admin.json', 'r', encoding="UTF-8").read())
         else:
             self.send_message(pid=self.event.object.from_id,
                               msg=text,

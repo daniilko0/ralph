@@ -1,4 +1,5 @@
 from bot import bot
+import time
 
 for event in bot.longpoll.listen():
     bot.event = event
@@ -7,28 +8,33 @@ for event in bot.longpoll.listen():
         text = bot.event.object.text.lower()
         if 'начать' in text:
             bot.send_gui()
-        elif 'q' in text:
-            bot.get_conversations()
-        elif 'общий призыв' in text and bot.mode == 'wait_for_command':
+        elif 'тест' == text:
+            key = ['admin.json', 'admin_w_select_test.json', 'alphabet.json', 'prompt.json',
+                   'select_col.json', 'skip.json', 'user.json']
+            for i in key:
+                bot.send_message(pid=bot.event.object.from_id,
+                                 msg=f'{i}',
+                                 keyboard=open(f'keyboards/{i}', 'r', encoding='UTF-8').read())
+                time.sleep(5)
+        elif 'conv' in text:
+            bot.send_conversation()
+        elif 'призыв' in text and bot.mode == 'wait_for_command':
             bot.send_call()
         elif 'призыв с сообщением' in text and bot.mode == 'wait_for_command':
             bot.ask_for_msg()
-        elif 'призыв должников' in text:
+        elif 'должники' in text:
             bot.send_message(pid=bot.event.object.from_id,
                              msg='Выберите статью сборов (номер колонки в таблице)',
                              keyboard=open('keyboards/select_col.json', 'r', encoding='UTF-8').read())
             bot.mode = 'select_col'
-        elif 'расписание на сегодня' in text:
+        elif 'что сегодня' in text:
             bot.get_schedule()
-        elif 'расписание на завтра' in text:
+        elif 'что будет завтра' in text:
             bot.get_schedule_for_tomorrow()
-        elif 'переключиться на основную беседу' in text:
-            bot.set_active_conv_as_main()
+        elif 'сменить беседу' in text:
+            bot.change_conversation()
             bot.send_gui(text='Команда успешно выполнена.')
-        elif 'переключиться на тестовую беседу' in text:
-            bot.set_active_conv_as_test()
-            bot.send_gui(text='Команда успешно выполнена.')
-        elif 'призыв выбранных' in text:
+        elif 'выбранные' in text:
             bot.send_message(pid=bot.event.object.from_id, msg='Отправка клавиатуры с алфавитом...',
                              keyboard=open('keyboards/alphabet.json', 'r', encoding='utf-8').read())
             bot.mode = 'select_letter'
@@ -41,7 +47,7 @@ for event in bot.longpoll.listen():
             bot.text = ''
             bot.send_message(pid=bot.event.object.from_id, msg='Сообщение отправлено.')
             bot.send_gui(text='Команда успешно выполнена.')
-        elif 'в главное меню' in text:
+        elif 'отмена' in text and bot.mode == 'confirm_msg_w_call':
             bot.mode = 'wait_for_command'
             bot.send_gui(text='Выполнение команды отменено.')
         elif '4' in text and bot.mode == 'select_col':

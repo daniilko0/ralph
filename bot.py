@@ -1,5 +1,5 @@
 """
-:project: dia-bot
+:project: ralph
 :version: v5.15.1
 :authors: dadyarri
 :contact: https://vk.me/dadyarri

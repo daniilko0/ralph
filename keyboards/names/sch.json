@@ -5,13 +5,15 @@
       {
         "action": {
           "type": "text",
-          "label": "Шаранин И."
+          "label": "Шаранин И.",
+          "payload": "{\"button\": \"student\", \"name\": \"Шаранин Илья\", \"id\": 217821282}"
         }
       },
       {
         "action": {
           "type": "text",
-          "label": "Широков И."
+          "label": "Широков И.",
+          "payload": "{\"button\": \"student\", \"name\": \"Широков Иван\", \"id\": 202556368}"
         }
       }
     ],
@@ -19,7 +21,8 @@
       {
         "action": {
           "type": "text",
-          "label": "Назад"
+          "label": "Назад",
+          "payload": "{\"button\": \"back\"}"
         }
       }
     ]

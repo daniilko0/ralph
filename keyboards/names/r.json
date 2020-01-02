@@ -5,13 +5,15 @@
       {
         "action": {
           "type": "text",
-          "label": "Руденко Д."
+          "label": "Руденко Д.",
+          "payload": "{\"button\": \"student\", \"name\": \"Руденко Даниил\", \"id\": 416217643}"
         }
       },
       {
         "action": {
           "type": "text",
-          "label": "Румянцев А."
+          "label": "Румянцев А.",
+          "payload": "{\"button\": \"student\", \"name\": \"Румянцев Александр\", \"id\": 257160362}"
         }
       }
     ],
@@ -19,7 +21,8 @@
       {
         "action": {
           "type": "text",
-          "label": "Назад"
+          "label": "Назад",
+          "payload": "{\"button\": \"back\"}"
         }
       }
     ]

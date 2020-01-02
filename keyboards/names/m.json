@@ -5,7 +5,8 @@
       {
         "action": {
           "type": "text",
-          "label": "Мыльников В."
+          "label": "Мыльников В.",
+          "payload": "{\"button\": \"student\", \"name\": \"Мыльников Василий\", \"id\": 480215855}"
         }
       }
     ],
@@ -13,7 +14,8 @@
       {
         "action": {
           "type": "text",
-          "label": "Назад"
+          "label": "Назад",
+          "payload": "{\"button\": \"back\"}"
         }
       }
     ]

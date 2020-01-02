@@ -5,13 +5,15 @@
       {
         "action": {
           "type": "text",
-          "label": "Кириллов Н."
+          "label": "Кириллов Н.",
+          "payload": "{\"button\": \"student\", \"name\": \"Кириллов Никита\", \"id\": 300517914}"
         }
       },
       {
         "action": {
           "type": "text",
-          "label": "Комаров А."
+          "label": "Комаров А.",
+          "payload": "{\"button\": \"student\", \"name\": \"Комаров Андрей\", \"id\": 190753547}"
         }
       }
     ],
@@ -19,13 +21,15 @@
       {
         "action": {
           "type": "text",
-          "label": "Королёв Е."
+          "label": "Королёв Е.",
+          "payload": "{\"button\": \"student\", \"name\": \"Королёв Егор\", \"id\": 104015174}"
         }
       },
       {
         "action": {
           "type": "text",
-          "label": "Королёв Р."
+          "label": "Королёв Р.",
+          "payload": "{\"button\": \"student\", \"name\": \"Королёв Роман\", \"id\": 185548061}"
         }
       }
     ],
@@ -33,13 +37,15 @@
       {
         "action": {
           "type": "text",
-          "label": "Королевская А."
+          "label": "Королевская А.",
+          "payload": "{\"button\": \"student\", \"name\": \"Королевская Алина\", \"id\": 55674321}"
         }
       },
       {
         "action": {
           "type": "text",
-          "label": "Кошкина Е."
+          "label": "Кошкина Е.",
+          "payload": "{\"button\": \"student\", \"name\": \"Кошкина Елена\", \"id\": 371997708}"
         }
       }
     ],
@@ -47,13 +53,15 @@
       {
         "action": {
           "type": "text",
-          "label": "Куликова Е."
+          "label": "Куликова Е.",
+          "payload": "{\"button\": \"student\", \"name\": \"Куликова Екатерина\", \"id\": 300957594}"
         }
       },
       {
         "action": {
           "type": "text",
-          "label": "Курзин Н."
+          "label": "Курзин Н.",
+          "payload": "{\"button\": \"student\", \"name\": \"Курзин Никита\", \"id\": 241050554}"
         }
       }
     ],
@@ -61,7 +69,8 @@
       {
         "action": {
           "type": "text",
-          "label": "Назад"
+          "label": "Назад",
+          "payload": "{\"button\": \"back\"}"
         }
       }
     ]

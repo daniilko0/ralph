@@ -5,7 +5,8 @@
       {
         "action": {
           "type": "text",
-          "label": "Пропустить"
+          "label": "Пропустить",
+          "payload": "{\"button\": \"skip\"}"
         }
       }
     ]

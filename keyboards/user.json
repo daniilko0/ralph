@@ -5,14 +5,16 @@
       {
         "action": {
           "type": "text",
-          "label": "Что сегодня?"
+          "label": "Что сегодня?",
+          "payload": "{\"button\": \"today\"}"
         },
         "color": "primary"
       },
       {
         "action": {
           "type": "text",
-          "label": "Что будет завтра?"
+          "label": "Что будет завтра?",
+          "payload": "{\"button\": \"tomorrow\"}"
         },
         "color": "primary"
       }

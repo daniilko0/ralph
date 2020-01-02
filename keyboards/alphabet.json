@@ -5,31 +5,36 @@
       {
         "action": {
           "type": "text",
-          "label": "А"
+          "label": "А",
+          "payload": "{\"button\": \"a\"}"
         }
       },
       {
         "action": {
           "type": "text",
-          "label": "Б"
+          "label": "Б",
+          "payload": "{\"button\": \"b\"}"
         }
       },
       {
         "action": {
           "type": "text",
-          "label": "Г"
+          "label": "Г",
+          "payload": "{\"button\": \"g\"}"
         }
       },
       {
         "action": {
           "type": "text",
-          "label": "Д"
+          "label": "Д",
+          "payload": "{\"button\": \"d\"}"
         }
       },
       {
         "action": {
           "type": "text",
-          "label": "Е"
+          "label": "Е",
+          "payload": "{\"button\": \"e\"}"
         }
       }
     ],
@@ -37,31 +42,36 @@
       {
         "action": {
           "type": "text",
-          "label": "Ж"
+          "label": "Ж",
+          "payload": "{\"button\": \"j\"}"
         }
       },
       {
         "action": {
           "type": "text",
-          "label": "З"
+          "label": "З",
+          "payload": "{\"button\": \"z\"}"
         }
       },
       {
         "action": {
           "type": "text",
-          "label": "К"
+          "label": "К",
+          "payload": "{\"button\": \"k\"}"
         }
       },
       {
         "action": {
           "type": "text",
-          "label": "Л"
+          "label": "Л",
+          "payload": "{\"button\": \"l\"}"
         }
       },
       {
         "action": {
           "type": "text",
-          "label": "М"
+          "label": "М",
+          "payload": "{\"button\": \"m\"}"
         }
       }
     ],
@@ -69,25 +79,29 @@
       {
         "action": {
           "type": "text",
-          "label": "П"
+          "label": "П",
+          "payload": "{\"button\": \"p\"}"
         }
       },
       {
         "action": {
           "type": "text",
-          "label": "Р"
+          "label": "Р",
+          "payload": "{\"button\": \"r\"}"
         }
       },
       {
         "action": {
           "type": "text",
-          "label": "С"
+          "label": "С",
+          "payload": "{\"button\": \"s\"}"
         }
       },
       {
         "action": {
           "type": "text",
-          "label": "Ш"
+          "label": "Ш",
+          "payload": "{\"button\": \"sch\"}"
         }
       }
     ],
@@ -95,14 +109,16 @@
       {
         "action": {
           "type": "text",
-          "label": "Отмена"
+          "label": "Отмена",
+          "payload": "{\"button\": \"cancel\"}"
         },
         "color": "negative"
       },
       {
         "action": {
           "type": "text",
-          "label": "Сохранить"
+          "label": "Сохранить",
+          "payload": "{\"button\": \"save\"}"
         },
         "color": "positive"
       }

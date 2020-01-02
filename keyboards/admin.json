@@ -5,14 +5,16 @@
       {
         "action": {
           "type": "text",
-          "label": "Призыв"
+          "label": "Призыв",
+          "payload": "{\"button\": \"call\"}"
         },
         "color": "secondary"
       },
       {
         "action": {
           "type": "text",
-          "label": "Призыв с сообщением"
+          "label": "Призыв с сообщением",
+          "payload": "{\"button\": \"call_w_msg\"}"
         },
         "color": "secondary"
       }
@@ -21,14 +23,16 @@
       {
         "action": {
           "type": "text",
-          "label": "Должники"
+          "label": "Должники",
+          "payload": "{\"button\": \"debtors\"}"
         },
         "color": "secondary"
       },
       {
         "action": {
           "type": "text",
-          "label": "Выбранные"
+          "label": "Выбранные",
+          "payload": "{\"button\": \"fav\"}"
         }
       }
     ],
@@ -36,14 +40,16 @@
       {
         "action": {
           "type": "text",
-          "label": "Что сегодня?"
+          "label": "Что сегодня?",
+          "payload": "{\"button\": \"today\"}"
         },
         "color": "primary"
       },
       {
         "action": {
           "type": "text",
-          "label": "Что будет завтра?"
+          "label": "Что будет завтра?",
+          "payload": "{\"button\": \"tomorrow\"}"
         },
         "color": "primary"
       }
@@ -52,7 +58,8 @@
       {
         "action": {
           "type": "text",
-          "label": "Сменить беседу"
+          "label": "Сменить беседу",
+          "payload": "{\"button\": \"chconv\"}"
         },
         "color": "negative"
       }

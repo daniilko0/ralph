@@ -5,13 +5,15 @@
       {
         "action": {
           "type": "text",
-          "label": "Белов А."
+          "label": "Белов А.",
+          "payload": "{\"button\": \"student\", \"name\": \"Белов Александр\", \"id\": 211502033}"
         }
       },
       {
         "action": {
           "type": "text",
-          "label": "Белоус Д."
+          "label": "Белоус Д.",
+          "payload": "{\"button\": \"student\", \"name\": \"Белоус Денис\", \"id\": 214080331}"
         }
       }
     ],
@@ -19,7 +21,8 @@
       {
         "action": {
           "type": "text",
-          "label": "Бобылев Д."
+          "label": "Бобылев Д.",
+          "payload": "{\"button\": \"student\", \"name\": \"Бобылев Данила\", \"id\": 534299949}"
         }
       }
     ],
@@ -27,7 +30,8 @@
       {
         "action": {
           "type": "text",
-          "label": "Назад"
+          "label": "Назад",
+          "payload": "{\"button\": \"back\"}"
         }
       }
     ]

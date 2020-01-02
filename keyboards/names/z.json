@@ -5,7 +5,8 @@
       {
         "action": {
           "type": "text",
-          "label": "Зинин Д."
+          "label": "Зинин Д.",
+          "payload": "{\"button\": \"student\", \"name\": \"Зинин Даниил\", \"id\": 294510554}"
         }
       }
     ],
@@ -13,7 +14,8 @@
       {
         "action": {
           "type": "text",
-          "label": "Назад"
+          "label": "Назад",
+          "payload": "{\"button\": \"back\"}"
         }
       }
     ]

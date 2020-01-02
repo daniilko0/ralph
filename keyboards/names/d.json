@@ -5,7 +5,8 @@
       {
         "action": {
           "type": "text",
-          "label": "Дубакин Д."
+          "label": "Дубакин Д.",
+          "payload": "{\"button\": \"student\", \"name\": \"Дубакин Даниил\", \"id\": 260216591}"
         }
       }
     ],
@@ -13,7 +14,8 @@
       {
         "action": {
           "type": "text",
-          "label": "Назад"
+          "label": "Назад",
+          "payload": "{\"button\": \"back\"}"
         }
       }
     ]

@@ -5,7 +5,8 @@
       {
         "action": {
           "type": "text",
-          "label": "Ерилина А."
+          "label": "Ерилина А.",
+          "payload": "{\"button\": \"student\", \"name\": \"Ерилина Анастасия\", \"id\": 217248015}"
         }
       }
     ],
@@ -13,7 +14,8 @@
       {
         "action": {
           "type": "text",
-          "label": "Назад"
+          "label": "Назад",
+          "payload": "{\"button\": \"back\"}"
         }
       }
     ]

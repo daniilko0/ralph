@@ -40,6 +40,16 @@
       {
         "action": {
           "type": "text",
+          "label": "Создать рассылку",
+          "payload": "{\"button\": \"newsletter\"}"
+        },
+        "color": "secondary"
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
           "label": "Что сегодня?",
           "payload": "{\"button\": \"today\"}"
         },

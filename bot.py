@@ -122,9 +122,8 @@ class Bot:
         except vk_api.exceptions.ApiError as e:
             print(f"Ошибка {e.__str__()}")
         else:
-            print(f"Успех. Версия {v}.")
+            print(f"Успех. {v}.")
         print("Проверка систем...")
-        print("Валидация JSON...", end=" ")
         no_errors = True
         for file in glob.glob("keyboards/**/*.json", recursive=True):
             try:
@@ -132,8 +131,9 @@ class Bot:
             except ValueError:
                 print(f"{file} содержит ошибку.")
                 no_errors = False
+        print("Валидация JSON...", end=" ")
         print("Успех" if no_errors else "Неудача")
-        print("Проверка систем завершена")
+        print("Проверка систем завершена.")
         print("Инициализация завершена.")
         self.send_message(msg="Инициализация... Успех.", pid=self.admins[0])
 

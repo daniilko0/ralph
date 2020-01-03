@@ -5,7 +5,7 @@
 :contact: https://vk.me/dadyarri
 :license: MIT
 
-:copyright: (c) 2019 dadyarri
+:copyright: (c) 2019 - 2020 dadyarri
 
 
 :release plan:

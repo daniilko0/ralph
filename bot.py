@@ -1,6 +1,6 @@
 """
 :project: ralph
-:version: v5.15.3
+:version: see VERSION.txt
 :authors: dadyarri
 :contact: https://vk.me/dadyarri
 :license: MIT

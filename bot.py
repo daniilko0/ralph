@@ -10,15 +10,18 @@
 
 :release plan:
     todo: v5.17.0:
-        - Вынести инструмент для создания рассылок в панель администратора
+        - Добавить систему самопроверки
     todo: v5.18.0:
-        - Использовать payload для обработки действий с клавиатуры
+        - Вынести инструмент для создания рассылок в панель администратора
     todo: v5.19.0:
+        - Использовать payload для обработки действий с клавиатуры
+    todo: v5.20.0:
         - Добавить болталку на искуственном интеллекте
     todo: v6.0.0:
         - Разделить бизнес-логику (собственный функционал) и обращения к API ВКонтакте и Google
 
 """
+import glob
 import json
 import os
 import random
@@ -116,6 +119,17 @@ class Bot:
             print(f'Ошибка {e.__str__()}')
         else:
             print(f'Успех. Версия {v}.')
+        print('Проверка систем...')
+        print('Валидация JSON...', end=' ')
+        no_errors = True
+        for file in glob.glob('keyboards/**/*.json', recursive=True):
+            try:
+                json.loads(open(file, 'r', encoding='UTF-8').read())
+            except ValueError:
+                print(f'{file} содержит ошибку.')
+                no_errors = False
+        print('Успех' if no_errors else 'Неудача')
+        print('Проверка систем завершена')
         print('Инициализация завершена.')
         self.send_message(msg='Инициализация... Успех.', pid=self.admins[0])
 

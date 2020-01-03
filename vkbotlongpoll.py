@@ -8,4 +8,4 @@ class RalphVkBotLongPoll(VkBotLongPoll):
                 for event in self.check():
                     yield event
             except Exception as e:
-                print('error', e)
+                print("error", e)

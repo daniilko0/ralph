@@ -54,6 +54,7 @@ class Bot:
         print('Инициализация...')
 
         self.token = os.environ['VK_TOKEN']
+        self.user_token = os.environ['VK_USER_TOKEN']
         self.gid = os.environ['GID_ID']
         self.cid = os.environ['CID_ID']
         self.table = os.environ['TABLE_ID']
@@ -62,11 +63,13 @@ class Bot:
         print('Авторизация ВКонтакте...', end=' ')
         try:
             self.bot_session = vk_api.VkApi(token=self.token, api_version='5.103')
+            self.user_session = vk_api.VkApi(token=self.user_token, api_version='5.103')
         except vk_api.exceptions.AuthError:
             print('Неудача. Ошибка авторизации.')
         else:
             try:
-                self.vk = self.bot_session.get_api()
+                self.bot_vk = self.bot_session.get_api()
+                self.user_vk = self.user_session.get_api()
                 self.longpoll = RalphVkBotLongPoll(vk=self.bot_session, group_id=self.gid)
             except requests.exceptions.ConnectionError:
                 print('Неудача. Превышен лимит попыток подключения.')
@@ -121,8 +124,8 @@ class Bot:
         """
 
         try:
-            self.vk.messages.send(peer_id=pid, random_id=random.getrandbits(64), message=msg, keyboard=keyboard,
-                                  attachments=attachments, user_ids=user_ids)
+            self.bot_vk.messages.send(peer_id=pid, random_id=random.getrandbits(64), message=msg, keyboard=keyboard,
+                                      attachments=attachments, user_ids=user_ids)
         except vk_api.exceptions.ApiError as e:
             print(f'[ОШИБКА]: {e.__str__()}')
 
@@ -134,7 +137,7 @@ class Bot:
                           attachments=attach, user_ids=pids)
 
     def get_conversations_ids(self):
-        q = self.vk.messages.getConversations(count=200, group_id=self.gid)
+        q = self.bot_vk.messages.getConversations(count=200, group_id=self.gid)
         _l = []
         for i in range(len(q['items'])):
             if q['items'][i]['conversation']['can_write']['allowed']:
@@ -285,7 +288,7 @@ class Bot:
         """
         Возвращает строку с упоминаниями участников
         """
-        conv_info = self.vk.messages.getConversationMembers(peer_id=self.cid)['items']
+        conv_info = self.bot_vk.messages.getConversationMembers(peer_id=self.cid)['items']
         members_ids = []
 
         for i in range(len(conv_info)):
@@ -297,7 +300,7 @@ class Bot:
         """
         Получить информацию о пользователе с указанным id
         """
-        return self.vk.users.get(user_ids=identifier, fields='sex')[0]
+        return self.bot_vk.users.get(user_ids=identifier, fields='sex')[0]
 
     def generate_mentions(self, ids: list, names: bool) -> str:
         """

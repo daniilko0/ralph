@@ -3,10 +3,10 @@ from bot import bot
 for event in bot.longpoll.listen():
     bot.event = event
     if (
-            bot.event.type == bot.NEW_MESSAGE
-            and bot.event.object.text
-            and bot.event.object.out == 0
-            and bot.event.object.from_id == bot.event.object.peer_id
+        bot.event.type == bot.NEW_MESSAGE
+        and bot.event.object.text
+        and bot.event.object.out == 0
+        and bot.event.object.from_id == bot.event.object.peer_id
     ):
         text = bot.event.object.text.lower()
         if "начать" in text:

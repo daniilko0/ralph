@@ -112,6 +112,15 @@ class Bot:
         print('Беседа...', end=' ')
         print('Тестовая' if self.cid == '2000000001' else 'Основная')
 
+        print('Обновление версии в статусе группы...', end=' ')
+        try:
+            with open('VERSION.txt', 'r') as f:
+                v = f'Версия: {f.read()}'
+            self.user_vk.status.set(text=v, group_id=self.gid)
+        except vk_api.exceptions.ApiError as e:
+            print(f'Ошибка {e.__str__()}')
+        else:
+            print(f'Успех. Версия {v}.')
         print('Инициализация завершена.')
         self.send_message(msg='Инициализация... Успех.', pid=self.admins[0])
 

@@ -6,7 +6,7 @@
         "action": {
           "type": "text",
           "label": "4",
-          "payload": "{\"button\": \"4\"}"
+          "payload": "{\"button\": \"col_id\", \"id\": 4}"
         },
         "color": "secondary"
       }

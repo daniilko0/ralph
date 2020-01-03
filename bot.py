@@ -24,11 +24,11 @@ todo:
         - Разделить бизнес-логику (собственный функционал) и обращения к API ВКонтакте и Google
 
 """
-import binascii
 import json
 import os
 import random
 import re
+from binascii import Error as binErr
 from typing import NoReturn
 from typing import Union
 
@@ -96,7 +96,7 @@ class Bot:
         try:
             credentials = ServiceAccountCredentials.from_json_keyfile_dict(keyfile_dict=json.loads(
                 os.environ['GOOGLE_CREDS']), scopes=self.scope)
-        except binascii.Error:
+        except binErr:
             print('Неудача.')
         else:
             self.gc = gspread.authorize(credentials=credentials)

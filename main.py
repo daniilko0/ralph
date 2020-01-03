@@ -1,5 +1,4 @@
 from bot import bot
-import time
 
 for event in bot.longpoll.listen():
     bot.event = event
@@ -8,16 +7,6 @@ for event in bot.longpoll.listen():
         text = bot.event.object.text.lower()
         if 'начать' in text:
             bot.send_gui()
-        elif 'тест' == text:
-            key = ['admin.json', 'admin_w_select_test.json', 'alphabet.json', 'prompt.json',
-                   'select_col.json', 'skip.json', 'user.json']
-            for i in key:
-                bot.send_message(pid=bot.event.object.from_id,
-                                 msg=f'{i}',
-                                 keyboard=open(f'keyboards/{i}', 'r', encoding='UTF-8').read())
-                time.sleep(5)
-        elif 'conv' in text:
-            bot.send_conversation()
         elif 'призыв' in text and bot.mode == 'wait_for_command':
             bot.send_call()
         elif 'призыв с сообщением' in text and bot.mode == 'wait_for_command':

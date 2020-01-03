@@ -108,6 +108,7 @@ class Bot:
         print('Тестовая' if self.cid == '2000000001' else 'Основная')
 
         print('Инициализация завершена.')
+        self.send_message(msg='Инициализация... Успех.', pid=self.admins[0])
 
     def send_message(self, msg: str, pid: int = None, keyboard=None, attachments: str = None, user_ids: str = None) -> \
             NoReturn:

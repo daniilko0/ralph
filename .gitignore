@@ -10,3 +10,4 @@ test/__pycache__
 .envrc
 .env
 .pre-commit-config.yaml
+pyproject.toml

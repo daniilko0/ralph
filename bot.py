@@ -410,7 +410,10 @@ class Bot:
             msg=text,
             keyboard=open("keyboards/prompt.json", "r", encoding="UTF-8").read(),
         )
-        self.mode = "confirm_msg_w_call"
+        if self.mode == "ask_for_msg":
+            self.mode = "confirm_msg_w_call"
+        if self.mode == "ask_for_message_mailing":
+            self.mode = "confirm_mailing"
 
 
 bot = Bot()

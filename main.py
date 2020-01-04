@@ -45,6 +45,13 @@ for event in bot.longpoll.listen():
                 keyboard=open("keyboards/alphabet.json", "r", encoding="utf-8").read(),
             )
             bot.mode = "select_letter"
+        elif "создать рассылку" in text:
+            bot.mode = "ask_for_mailing_message"
+            bot.send_message(
+                pid=bot.event.object.from_id,
+                msg="Отправьте сообщение с текстом рассылки",
+                keyboard=open("keyboards/empty.json", "r", encoding="UTF-8").read(),
+            )
         elif bot.mode == "ask_for_msg":
             bot.send_message(
                 pid=bot.event.object.from_id,
@@ -52,13 +59,27 @@ for event in bot.longpoll.listen():
             )
             t = bot.get_conversation_members() + "\n" + bot.event.object.text
             bot.show_msg(t)
-        elif "подтвердить" in text and bot.mode == "confirm_msg_w_call":
+        elif bot.mode == "ask_for_mailing_message":
+            bot.send_message(
+                pid=bot.event.object.from_id,
+                msg="Будет отправлено такое сообщение. Подтвердить?",
+            )
+            t = bot.event.object.text
+            bot.show_msg(t)
+        elif "подтвердить" in text and bot.mode == "confirm_mailing":
             bot.send_message(pid=bot.cid, msg=bot.text)
             bot.text = ""
             bot.send_message(pid=bot.event.object.from_id, msg="Сообщение отправлено.")
             bot.send_gui(text="Команда успешно выполнена.")
         elif "отмена" in text and bot.mode == "confirm_msg_w_call":
             bot.mode = "wait_for_command"
+            bot.send_gui(text="Выполнение команды отменено.")
+        elif "подтвердить" in text and bot.mode == "confirm_mailing":
+            bot.send_mailing(msg=bot.text)
+            bot.text = ""
+            bot.send_message(pid=bot.event.object.from_id, msg="Сообщение отправлено.")
+            bot.send_gui(text="Команда успешно выполнена.")
+        elif "отмена" in text and bot.mode == "confirm_msg_w_call":
             bot.send_gui(text="Выполнение команды отменено.")
         elif "4" in text and bot.mode == "select_col":
             bot.mode = "execute"

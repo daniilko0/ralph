@@ -8,4 +8,6 @@ test/__pycache__
 .vscode/
 .pytest_cache/
 .envrc
+.pre-commit-config.yaml
+pyproject.toml
 .env

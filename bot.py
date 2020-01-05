@@ -158,6 +158,7 @@ class Bot:
                 attachments=attachments,
                 user_ids=user_ids,
             )
+
         except vk_api.exceptions.ApiError as e:
             print(f"[ОШИБКА]: {e.__str__()}")
 
@@ -189,16 +190,14 @@ class Bot:
             if members is not None:
                 self.send_message(pid=self.cid, msg=members)
                 self.send_message(
-                    pid=self.event.object.from_id,
-                    msg=f"{self.appeal}, студенты призваны.",
+                    pid=self.event.object.from_id, msg=f"Cтуденты призваны."
                 )
                 print("Студенты призваны.")
             self.mode = "wait_for_command"
 
         else:
             self.send_message(
-                pid=self.event.object.from_id,
-                msg="{}, у тебя нет доступа к этой функции.".format(self.appeal),
+                pid=self.event.object.from_id, msg="У тебя нет доступа к этой функции."
             )
 
     def send_conversation(self) -> None:
@@ -224,7 +223,8 @@ class Bot:
 
     def get_schedule_for_tomorrow(self) -> None:
         """
-        Получает строку с завтрашней датой (послезавтрашней, если сегодня суббота) и вызывает self.get_schedule()
+        Получает строку с завтрашней датой (послезавтрашней, если сегодня суббота) и
+        вызывает self.get_schedule()
         """
         dow = pendulum.now("Europe/Moscow").format("d")
         a = 1
@@ -283,8 +283,9 @@ class Bot:
                         item = re.sub(k, v, item)
                     if re.findall("Иностранный язык", item):
                         lesson = re.compile(r"(?<=\()\D+(?=\))").findall(item)
-                        item = "Английский язык ({}) Кузнецова И.Н/Коротина М.А. 12/13а".format(
-                            lesson[1]
+                        item = (
+                            f"Английский язык ({lesson[1]}) Кузнецова И.Н/Коротина "
+                            f"М.А. 12/13а"
                         )
                         schedule[i][j + 1] = ""
                     msg += "{} ".format(item)
@@ -321,9 +322,7 @@ class Bot:
     def get_debtors(self, col):
         self.send_message(
             pid=self.event.object.from_id,
-            msg="{}, эта команда может работать медленно. Прошу немного подождать.".format(
-                self.appeal
-            ),
+            msg="Эта команда может работать медленно. Прошу немного " "подождать.",
         )
         men, cash, goal = self.handle_table(col)
         msg = "{} вам нужно принести по {} на {}.".format(men, cash, goal.lower())
@@ -404,15 +403,6 @@ class Bot:
             )
         self.mode = "wait_for_command"
 
-    def ask_for_msg(self):
-        self.mode = "ask_for_msg"
-        if self.current_is_admin():
-            self.send_message(
-                pid=self.event.object.from_id,
-                msg="Отправьте сообщение с текстом объявления (вложения пока не поддерживаются).",
-                keyboard=open("keyboards/empty.json", "r", encoding="UTF-8").read(),
-            )
-
     def show_msg(self, text: str):
         self.text = text
         self.send_message(
@@ -420,7 +410,10 @@ class Bot:
             msg=text,
             keyboard=open("keyboards/prompt.json", "r", encoding="UTF-8").read(),
         )
-        self.mode = "confirm_msg_w_call"
+        if self.mode == "ask_for_msg":
+            self.mode = "confirm_msg_w_call"
+        if self.mode == "ask_for_mailing_message":
+            self.mode = "confirm_mailing"
 
 
 bot = Bot()

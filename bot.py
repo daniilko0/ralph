@@ -133,7 +133,6 @@ class Bot:
         print("Успех" if no_errors else "Неудача")
         print("Проверка систем завершена")
         print("Инициализация завершена.")
-        self.send_message(msg="Инициализация... Успех.", pid=self.admins[0])
 
     def send_message(
         self,
@@ -412,7 +411,7 @@ class Bot:
         )
         if self.mode == "ask_for_msg":
             self.mode = "confirm_msg_w_call"
-        if self.mode == "ask_for_message_mailing":
+        if self.mode == "ask_for_mailing_message":
             self.mode = "confirm_mailing"
 
 

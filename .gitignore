@@ -9,5 +9,4 @@ test/__pycache__
 .pytest_cache/
 .envrc
 .pre-commit-config.yaml
-pyproject.toml
 .env

@@ -104,6 +104,8 @@ class Bot:
             self.sh_sch = self.table_auth.get_worksheet(1)
             print("Успех.")
 
+        self.df_key = os.environ["DIALOGFLOW"]
+
         # Переименование обрабатываемых типов событий
         self.NEW_MESSAGE = VkBotEventType.MESSAGE_NEW
         self.NEW_POST = VkBotEventType.WALL_POST_NEW

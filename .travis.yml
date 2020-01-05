@@ -4,6 +4,7 @@ cache: pip
 install: pip install -r requirements.txt
 script: pytest -q test/tests.py
 deploy:
+  if: branch = master
   provider: heroku
   api_key:
     secure: HxB+BvlP+36Pgub7Kh72rjISgMFDYSkykJNEbIlsMIRMcvwP0q99SAjo60uUzg8D7a3qFQSdvfFI+ak9A1Xv1YDJ94qmtaw6X/R14FKd1rwdtbxGeDXLy/Moa0YOK38mcqf5UIe+0dNqnrbYseMv9OYqijk5ypo/8BgSM4iv5mkp94qOqUsM0Y2N2+mY+w8bpFmcme8BbD4eb1KyhNW9mGF4XhbERal+T8N6bI7vNz+RFaxHJDuVdXq2qV097/L5Ky91tuszYfenUydbEr6q8NfbIugBc8ef+DUKZ/LMWL3LGlHPkDg7oEkY2jDm4Q+VqODv0sKsBWad50GQDEW9exMAa3irpcIPUpF9um0e8ymlfId04cc/ouDbjV3UqC+Z/mOekfF884ZycFI6aqwyvtc7Cidte5eNkE0WQ4g/8k/Jda7T4iYxd/OE70zyLU5q5Zc8GRnkW5/Nw4BkKo/ROqZflTJ73T1oyhNbCO3Onceh0+HO+D6wOwtd/RBo+g9yVlOhhjeQ1+pJNWNqkANKQx6639b6oAXVrnzdGTX8spm9jmMBSXykZf/jIgKDzR3w2WOvi1nxf8bNGDuQZrwk2nNsrchKaUJkGt/NLjBoccX8uc8PBiDToJ2VkmInjHysixwqVicFt+4iQDY5cHUoGs+FAoPuEn2hVNGtHteDwaw=

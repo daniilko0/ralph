@@ -15,7 +15,7 @@ build:
                     - py-scrutinizer-run
                     -
                         command: pylint-run
-                        use_website_config: true
+                        use_website_config: false
 filter:
     excluded_paths:
         - '*/test/*'

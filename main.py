@@ -408,15 +408,18 @@ for event in bot.longpoll.listen():
                 msg="{} добавлен в список упоминаний".format(bot.event.object.text),
             )
         else:
-            df_request = apiai.ApiAI(bot.df_key).text_request()
-            df_request.lang = "ru"
-            df_request.session_id = f"RALPH{bot.event.object.from_id}"
-            df_request.query = bot.event.object.text
-            df_response = json.loads(df_request.getresponse().read().decode("utf-8"))
-            df_response_text = df_response["result"]["fulfillment"]["speech"]
-            if df_response_text:
-                bot.send_message(pid=bot.event.object.from_id, msg=df_response_text)
-            else:
-                bot.send_message(
-                    pid=bot.event.object.from_id, msg="Я вас не совсем понял."
+            if bot.event.object.from_id != bot.gid:
+                df_request = apiai.ApiAI(bot.df_key).text_request()
+                df_request.lang = "ru"
+                df_request.session_id = f"RALPH{bot.event.object.from_id}"
+                df_request.query = bot.event.object.text
+                df_response = json.loads(
+                    df_request.getresponse().read().decode("utf-8")
                 )
+                df_response_text = df_response["result"]["fulfillment"]["speech"]
+                if df_response_text:
+                    bot.send_message(pid=bot.event.object.from_id, msg=df_response_text)
+                else:
+                    bot.send_message(
+                        pid=bot.event.object.from_id, msg="Я вас не совсем понял."
+                    )

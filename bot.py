@@ -372,12 +372,10 @@ class Bot:
         if self.current_is_admin():
             if self.cid == "2000000001":
                 self.cid = "2000000002"
-                self.send_conversation()
-                return self.cid
             elif self.cid == "2000000002":
                 self.cid = "2000000001"
-                self.send_conversation()
-                return self.cid
+            self.send_conversation()
+            return self.cid
         else:
             self.send_message(
                 pid=self.event.object.from_id, msg="У тебя нет доступа к этой функции."

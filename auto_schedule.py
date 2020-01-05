@@ -97,7 +97,7 @@ while True:
 
             if msg:
                 msg = "Расписание на {}:\n".format(msg_date) + msg
-                bot.send_mailing(ids=bot.sch_maillist, msg=msg)
+                bot.send_mailing(msg=msg)
                 bot.send_message(pid=bot.cid, msg=msg)
                 update_table()
 

@@ -1,12 +1,19 @@
+# Virtual environment files
 venv_ralph/
+
+# Environmental variables files
+.envrc
+.env
+
+# IDEs config files
+.vscode/
 .idea/
-new/
-old/
+
+# Python's caches
 **/__pycache__/
 test/__pycache__
 **/.pytest_cache/
-.vscode/
 .pytest_cache/
-.envrc
+
+# Config files
 .pre-commit-config.yaml
-.env

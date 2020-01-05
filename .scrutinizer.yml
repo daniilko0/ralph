@@ -10,6 +10,7 @@ build:
         analysis:
             tests:
                 override:
-                    -
-                        command: pylint-run
+                    -   command: py-scrutinizer-run
+                    -   command: pylint-run
                         use_website_config: true
+

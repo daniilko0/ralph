@@ -410,7 +410,7 @@ for event in bot.longpoll.listen():
         else:
             df_request = apiai.ApiAI(bot.df_key).text_request()
             df_request.lang = "ru"
-            df_request.session_id = "RALPH"
+            df_request.session_id = f"RALPH{bot.event.object.from_id}"
             df_request.query = bot.event.object.text
             df_response = json.loads(df_request.getresponse().read().decode("utf-8"))
             df_response_text = df_response["result"]["fulfillment"]["speech"]

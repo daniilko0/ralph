@@ -1,20 +1,23 @@
 import json
 import re
-from pprint import pprint
 
 from bot import bot
 
 for event in bot.longpoll.listen():
     bot.event = event
-    pprint(bot.event.object)
-    payload = json.loads(bot.event.object.payload)
-    print(payload)
     if (
         bot.event.type == bot.NEW_MESSAGE
         and bot.event.object.text
         and bot.event.object.out == 0
         and bot.event.object.from_id == bot.event.object.peer_id
     ):
+        payload = {"button": ""}
+        try:
+            payload = json.loads(bot.event.object.payload)
+        except TypeError:
+            pass
+        else:
+            print(payload)
         text = bot.event.object.text.lower()
         if text == "начать":
             bot.send_gui()
@@ -28,7 +31,16 @@ for event in bot.longpoll.listen():
             )
         elif payload["button"] == "student":
             bot.ids.append(payload["id"])
-            bot.send_message(msg=f'{payload["name"]} добавлен к списку призыва.')
+            bot.send_message(
+                pid=bot.event.object.from_id,
+                msg=f'{payload["name"]} добавлен к списку призыва.',
+            )
+        elif payload["button"] == "back":
+            bot.send_message(
+                msg="Отправка клавиатуры с алфавитом.",
+                pid=bot.event.object.from_id,
+                keyboard=open("keyboards/alphabet.json", "r", encoding="UTF-8").read(),
+            )
         elif payload["button"] == "call":
             bot.send_call()
         elif payload["button"] == "call_w_msg":
@@ -75,7 +87,8 @@ for event in bot.longpoll.listen():
         elif bot.mode == "ask_for_message_partial_call":
             bot.send_message(
                 pid=bot.event.object.from_id,
-                msg="Будет отправлено такое сообщение. Подтвердить?",
+                msg=f"Будет отправлено такое сообщение в беседу {bot.cid}. "
+                f"Подтвердить?",
             )
             t = bot.generate_mentions(bot.ids, True) + "\n" + bot.event.object.text
             bot.show_msg(t)

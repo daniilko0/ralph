@@ -17,7 +17,8 @@ todo:
     v5.18.0:
         - Добавить болталку на искуственном интеллекте
     v6.0.0:
-        - Разделить бизнес-логику (собственный функционал) и обращения к API ВКонтакте и Google
+        - Разделить бизнес-логику (собственный функционал) и обращения к API ВКонтакте
+        и Google
 
 """
 import binascii
@@ -200,7 +201,8 @@ class Bot:
 
     def get_schedule_for_tomorrow(self) -> None:
         """
-        Получает строку с завтрашней датой (послезавтрашней, если сегодня суббота) и вызывает self.get_schedule()
+        Получает строку с завтрашней датой (послезавтрашней, если сегодня суббота) и вы-
+        зывает self.get_schedule()
         """
         dow = pendulum.now("Europe/Moscow").format("d")
         a = 1
@@ -259,9 +261,7 @@ class Bot:
                         item = re.sub(k, v, item)
                     if re.findall("Иностранный язык", item):
                         lesson = re.compile(r"(?<=\()\D+(?=\))").findall(item)
-                        item = "Английский язык ({}) Кузнецова И.Н/Коротина М.А. 12/13а".format(
-                            lesson[1]
-                        )
+                        item = f"Английский язык ({lesson[1]}) Кузнецова И.Н/Коротина М.А. 12/13а"
                         schedule[i][j + 1] = ""
                     msg += "{} ".format(item)
                 msg += "\n"
@@ -297,9 +297,7 @@ class Bot:
     def get_debtors(self, col):
         self.send_message(
             pid=self.event.object.from_id,
-            msg="{}, эта команда может работать медленно. Прошу немного подождать.".format(
-                self.appeal
-            ),
+            msg="Эта команда может работать медленно. Прошу немного подождать.",
         )
         men, cash, goal = self.handle_table(col)
         msg = "{} вам нужно принести по {} на {}.".format(men, cash, goal.lower())

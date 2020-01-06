@@ -21,9 +21,9 @@ for event in bot.longpoll.listen():
         else:
             print(payload)
         text = bot.event.object.text.lower()
-        if text == "начать":
+        if text in ["начать", "старт"]:
             bot.send_gui()
-        elif re.match(r"\b([a-z]|sch)\b", payload["button"]):
+        elif re.match(r"^([a-z]|sch)$", payload["button"]):
             bot.send_message(
                 msg="Отправка клавиатуры.",
                 pid=bot.event.object.from_id,
@@ -94,5 +94,7 @@ for event in bot.longpoll.listen():
             )
             t = bot.generate_mentions(bot.ids, True) + "\n" + bot.event.object.text
             bot.show_msg(t)
+        elif bot.mode == "ask_for_msg":
+            pass
         elif "отмена" in text and bot.mode == "select_letter":
             bot.send_gui("Выполнение команды отменено.")

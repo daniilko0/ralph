@@ -26,7 +26,7 @@ import json
 import os
 import random
 import re
-from typing import NoReturn
+from typing import NoReturn, List
 from typing import Union
 
 import gspread
@@ -321,23 +321,25 @@ class Bot:
                 members_ids.append(conv_info[i]["member_id"])
         return self.generate_mentions(members_ids, False)
 
-    def get_user_info(self, identifier: Union[str, int]) -> dict:
+    def get_users_names(self, ids: list) -> list:
         """
-        Получить информацию о пользователе с указанным id
+        Получает информацию о пользователях с указанными id
         """
-        return self.vk.users.get(user_ids=identifier, fields="sex")[0]
+        return self.vk.users.get(user_ids=",".join(map(str, ids)))
 
     def generate_mentions(self, ids: list, names: bool) -> str:
         """
         Генерирует строку с упоминаниями из списка идентификаторов
         """
-        result = ""
-        for i in range(len(ids)):
-            if names:
-                name = self.get_user_info(ids[i])["first_name"]
-                result += "@id{}({}), ".format(ids[i], name)
-            else:
-                result += "@id{}(!)".format(ids[i])
+        if names:
+            names = [user_info["first_name"] for user_info in self.get_users_names(ids)]
+            result = ", ".join(
+                [f"@id{id}({names[i]})" for (i, id) in enumerate(ids)]
+            )
+        else:
+            result = "".join(
+                [f"@id{_id}(!)" for _id in ids]
+            )
         return result
 
     def change_conversation(self) -> str:

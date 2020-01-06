@@ -393,6 +393,3 @@ class Bot:
             keyboard=open("keyboards/prompt.json", "r", encoding="UTF-8").read(),
         )
         self.mode = "confirm_msg_w_call"
-
-
-bot = Bot()

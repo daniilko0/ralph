@@ -1,7 +1,9 @@
 import json
 import re
 
-from bot import bot
+from bot import Bot
+
+bot = Bot()
 
 for event in bot.longpoll.listen():
     bot.event = event
@@ -61,7 +63,7 @@ for event in bot.longpoll.listen():
                 ).read(),
             )
         elif payload["button"] == "col_id":
-            bot.get_debtors(col=payload["col_id"])
+            bot.get_debtors(col=payload["id"])
         elif payload["button"] == "fav":
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",

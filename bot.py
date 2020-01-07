@@ -39,6 +39,7 @@ from vk_api.bot_longpoll import VkBotEventType
 
 from students import students
 from vkbotlongpoll import RalphVkBotLongPoll
+from database.database import Database
 
 
 class Bot:
@@ -54,6 +55,11 @@ class Bot:
         self.gid = os.environ["GID_ID"]
         self.cid = os.environ["CID_ID"]
         self.table = os.environ["TABLE_ID"]
+        self.db_url = os.environ['DATABASE_URL']
+
+        # Авторизация в PostgreSQL - базе данных
+
+        db = Database(self.db_url)
 
         # Авторизация в API ВКонтакте
         print("Авторизация ВКонтакте...", end=" ")
@@ -332,7 +338,10 @@ class Bot:
         Генерирует строку с упоминаниями из списка идентификаторов
         """
         users_info = self.get_users_info(ids)
+        print(ids)
+        print(users_info)
         users_names = [users_info[i]["first_name"] if names else "!" for i in range(len(ids))]
+        print(users_names)
         result = (", " if names else "").join(
             [f"@id{_id}({users_names[i]})" for (i, _id) in enumerate(ids)]
         )

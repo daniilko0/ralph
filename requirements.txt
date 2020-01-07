@@ -18,3 +18,4 @@ soupsieve==1.9.5
 urllib3==1.25.7
 virtualenv==16.7.9
 vk-api==11.6.1
+psycopg2==2.8.4

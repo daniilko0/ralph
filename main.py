@@ -4,6 +4,7 @@ import re
 import apiai
 
 from bot import Bot
+from students import students
 
 bot = Bot()
 
@@ -94,10 +95,20 @@ for event in bot.longpoll.listen():
                 msg=f"Будет отправлено такое сообщение в беседу {bot.cid}. "
                 f"Подтвердить?",
             )
-            t = bot.generate_mentions(bot.ids, True) + "\n" + bot.event.object.text
+            t = f"{bot.generate_mentions(bot.ids, True)}\n{bot.event.object.text}"
             bot.show_msg(t)
         elif bot.mode == "ask_for_msg":
-            pass
+            bot.send_message(
+                pid=bot.event.object.from_id,
+                msg=f"Будет отправлено такое сообщение в беседу {bot.cid}. "
+                f"Подтвердить?",
+            )
+            t = (
+                bot.generate_mentions(list(students.keys()), False)
+                + "\n"
+                + bot.event.object.text
+            )
+            bot.show_msg(t)
         elif "отмена" in text and bot.mode == "select_letter":
             bot.send_gui("Выполнение команды отменено.")
         else:

@@ -7,7 +7,9 @@ import requests
 from bs4 import BeautifulSoup
 from gspread import exceptions as gsprex
 
-from bot import bot
+from bot import Bot
+
+bot = Bot()
 
 
 def update_table():

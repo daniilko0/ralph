@@ -189,16 +189,16 @@ class Bot:
             self.mode = "execute"
             members = self.generate_mentions(list(students.keys()), names=False)
             if members is not None:
-                self.send_message(pid=self.cid, msg=members)
+                self.mode = "wait_for_command"
                 self.send_message(
                     pid=self.event.object.from_id, msg=f"Cтуденты призваны."
                 )
                 print("Студенты призваны.")
-            self.mode = "wait_for_command"
+                self.mode = "wait_for_command"
 
         else:
             self.send_message(
-                pid=self.event.object.from_id, msg="У тебя нет доступа к этой функции."
+                pid=self.event.object.from_id, msg="У тебя нет доступа к этой функции.",
             )
 
     def send_conversation(self) -> None:
@@ -284,10 +284,7 @@ class Bot:
                         item = re.sub(k, v, item)
                     if re.findall("Иностранный язык", item):
                         lesson = re.compile(r"(?<=\()\D+(?=\))").findall(item)
-                        item = (
-                            f"Английский язык ({lesson[1]}) Кузнецова И.Н/Коротина "
-                            f"М.А. 12/13а"
-                        )
+                        item = f"Английский язык ({lesson[1]}) Кузнецова И.Н/Коротина М.А. 12/13а"
                         schedule[i][j + 1] = ""
                     msg += "{} ".format(item)
                 msg += "\n"
@@ -323,7 +320,7 @@ class Bot:
     def get_debtors(self, col):
         self.send_message(
             pid=self.event.object.from_id,
-            msg="Эта команда может работать медленно. Прошу немного " "подождать.",
+            msg="Эта команда может работать медленно. Прошу немного подождать.",
         )
         men, cash, goal = self.handle_table(col)
         msg = "{} вам нужно принести по {} на {}.".format(men, cash, goal.lower())
@@ -349,33 +346,35 @@ class Bot:
                 members_ids.append(conv_info[i]["member_id"])
         return self.generate_mentions(members_ids, False)
 
-    def get_user_info(self, identifier: Union[str, int]) -> dict:
+    def get_users_info(self, ids: list) -> list:
         """
-        Получить информацию о пользователе с указанным id
+        Получает информацию о пользователях с указанными id
         """
-        return self.bot_vk.users.get(user_ids=identifier, fields="sex")[0]
+        return self.bot_vk.users.get(user_ids=",".join(map(str, ids)))
 
     def generate_mentions(self, ids: list, names: bool) -> str:
         """
         Генерирует строку с упоминаниями из списка идентификаторов
         """
-        result = ""
-        for i in range(len(ids)):
-            if names:
-                name = self.get_user_info(ids[i])["first_name"]
-                result += "@id{}({}), ".format(ids[i], name)
-            else:
-                result += "@id{}(!)".format(ids[i])
+        users_info = self.get_users_info(ids)
+        users_names = [
+            users_info[i]["first_name"] if names else "!" for i in range(len(ids))
+        ]
+        result = (", " if names else "").join(
+            [f"@id{_id}({users_names[i]})" for (i, _id) in enumerate(ids)]
+        )
         return result
 
     def change_conversation(self) -> str:
         if self.current_is_admin():
             if self.cid == "2000000001":
                 self.cid = "2000000002"
+                self.send_conversation()
+                return self.cid
             elif self.cid == "2000000002":
                 self.cid = "2000000001"
-            self.send_conversation()
-            return self.cid
+                self.send_conversation()
+                return self.cid
         else:
             self.send_message(
                 pid=self.event.object.from_id, msg="У тебя нет доступа к этой функции."
@@ -402,6 +401,15 @@ class Bot:
             )
         self.mode = "wait_for_command"
 
+    def ask_for_msg(self):
+        self.mode = "ask_for_msg"
+        if self.current_is_admin():
+            self.send_message(
+                pid=self.event.object.from_id,
+                msg="Отправьте сообщение с текстом объявления (вложения пока не поддерживаются).",
+                keyboard=open("keyboards/empty.json", "r", encoding="UTF-8").read(),
+            )
+
     def show_msg(self, text: str):
         self.text = text
         self.send_message(
@@ -409,10 +417,4 @@ class Bot:
             msg=text,
             keyboard=open("keyboards/prompt.json", "r", encoding="UTF-8").read(),
         )
-        if self.mode == "ask_for_msg":
-            self.mode = "confirm_msg_w_call"
-        if self.mode == "ask_for_mailing_message":
-            self.mode = "confirm_mailing"
-
-
-bot = Bot()
+        self.mode = "confirm_msg_w_call"

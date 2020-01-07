@@ -50,9 +50,11 @@ for event in bot.longpoll.listen():
         elif payload["button"] == "confirm":
             bot.send_message(pid=bot.cid, msg=bot.text)
             bot.text = ""
+            bot.ids = []
             bot.send_gui(text="Сообщение отправлено.")
         elif payload["button"] == "deny":
             bot.text = ""
+            bot.ids = []
             bot.send_gui(text="Выполнение команды отменено.")
         elif payload["button"] == "debtors":
             bot.send_message(
@@ -97,4 +99,6 @@ for event in bot.longpoll.listen():
         elif bot.mode == "ask_for_msg":
             pass
         elif "отмена" in text and bot.mode == "select_letter":
+            bot.text = ""
+            bot.ids = []
             bot.send_gui("Выполнение команды отменено.")

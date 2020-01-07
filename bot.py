@@ -189,6 +189,9 @@ class Bot:
             if members is not None:
                 self.mode = "wait_for_command"
                 self.send_message(
+                    msg=members, pid=self.cid,
+                )
+                self.send_message(
                     pid=self.event.object.from_id, msg=f"Cтуденты призваны."
                 )
                 print("Студенты призваны.")

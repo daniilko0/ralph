@@ -321,7 +321,7 @@ class Bot:
                 members_ids.append(conv_info[i]["member_id"])
         return self.generate_mentions(members_ids, False)
 
-    def get_users_names(self, ids: list) -> list:
+    def get_users_info(self, ids: list) -> list:
         """
         Получает информацию о пользователях с указанными id
         """
@@ -331,15 +331,11 @@ class Bot:
         """
         Генерирует строку с упоминаниями из списка идентификаторов
         """
-        if names:
-            names = [user_info["first_name"] for user_info in self.get_users_names(ids)]
-            result = ", ".join(
-                [f"@id{id}({names[i]})" for (i, id) in enumerate(ids)]
-            )
-        else:
-            result = "".join(
-                [f"@id{_id}(!)" for _id in ids]
-            )
+        users_info = self.get_users_info(ids)
+        users_names = [users_info[i]["first_name"] if names else "!" for i in range(len(ids))]
+        result = (", " if names else "").join(
+            [f"@id{_id}({users_names[i]})" for (i, _id) in enumerate(ids)]
+        )
         return result
 
     def change_conversation(self) -> str:

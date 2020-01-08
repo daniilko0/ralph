@@ -151,7 +151,7 @@ class Bot:
         self,
         msg: str,
         pid: int = None,
-        keyboard=None,
+        keyboard="keyboards/empty.json",
         attachments: str = None,
         user_ids: str = None,
     ) -> NoReturn:
@@ -166,7 +166,7 @@ class Bot:
                 peer_id=pid,
                 random_id=random.getrandbits(64),
                 message=msg,
-                keyboard=keyboard,
+                keyboard=open(keyboard, "r", encoding="UTF-8").read(),
                 attachments=attachments,
                 user_ids=user_ids,
             )
@@ -393,15 +393,13 @@ class Bot:
             self.send_message(
                 pid=self.event.object.from_id,
                 msg=text,
-                keyboard=open("keyboards/admin.json", "r", encoding="UTF-8").read(),
+                keyboard="keyboards/admin.json",
             )
         else:
             self.send_message(
                 pid=self.event.object.from_id,
                 msg=text,
-                keyboard=open(
-                    "keyboards/schedule.json.json", "r", encoding="UTF-8"
-                ).read(),
+                keyboard="keyboards/schedule.json",
             )
         self.mode = "wait_for_command"
 

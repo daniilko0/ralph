@@ -27,9 +27,7 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg="Отправка клавиатуры.",
                 pid=bot.event.object.from_id,
-                keyboard=open(
-                    f'keyboards/names/{payload["letter"]}.json', "r", encoding="UTF-8"
-                ).read(),
+                keyboard=f'keyboards/names/{payload["letter"]}.json',
             )
         elif payload["button"] == "student":
             bot.ids.append(payload["id"])
@@ -41,21 +39,21 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",
                 pid=bot.event.object.from_id,
-                keyboard=open("keyboards/call.json", "r", encoding="UTF-8").read(),
+                keyboard="keyboards/call.json",
             )
         elif payload["button"] == "call":
             bot.mode = "ask_for_msg"
             bot.send_message(
                 msg="Отправьте сообщение к призыву (вложения не поддерживаются)",
                 pid=bot.event.object.from_id,
-                keyboard=open("keyboards/skip.json", "r", encoding="UTF-8").read(),
+                keyboard="keyboards/skip.json",
             )
         elif payload["button"] == "skip":
             bot.text = ""
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",
                 pid=bot.event.object.from_id,
-                keyboard=open("keyboards/call.json", "r", encoding="UTF-8").read(),
+                keyboard="keyboards/call.json",
             )
         elif payload["button"] == "send_to_all":
             bot.ids = list(students.keys())
@@ -77,9 +75,7 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg="Выберите статью расходов (колонку в таблице)",
                 pid=bot.event.object.from_id,
-                keyboard=open(
-                    "keyboards/select_col.json", "r", encoding="UTF-8"
-                ).read(),
+                keyboard="keyboards/select_col.json",
             )
         elif payload["button"] == "col_id":
             bot.get_debtors(col=payload["id"])
@@ -87,7 +83,7 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg="Отправка клавиатуры с расписанием.",
                 pid=bot.event.object.from_id,
-                keyboard=open("keyboards/schedule.json", "r", encoding="UTF-8").read(),
+                keyboard="keyboards/schedule.json",
             )
         elif payload["button"] == "today":
             bot.get_schedule()
@@ -103,7 +99,7 @@ for event in bot.longpoll.listen():
                 msg=f"В {'тестовую ' if bot.cid.endswith('1') else 'основную '}"
                 f"беседу будет отправлено сообщение:",
                 pid=bot.event.object.from_id,
-                keyboard=open("keyboards/prompt.json", "r", encoding="UTF-8").read(),
+                keyboard="keyboards/prompt.json",
             )
             if len(bot.ids) < 33:
                 f = True
@@ -118,7 +114,7 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg="Отправка клавиатуры призыва",
                 pid=bot.event.object.from_id,
-                keyboard=open("keyboards/call.json", "r", encoding="UTF-8").read(),
+                keyboard="keyboards/call.json",
             )
         elif payload["button"] == "cancel" and bot.mode == "select_letter":
             bot.text = ""

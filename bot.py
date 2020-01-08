@@ -288,7 +288,7 @@ class Bot:
                         lesson = re.compile(r"(?<=\()\D+(?=\))").findall(item)
                         item = f"Английский язык ({lesson[1]}) Кузнецова И.Н/Коротина М.А. 12/13а"
                         schedule[i][j + 1] = ""
-                    msg += "{} ".format(item)
+                    msg += f"{item} "
                 msg += "\n"
 
             if not msg:
@@ -325,12 +325,11 @@ class Bot:
             msg="Эта команда может работать медленно. Прошу немного подождать.",
         )
         men, cash, goal = self.handle_table(col)
-        msg = "{} вам нужно принести по {} на {}.".format(men, cash, goal.lower())
+        msg = f"{men} вам нужно принести по {cash} на {goal.lower()}."
         self.send_message(pid=self.cid, msg=msg)
         print("Должники призваны")
         self.send_message(
-            pid=self.event.object.from_id,
-            msg="{}, я напомнил холопам об их долгах.".format(self.appeal),
+            pid=self.event.object.from_id, msg="Я напомнил холопам об их долгах.",
         )
         self.send_gui(text="Команда успешно выполнена.")
 

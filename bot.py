@@ -399,7 +399,9 @@ class Bot:
             self.send_message(
                 pid=self.event.object.from_id,
                 msg=text,
-                keyboard=open("keyboards/user.json", "r", encoding="UTF-8").read(),
+                keyboard=open(
+                    "keyboards/schedule.json.json", "r", encoding="UTF-8"
+                ).read(),
             )
         self.mode = "wait_for_command"
 

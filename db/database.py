@@ -14,6 +14,12 @@ class Database:
             "database": url.path[1:]
             # "dbname": url.path[1:]
         }
+        self.conn, self.cur = None, None
 
-        self.conn = psycopg2.connect()
+    def connect(self):
+        self.conn = psycopg2.connect(**self.db_auth)
         self.cur = self.conn.cursor()
+
+    def close(self):
+        self.cur.close()
+        self.conn.close()

@@ -51,7 +51,14 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg="Отправьте сообщение к призыву (вложения не поддерживаются)",
                 pid=bot.event.object.from_id,
-                keyboard=open("keyboards/empty.json", "r", encoding="UTF-8").read(),
+                keyboard=open("keyboards/skip.json", "r", encoding="UTF-8").read(),
+            )
+        elif payload["button"] == "skip":
+            bot.text = ""
+            bot.send_message(
+                msg="Отправка клавиатуры с алфавитом.",
+                pid=bot.event.object.from_id,
+                keyboard=open("keyboards/call.json", "r", encoding="UTF-8").read(),
             )
         elif payload["button"] == "send_to_all":
             bot.ids = list(students.keys())

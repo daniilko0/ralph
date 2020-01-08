@@ -8,13 +8,23 @@
           "label": "На сегодня",
           "payload": "{\"button\": \"today\"}"
         },
-        "color": "primary"
+        "color": "secondary"
       },
       {
         "action": {
           "type": "text",
           "label": "На завтра",
           "payload": "{\"button\": \"tomorrow\"}"
+        },
+        "color": "secondary"
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Назад",
+          "payload": "{\"button\": \"home\"}"
         },
         "color": "primary"
       }

@@ -13,27 +13,10 @@
       {
         "action": {
           "type": "text",
-          "label": "Призыв с сообщением",
-          "payload": "{\"button\": \"call_w_msg\"}"
-        },
-        "color": "secondary"
-      }
-    ],
-    [
-      {
-        "action": {
-          "type": "text",
           "label": "Должники",
           "payload": "{\"button\": \"debtors\"}"
         },
         "color": "secondary"
-      },
-      {
-        "action": {
-          "type": "text",
-          "label": "Выбранные",
-          "payload": "{\"button\": \"fav\"}"
-        }
       }
     ],
     [
@@ -50,18 +33,9 @@
       {
         "action": {
           "type": "text",
-          "label": "Что сегодня?",
-          "payload": "{\"button\": \"today\"}"
-        },
-        "color": "primary"
-      },
-      {
-        "action": {
-          "type": "text",
-          "label": "Что будет завтра?",
-          "payload": "{\"button\": \"tomorrow\"}"
-        },
-        "color": "primary"
+          "label": "Расписание",
+          "payload": "{\"button\": \"schedule\"}"
+        }
       }
     ],
     [

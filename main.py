@@ -97,6 +97,8 @@ for event in bot.longpoll.listen():
                 keyboard=open("keyboards/empty.json", "r", encoding="utf-8").read(),
             )
             bot.mode = "ask_for_message_partial_call"
+        elif payload["button"] == "home":
+            bot.send_gui(text="Главный экран")
         elif bot.mode == "ask_for_message_partial_call":
             bot.send_message(
                 pid=bot.event.object.from_id,

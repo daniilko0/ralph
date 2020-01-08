@@ -250,7 +250,7 @@ class Bot:
         req = requests.get(
             f"http://rating.ivpek.ru/timetable/timetable/show?gid=324&date={date}"
         )
-        soup = BeautifulSoup(req.text)
+        soup = BeautifulSoup(req.text, parser="lxml")
         msg_w = soup.find_all("div", {"class": "msg warning"})
         msg_e = soup.find_all("div", {"class": "msg error"})
         if msg_w != [] and msg_w is not None:

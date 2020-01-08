@@ -1,5 +1,4 @@
 import json
-import re
 
 import apiai
 
@@ -26,12 +25,12 @@ for event in bot.longpoll.listen():
         text = bot.event.object.text.lower()
         if text in ["начать", "старт"]:
             bot.send_gui()
-        elif re.match(r"^([a-z]|sh)$", payload["button"]):
+        elif payload["button"] == "letter":
             bot.send_message(
                 msg="Отправка клавиатуры.",
                 pid=bot.event.object.from_id,
                 keyboard=open(
-                    f'keyboards/names/{payload["button"]}.json', "r", encoding="UTF-8"
+                    f'keyboards/names/{payload["letter"]}.json', "r", encoding="UTF-8"
                 ).read(),
             )
         elif payload["button"] == "student":

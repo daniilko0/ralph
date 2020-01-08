@@ -334,20 +334,6 @@ class Bot:
         )
         self.send_gui(text="Команда успешно выполнена.")
 
-    def get_conversation_members(self) -> Union[str, None]:
-        """
-        Возвращает строку с упоминаниями участников
-        """
-        conv_info = self.bot_vk.messages.getConversationMembers(peer_id=self.cid)[
-            "items"
-        ]
-        members_ids = []
-
-        for i in range(len(conv_info)):
-            if conv_info[i]["member_id"] > 0:
-                members_ids.append(conv_info[i]["member_id"])
-        return self.generate_mentions(members_ids, False)
-
     def get_users_info(self, ids: list) -> list:
         """
         Получает информацию о пользователях с указанными id

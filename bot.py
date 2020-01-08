@@ -34,6 +34,7 @@ from bs4 import BeautifulSoup
 from oauth2client.service_account import ServiceAccountCredentials
 from vk_api.bot_longpoll import VkBotEventType
 
+from database.database import Database
 from students import students
 from vkbotlongpoll import RalphVkBotLongPoll
 
@@ -52,6 +53,11 @@ class Bot:
         self.gid = os.environ["GID_ID"]
         self.cid = os.environ["CID_ID"]
         self.table = os.environ["TABLE_ID"]
+        self.db_url = os.environ["DATABASE_URL"]
+
+        # Авторизация в PostgreSQL - базе данных
+
+        db = Database(self.db_url)
 
         # Авторизация в API ВКонтакте
         print("Авторизация ВКонтакте...", end=" ")
@@ -225,8 +231,8 @@ class Bot:
 
     def get_schedule_for_tomorrow(self) -> None:
         """
-        Получает строку с завтрашней датой (послезавтрашней, если сегодня суббота) и
-        вызывает self.get_schedule()
+        Получает строку с завтрашней датой (послезавтрашней, если сегодня суббота) и вы-
+        зывает self.get_schedule()
         """
         dow = pendulum.now("Europe/Moscow").format("d")
         a = 1

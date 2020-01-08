@@ -44,12 +44,22 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",
                 pid=bot.event.object.from_id,
-                keyboard=open("keyboards/alphabet.json", "r", encoding="UTF-8").read(),
+                keyboard=open("keyboards/call.json", "r", encoding="UTF-8").read(),
             )
         elif payload["button"] == "call":
-            bot.send_call()
-        elif payload["button"] == "call_w_msg":
-            bot.ask_for_msg()
+            bot.mode = "ask_for_msg"
+            bot.send_message(
+                msg="Отправьте сообщение к призыву (вложения не поддерживаются)",
+                pid=bot.event.object.from_id,
+                keyboard=open("keyboards/empty.json", "r", encoding="UTF-8").read(),
+            )
+        elif payload["button"] == "send_to_all":
+            bot.ids = list(students.keys())
+            bot.send_message(
+                msg="Все студенты отмечены как получатели уведомления. Готово к "
+                'отправке, нажмите "Сохранить"',
+                pid=bot.event.object.from_id,
+            )
         elif payload["button"] == "confirm":
             bot.send_message(pid=bot.cid, msg=bot.text)
             bot.text = ""
@@ -69,12 +79,6 @@ for event in bot.longpoll.listen():
             )
         elif payload["button"] == "col_id":
             bot.get_debtors(col=payload["id"])
-        elif payload["button"] == "fav":
-            bot.send_message(
-                msg="Отправка клавиатуры с алфавитом.",
-                pid=bot.event.object.from_id,
-                keyboard=open("keyboards/alphabet.json", "r", encoding="UTF-8").read(),
-            )
         elif payload["button"] == "schedule":
             bot.send_message(
                 msg="Отправка клавиатуры с расписанием.",
@@ -92,34 +96,27 @@ for event in bot.longpoll.listen():
             bot.send_gui("Выполнение команды отменено.")
         elif payload["button"] == "save":
             bot.send_message(
+                msg=f"В {'тестовую ' if bot.cid.endswith('1') else 'основную '}"
+                f"беседу будет отправлено сообщение:",
                 pid=bot.event.object.from_id,
-                msg="Отправьте сообщение к призыву",
-                keyboard=open("keyboards/empty.json", "r", encoding="utf-8").read(),
+                keyboard=open("keyboards/prompt.json", "r", encoding="UTF-8").read(),
             )
-            bot.mode = "ask_for_message_partial_call"
+            if len(bot.ids) < 33:
+                f = True
+            else:
+                f = False
+            bot.text = f"{bot.generate_mentions(ids=bot.ids, names=f)}\n{bot.text}"
+            bot.show_msg(f"{bot.text}")
         elif payload["button"] == "home":
             bot.send_gui(text="Главный экран")
-        elif bot.mode == "ask_for_message_partial_call":
-            bot.send_message(
-                pid=bot.event.object.from_id,
-                msg=f"Будет отправлено такое сообщение в беседу {bot.cid}. "
-                f"Подтвердить?",
-            )
-            t = f"{bot.generate_mentions(bot.ids, True)}\n{bot.event.object.text}"
-            bot.show_msg(t)
         elif bot.mode == "ask_for_msg":
+            bot.text = bot.event.object.text
             bot.send_message(
+                msg="Отправка клавиатуры призыва",
                 pid=bot.event.object.from_id,
-                msg=f"Будет отправлено такое сообщение в беседу {bot.cid}. "
-                f"Подтвердить?",
+                keyboard=open("keyboards/call.json", "r", encoding="UTF-8").read(),
             )
-            t = (
-                bot.generate_mentions(list(students.keys()), False)
-                + "\n"
-                + bot.event.object.text
-            )
-            bot.show_msg(t)
-        elif "отмена" in text and bot.mode == "select_letter":
+        elif payload["button"] == "cancel" and bot.mode == "select_letter":
             bot.text = ""
             bot.ids = []
             bot.send_gui("Выполнение команды отменено.")

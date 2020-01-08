@@ -20,8 +20,6 @@ for event in bot.longpoll.listen():
             payload = json.loads(bot.event.object.payload)
         except TypeError:
             pass
-        else:
-            print(payload)
         text = bot.event.object.text.lower()
         if text in ["начать", "старт"]:
             bot.send_gui()

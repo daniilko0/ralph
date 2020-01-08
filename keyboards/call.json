@@ -122,6 +122,16 @@
         },
         "color": "positive"
       }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Отправить всем",
+          "payload": "{\"button\": \"send_to_all\"}"
+        },
+        "color": "primary"
+      }
     ]
   ]
 }

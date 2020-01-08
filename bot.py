@@ -61,9 +61,10 @@ class Bot:
         try:
             db = Database(self.db_url)
             db.connect()
-            print("Успех")
         except TypeError:
             print("Неудача. Ошибка авторизации.")
+        else:
+            print("Успех.")
 
         # Авторизация в API ВКонтакте
         print("Авторизация ВКонтакте...", end=" ")

@@ -75,6 +75,12 @@ for event in bot.longpoll.listen():
                 pid=bot.event.object.from_id,
                 keyboard=open("keyboards/alphabet.json", "r", encoding="UTF-8").read(),
             )
+        elif payload["button"] == "schedule":
+            bot.send_message(
+                msg="Отправка клавиатуры с расписанием.",
+                pid=bot.event.object.from_id,
+                keyboard=open("keyboards/schedule.json", "r", encoding="UTF-8").read(),
+            )
         elif payload["button"] == "today":
             bot.get_schedule()
         elif payload["button"] == "tomorrow":

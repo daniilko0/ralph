@@ -1,11 +1,11 @@
 """
 :project: ralph
 :version: see VERSION.txt
-:authors: dadyarri
-:contact: https://vk.me/dadyarri
+:authors: dadyarri & 6a16ec
+:contact: https://vk.me/dadyarri & https://vk.me/6a16ec
 :license: MIT
 
-:copyright: (c) 2019 - 2020 dadyarri
+:copyright: (c) 2019 - 2020 dadyarri & 6a16ec
 
 
 :release plan:

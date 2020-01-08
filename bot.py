@@ -34,6 +34,7 @@ from bs4 import BeautifulSoup
 from oauth2client.service_account import ServiceAccountCredentials
 from vk_api.bot_longpoll import VkBotEventType
 
+from db.database import Database
 from students import students
 from vkbotlongpoll import RalphVkBotLongPoll
 
@@ -56,7 +57,13 @@ class Bot:
 
         # Авторизация в PostgreSQL - базе данных
 
-        # db = Database(self.db_url)
+        print("Авторизация базы данных...", end=" ")
+        try:
+            db = Database(self.db_url)
+            db.connect()
+            print("Успех")
+        except TypeError:
+            print("Неудача. Ошибка авторизации.")
 
         # Авторизация в API ВКонтакте
         print("Авторизация ВКонтакте...", end=" ")

@@ -1,0 +1,23 @@
+{
+  "one_time": false,
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "На сегодня",
+          "payload": "{\"button\": \"today\"}"
+        },
+        "color": "primary"
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "На завтра",
+          "payload": "{\"button\": \"tomorrow\"}"
+        },
+        "color": "primary"
+      }
+    ]
+  ]
+}

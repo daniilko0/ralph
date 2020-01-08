@@ -285,7 +285,10 @@ class Bot:
                         item = re.sub(k, v, item)
                     if re.findall("Иностранный язык", item):
                         lesson = re.compile(r"(?<=\()\D+(?=\))").findall(item)
-                        item = f"Английский язык ({lesson[1]}) Кузнецова И.Н/Коротина М.А. 12/13а"
+                        item = (
+                            f"Английский язык ({lesson[1]}) "
+                            f"Кузнецова И.Н/Коротина М.А. 12/13а"
+                        )
                         schedule[i][j + 1] = ""
                     msg += f"{item} "
                 msg += "\n"
@@ -392,7 +395,8 @@ class Bot:
         if self.current_is_admin():
             self.send_message(
                 pid=self.event.object.from_id,
-                msg="Отправьте сообщение с текстом объявления (вложения пока не поддерживаются).",
+                msg="Отправьте сообщение с текстом объявления"
+                "(вложения пока не поддерживаются).",
                 keyboard=open("keyboards/empty.json", "r", encoding="UTF-8").read(),
             )
 

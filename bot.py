@@ -34,7 +34,7 @@ from bs4 import BeautifulSoup
 from oauth2client.service_account import ServiceAccountCredentials
 from vk_api.bot_longpoll import VkBotEventType
 
-from database.database import Database
+from db.database import Database
 from students import students
 from vkbotlongpoll import RalphVkBotLongPoll
 

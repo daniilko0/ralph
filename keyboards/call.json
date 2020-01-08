@@ -6,35 +6,35 @@
         "action": {
           "type": "text",
           "label": "А",
-          "payload": "{\"button\": \"a\"}"
+          "payload": "{\"button\": \"letter\", \"letter\": \"a\"}"
         }
       },
       {
         "action": {
           "type": "text",
           "label": "Б",
-          "payload": "{\"button\": \"b\"}"
+          "payload": "{\"button\": \"letter\", \"letter\": \"b\"}"
         }
       },
       {
         "action": {
           "type": "text",
           "label": "Г",
-          "payload": "{\"button\": \"g\"}"
+          "payload": "{\"button\": \"letter\", \"letter\": \"g\"}"
         }
       },
       {
         "action": {
           "type": "text",
           "label": "Д",
-          "payload": "{\"button\": \"d\"}"
+          "payload": "{\"button\": \"letter\", \"letter\": \"d\"}"
         }
       },
       {
         "action": {
           "type": "text",
           "label": "Е",
-          "payload": "{\"button\": \"e\"}"
+          "payload": "{\"button\": \"letter\", \"letter\": \"e\"}"
         }
       }
     ],
@@ -43,35 +43,35 @@
         "action": {
           "type": "text",
           "label": "Ж",
-          "payload": "{\"button\": \"j\"}"
+          "payload": "{\"button\": \"letter\", \"letter\": \"j\"}"
         }
       },
       {
         "action": {
           "type": "text",
           "label": "З",
-          "payload": "{\"button\": \"z\"}"
+          "payload": "{\"button\": \"letter\", \"letter\": \"z\"}"
         }
       },
       {
         "action": {
           "type": "text",
           "label": "К",
-          "payload": "{\"button\": \"k\"}"
+          "payload": "{\"button\": \"letter\", \"letter\": \"k\"}"
         }
       },
       {
         "action": {
           "type": "text",
           "label": "Л",
-          "payload": "{\"button\": \"l\"}"
+          "payload": "{\"button\": \"letter\", \"letter\": \"l\"}"
         }
       },
       {
         "action": {
           "type": "text",
           "label": "М",
-          "payload": "{\"button\": \"m\"}"
+          "payload": "{\"button\": \"letter\", \"letter\": \"m\"}"
         }
       }
     ],
@@ -80,28 +80,28 @@
         "action": {
           "type": "text",
           "label": "П",
-          "payload": "{\"button\": \"p\"}"
+          "payload": "{\"button\": \"letter\", \"letter\": \"p\"}"
         }
       },
       {
         "action": {
           "type": "text",
           "label": "Р",
-          "payload": "{\"button\": \"r\"}"
+          "payload": "{\"button\": \"letter\", \"letter\": \"r\"}"
         }
       },
       {
         "action": {
           "type": "text",
           "label": "С",
-          "payload": "{\"button\": \"s\"}"
+          "payload": "{\"button\": \"letter\", \"letter\": \"s\"}"
         }
       },
       {
         "action": {
           "type": "text",
           "label": "Ш",
-          "payload": "{\"button\": \"sh\"}"
+          "payload": "{\"button\": \"letter\", \"letter\": \"sh\"}"
         }
       }
     ],

@@ -26,7 +26,7 @@ for event in bot.longpoll.listen():
         text = bot.event.object.text.lower()
         if text in ["начать", "старт"]:
             bot.send_gui()
-        elif re.match(r"^([a-z]|sch)$", payload["button"]):
+        elif re.match(r"^([a-z]|sh)$", payload["button"]):
             bot.send_message(
                 msg="Отправка клавиатуры.",
                 pid=bot.event.object.from_id,

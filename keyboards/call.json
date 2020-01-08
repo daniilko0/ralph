@@ -101,7 +101,7 @@
         "action": {
           "type": "text",
           "label": "Ш",
-          "payload": "{\"button\": \"sch\"}"
+          "payload": "{\"button\": \"sh\"}"
         }
       }
     ],

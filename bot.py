@@ -151,7 +151,7 @@ class Bot:
         self,
         msg: str,
         pid: int = None,
-        keyboard="keyboards/empty.json",
+        keyboard="",
         attachments: str = None,
         user_ids: str = None,
     ) -> NoReturn:
@@ -161,18 +161,22 @@ class Bot:
         с клавиатурой keyboard (не отправляется, если не указан json файл)
         """
 
+        kb = open(keyboard, "r", encoding="UTF-8").read() if keyboard != "" else ""
+
         try:
             self.bot_vk.messages.send(
                 peer_id=pid,
                 random_id=random.getrandbits(64),
                 message=msg,
-                keyboard=open(keyboard, "r", encoding="UTF-8").read(),
+                keyboard=kb,
                 attachments=attachments,
                 user_ids=user_ids,
             )
 
         except vk_api.exceptions.ApiError as e:
             print(f"[ОШИБКА]: {e.__str__()}")
+        except FileNotFoundError:
+            print("Такого файла не существует.")
 
     def send_mailing(self, msg: str = "", attach: str = None):
         if msg == "":

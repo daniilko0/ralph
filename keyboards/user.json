@@ -1,0 +1,14 @@
+{
+  "one_time": false,
+  "buttons": [
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Расписание",
+          "payload": "{\"button\": \"schedule\"}"
+        }
+      }
+    ]
+  ]
+}

@@ -401,9 +401,7 @@ class Bot:
             )
         else:
             self.send_message(
-                pid=self.event.object.from_id,
-                msg=text,
-                keyboard="keyboards/schedule.json",
+                pid=self.event.object.from_id, msg=text, keyboard="keyboards/user.json",
             )
         self.mode = "wait_for_command"
 

@@ -1,5 +1,7 @@
 import re
 import time
+import os
+import logging
 from datetime import datetime
 from datetime import timedelta
 
@@ -41,6 +43,18 @@ class Schedule:
             f"http://rating.ivpek.ru/timetable/timetable/show?gid=324&date={date}"
         ).text
         self.s = BeautifulSoup(self.raw, "lxml")
+        self.log_level = int(os.environ["LOG_LEVEL"])
+
+        # Инициализация и настройка logging
+        self.log = logging.getLogger()
+        self.log.setLevel(self.log_level)
+
+        self.log.info("OK")
+
+        log_format = "%(asctime)s %(levelname)s: %(message)s"
+        logging.basicConfig(
+            filename="ralph.log", format=log_format, datefmt="%d-%m-%Y %H:%M:%S"
+        )
 
     def make_schedule(self):
         for span in self.s.find_all("span", {"class": "ldur"}):

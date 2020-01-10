@@ -18,6 +18,22 @@ class Date:
         return datetime.strftime(datetime.now() + timedelta(1), "%Y-%m-%d")
 
 
+def pause():
+    hour = datetime.now().hour
+    p = 0
+    if 0 <= hour <= 5:
+        p = 5
+    if 5 < hour < 10:
+        p = 24
+    if 9 < hour < 15:
+        p = 19
+    if 14 < hour < 19:
+        p = 15
+    if 18 < hour <= 23:
+        p = 11
+    time.sleep(p * 3600)
+
+
 class Schedule:
     def __init__(self, date: str):
 
@@ -79,7 +95,7 @@ class Schedule:
             if self.check() is not None:
                 sch = self.make_schedule()
                 print(sch)
-                time.sleep(24 * 3600)
+                pause()
             else:
                 time.sleep(15 * 60)
 

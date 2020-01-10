@@ -418,8 +418,5 @@ class Bot:
     def show_msg(self, text: str):
         self.text = text
         self.send_message(
-            pid=self.event.object.from_id,
-            msg=text,
-            keyboard=open("keyboards/prompt.json", "r", encoding="UTF-8").read(),
+            pid=self.event.object.from_id, msg=text, keyboard="keyboards/prompt.json",
         )
-        self.mode = "confirm_msg_w_call"

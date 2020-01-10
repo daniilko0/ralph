@@ -107,6 +107,11 @@ for event in bot.longpoll.listen():
                 f = False
             bot.text = f"{bot.generate_mentions(ids=bot.ids, names=f)}\n{bot.text}"
             bot.show_msg(f"{bot.text}")
+        elif payload["button"] == "newsletter":
+            bot.send_message(
+                msg="Введите текст рассылки.", pid=bot.event.object.from_id
+            )
+            bot.mode = "wait_for_newsletter_message"
         elif payload["button"] == "home":
             bot.send_gui(text="Главный экран")
         elif bot.mode == "ask_for_msg":
@@ -116,6 +121,21 @@ for event in bot.longpoll.listen():
                 pid=bot.event.object.from_id,
                 keyboard="keyboards/call.json",
             )
+        elif bot.mode == "wait_for_newsletter_message":
+            bot.mode = "prompt_for_newletter"
+            bot.text = bot.event.object.text
+            bot.send_message(
+                msg="Всем пользователям, активировавшим бота будет отправлено "
+                "следующее сообщение: ",
+                pid=bot.event.object.from_id,
+            )
+            bot.show_msg(text=bot.text)
+        elif payload["button"] == "confirm" and bot.mode == "prompt_for_newsletter":
+            bot.send_mailing(msg=bot.text)
+            bot.send_gui(text="Рассылка отправлена")
+        elif payload["button"] == "confirm" and bot.mode == "prompt_for_newsletter":
+            bot.text = ""
+            bot.send_gui(text="Отправка рассылки отменена.")
         elif payload["button"] == "cancel" and bot.mode == "select_letter":
             bot.text = ""
             bot.ids = []

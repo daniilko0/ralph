@@ -77,3 +77,9 @@ class Schedule:
                 time.sleep(24 * 3600)
             else:
                 time.sleep(15 * 60)
+
+
+if __name__ == "__main__":
+    d = Date()
+    a = Schedule(d.today)
+    a.listen()

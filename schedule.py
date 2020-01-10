@@ -106,13 +106,16 @@ class Schedule:
         warn = self.s.find_all("div", {"class": "msg warning"})
         err = self.s.find_all("div", {"class": "msg error"})
         if warn or err:
+            self.log.info("Расписание отсутствует.")
             return None
+        self.log.info("Расписание составлено.")
         return self.s
 
     def listen(self):
         while True:
             if self.check() is not None:
                 sch = self.make_schedule()
+                self.log.info("Расписание отправлено.")
                 print(sch)
                 pause()
             else:

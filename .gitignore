@@ -17,3 +17,6 @@ test/__pycache__
 
 # Config files
 .pre-commit-config.yaml
+
+# Log files
+ralph.log

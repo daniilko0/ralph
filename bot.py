@@ -182,9 +182,9 @@ class Bot:
             )
 
         except vk_api.exceptions.ApiError as e:
-            print(f"[ОШИБКА]: {e.__str__()}")
+            self.log.error(f"[ОШИБКА]: {e.__str__()}")
         except FileNotFoundError:
-            print("Такого файла не существует.")
+            self.log.error("Такого файла не существует.")
 
     def send_mailing(self, msg: str = "", attach: str = None):
         if msg == "":
@@ -198,7 +198,7 @@ class Bot:
         for i in range(len(q["items"])):
             if q["items"][i]["conversation"]["can_write"]["allowed"]:
                 _l.append(q["items"][i]["conversation"]["peer"]["id"])
-        print(_l)
+        self.log.debug(_l)
         return _l
 
     def send_call(self) -> None:
@@ -219,7 +219,6 @@ class Bot:
                 self.send_message(
                     pid=self.event.object.from_id, msg=f"Cтуденты призваны."
                 )
-                print("Студенты призваны.")
                 self.mode = "wait_for_command"
 
         else:
@@ -333,10 +332,12 @@ class Bot:
                 if self.sh.cell(i, col).value != self.sh.cell(41, col).value:
                     debtor_ids.append(self.sh.cell(i, 3).value)
         except gspread.exceptions.APIError as e:
-            print(f"[ERROR]: [{e.response.error.code}] – {e.response.error.message}")
+            self.log.error(
+                f"[ERROR]: [{e.response.error.code}] – {e.response.error.message}"
+            )
             self.handle_table(col)
         except (AttributeError, KeyError, ValueError):
-            print("Херню ты натворил, Даня!")
+            self.log.error("Херню ты натворил, Даня!")
         else:
             men = self.generate_mentions(debtor_ids, True)
             cash = self.sh.cell(41, col).value
@@ -354,10 +355,6 @@ class Bot:
         men, cash, goal = self.handle_table(col)
         msg = f"{men} вам нужно принести по {cash} на {goal.lower()}."
         self.send_message(pid=self.cid, msg=msg)
-        print("Должники призваны")
-        self.send_message(
-            pid=self.event.object.from_id, msg="Я напомнил холопам об их долгах.",
-        )
         self.send_gui(text="Команда успешно выполнена.")
 
     def get_users_info(self, ids: list) -> list:

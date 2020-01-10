@@ -54,7 +54,6 @@ class Bot:
 
     def __init__(self) -> None:
 
-        print("Инициализация...")
         self.log_level = int(os.environ["LOG_LEVEL"])
 
         # Инициализация и настройка logging
@@ -77,22 +76,22 @@ class Bot:
 
         # Авторизация в PostgreSQL - базе данных
 
-        print("Авторизация базы данных...", end=" ")
+        self.log.info("Авторизация базы данных...")
         try:
             db = Database(self.db_url)
             db.connect()
         except TypeError:
-            print("Неудача. Ошибка авторизации.")
+            self.log.error("Неудача. Ошибка авторизации.")
         else:
-            print("Успех.")
+            self.log.info("Успех.")
 
         # Авторизация в API ВКонтакте
-        print("Авторизация ВКонтакте...", end=" ")
+        self.log.info("Авторизация ВКонтакте...")
         try:
             self.bot_session = vk_api.VkApi(token=self.token, api_version="5.103")
             self.user_session = vk_api.VkApi(token=self.user_token, api_version="5.103")
         except vk_api.exceptions.AuthError:
-            print("Неудача. Ошибка авторизации.")
+            self.log.error("Неудача. Ошибка авторизации.")
         else:
             try:
                 self.bot_vk = self.bot_session.get_api()
@@ -101,12 +100,12 @@ class Bot:
                     vk=self.bot_session, group_id=self.gid
                 )
             except requests.exceptions.ConnectionError:
-                print("Неудача. Превышен лимит попыток подключения.")
+                self.log.error("Неудача. Превышен лимит попыток подключения.")
             except vk_api.exceptions.ApiError:
-                print("Неудача. Ошибка доступа.")
+                self.log.error("Неудача. Ошибка доступа.")
             else:
-                print("Успех.")
-                print(f"Версия API ВКонтакте: {self.bot_session.api_version}.")
+                self.log.info("Успех.")
+                self.log.debug(f"Версия API ВКонтакте: {self.bot_session.api_version}.")
 
         # Инициализация дополнительных переменных
         self.event = {}
@@ -117,7 +116,7 @@ class Bot:
         self.ids = []
 
         # Авторизация в API Google Sheets и подключение к заданной таблице
-        print("Авторизация в Google Cloud...", end=" ")
+        self.log.info("Авторизация в Google Cloud...")
         self.scope = [
             "https://spreadsheets.google.com/feeds",
             "https://www.googleapis.com/auth/drive",
@@ -127,13 +126,13 @@ class Bot:
                 keyfile_dict=json.loads(os.environ["GOOGLE_CREDS"]), scopes=self.scope
             )
         except binErr:
-            print("Неудача.")
+            self.log.error("Неудача.")
         else:
             self.gc = gspread.authorize(credentials=credentials)
             self.table_auth = self.gc.open_by_key(key=self.table)
             self.sh = self.table_auth.get_worksheet(0)
             self.sh_sch = self.table_auth.get_worksheet(1)
-            print("Успех.")
+            self.log.info("Успех.")
 
         self.df_key = os.environ["DIALOGFLOW"]
 
@@ -141,19 +140,19 @@ class Bot:
         self.NEW_MESSAGE = VkBotEventType.MESSAGE_NEW
         self.NEW_POST = VkBotEventType.WALL_POST_NEW
 
-        print("Беседа...", end=" ")
-        print("Тестовая" if self.cid == "2000000001" else "Основная")
+        self.log.info("Беседа...")
+        self.log.info("Тестовая" if self.cid == "2000000001" else "Основная")
 
-        print("Обновление версии в статусе группы...", end=" ")
+        self.log.info("Обновление версии в статусе группы...")
         try:
             with open("VERSION.txt", "r") as f:
                 v = f"Версия: {f.read()}"
             self.user_vk.status.set(text=v, group_id=self.gid)
         except vk_api.exceptions.ApiError as e:
-            print(f"Ошибка {e.__str__()}")
+            self.log.error(f"Ошибка {e.__str__()}")
         else:
-            print(f"Успех. {v}.")
-        print("Инициализация завершена.")
+            self.log.info(f"Успех. {v}.")
+        self.log.info("Инициализация завершена.")
         self.send_message(msg="Инициализация... Успех.", pid=self.admins[0])
 
     def send_message(

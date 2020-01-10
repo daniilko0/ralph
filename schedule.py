@@ -120,10 +120,7 @@ class Schedule:
             if self.check() is not None:
                 sch = self.make_schedule()
                 self.log.info("Расписание отправлено.")
-                bot.send_message(
-                    msg=sch,
-                    pid=bot.cid
-                )
+                bot.send_message(msg=sch, pid=bot.cid)
                 bot.send_mailing(msg=sch)
                 pause()
             else:

@@ -39,10 +39,6 @@ def pause():
 class Schedule:
     def __init__(self, date: str):
 
-        self.raw = requests.get(
-            f"http://rating.ivpek.ru/timetable/timetable/show?gid=324&date={date}"
-        ).text
-        self.s = BeautifulSoup(self.raw, "lxml")
         self.log_level = int(os.environ["LOG_LEVEL"])
 
         # Инициализация и настройка logging
@@ -55,6 +51,15 @@ class Schedule:
         logging.basicConfig(
             filename="ralph.log", format=log_format, datefmt="%d-%m-%Y %H:%M:%S"
         )
+
+        try:
+            self.raw = requests.get(
+                f"http://rating.ivpek.ru/timetable/timetable/show?gid=324&date={date}"
+            ).text
+        except requests.exceptions.ConnectionError as e:
+            self.log.error(msg=e)
+        else:
+            self.s = BeautifulSoup(self.raw, "lxml")
 
     def make_schedule(self):
         for span in self.s.find_all("span", {"class": "ldur"}):

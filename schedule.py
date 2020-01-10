@@ -63,8 +63,8 @@ class Schedule:
                         f"Кузнецова И.Н/Коротина М.А. 12/13а"
                     )
                     schedule[i][j + 1] = ""
-                    msg += f"{item} "
-                msg += "\n"
+                msg += f"{item} "
+            msg += "\n"
         return msg
 
     def check(self):

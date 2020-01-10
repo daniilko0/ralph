@@ -17,10 +17,6 @@ class Date:
 
 class Schedule:
     def __init__(self, date: str):
-        self.date = date
-        self.warn = "Составлено, но не опубликовано."
-        self.err = "Отсутствует."
-        self.found = "Найдено."
 
     @property
     def status(self):

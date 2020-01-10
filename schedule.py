@@ -8,6 +8,10 @@ from datetime import timedelta
 import requests
 from bs4 import BeautifulSoup
 
+from bot import Bot
+
+bot = Bot()
+
 
 class Date:
     def __init__(self):
@@ -116,7 +120,11 @@ class Schedule:
             if self.check() is not None:
                 sch = self.make_schedule()
                 self.log.info("Расписание отправлено.")
-                print(sch)
+                bot.send_message(
+                    msg=sch,
+                    pid=bot.cid
+                )
+                bot.send_mailing(msg=sch)
                 pause()
             else:
                 time.sleep(15 * 60)

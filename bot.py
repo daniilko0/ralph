@@ -23,6 +23,7 @@
 
 # CRITICAL: A serious error, indicating that the program itself may be unable to
 # continue running.
+
 import glob
 import json
 import os
@@ -31,6 +32,7 @@ import re
 from binascii import Error as binErr
 from typing import NoReturn
 from typing import Union
+import logging
 
 import gspread
 import pendulum
@@ -53,6 +55,18 @@ class Bot:
     def __init__(self) -> None:
 
         print("Инициализация...")
+        self.log_level = int(os.environ["LOG_LEVEL"])
+
+        # Инициализация и настройка logging
+        self.log = logging.getLogger()
+        self.log.setLevel(logging.DEBUG)
+
+        log_format = "%(asctime)s %(levelname)s: %(message)s"
+        logging.basicConfig(
+            filename="ralph.log", format=log_format, datefmt="%d-%m-%Y %H:%M:%S"
+        )
+
+        self.log.info("Инициализация...")
 
         self.token = os.environ["VK_TOKEN"]
         self.user_token = os.environ["VK_USER_TOKEN"]

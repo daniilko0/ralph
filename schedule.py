@@ -115,6 +115,14 @@ class Schedule:
         self.log.info("Расписание составлено.")
         return self.s
 
+    def get(self):
+        if self.check() is not None:
+            sch = self.make_schedule()
+            bot.send_message(msg=sch, pid=bot.event.object.from_id)
+        else:
+            bot.send_message(msg="Расписание отсутствует.",
+                             pid=bot.event.object.from_id)
+
     def listen(self):
         while True:
             if self.check() is not None:

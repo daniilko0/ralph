@@ -4,6 +4,8 @@ import apiai
 
 from bot import Bot
 from students import students
+from schedule import Date
+from schedule import Schedule
 
 bot = Bot()
 
@@ -86,9 +88,21 @@ for event in bot.longpoll.listen():
                 keyboard="keyboards/schedule.json",
             )
         elif payload["button"] == "today":
-            bot.get_schedule()
+            d = Date()
+            s = Schedule(d.today)
+            schedule = s.get()
+            bot.send_message(
+                msg=schedule,
+                pid=bot.event.object.from_id
+            )
         elif payload["button"] == "tomorrow":
-            bot.get_schedule_for_tomorrow()
+            d = Date()
+            s = Schedule(d.today)
+            schedule = s.get()
+            bot.send_message(
+                msg=schedule,
+                pid=bot.event.object.from_id
+            )
         elif payload["button"] == "chconv":
             bot.change_conversation()
         elif payload["button"] == "cancel":

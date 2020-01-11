@@ -49,8 +49,6 @@ class Schedule:
         self.log = logging.getLogger()
         self.log.setLevel(self.log_level)
 
-        self.log.info("OK")
-
         log_format = "%(asctime)s %(levelname)s: %(message)s"
         logging.basicConfig(
             filename="ralph.log", format=log_format, datefmt="%d-%m-%Y %H:%M:%S"

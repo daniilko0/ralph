@@ -116,10 +116,9 @@ class Schedule:
     def get(self):
         if self.check() is not None:
             sch = self.make_schedule()
-            bot.send_message(msg=sch, pid=bot.event.object.from_id)
+            return sch
         else:
-            bot.send_message(msg="Расписание отсутствует.",
-                             pid=bot.event.object.from_id)
+            return "Расписание отсутствует."
 
     def listen(self):
         while True:

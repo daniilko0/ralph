@@ -78,8 +78,8 @@ class Bot:
 
         self.log.info("Авторизация базы данных...")
         try:
-            db = Database(self.db_url)
-            db.connect()
+            self.db = Database(self.db_url)
+            self.db.connect()
         except TypeError:
             self.log.error("Неудача. Ошибка авторизации.")
         else:
@@ -153,7 +153,6 @@ class Bot:
         else:
             self.log.info(f"Успех. {v}.")
         self.log.info("Инициализация завершена.")
-        self.send_message(msg="Инициализация... Успех.", pid=self.admins[0])
 
     def send_message(
         self,

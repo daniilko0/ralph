@@ -91,18 +91,12 @@ for event in bot.longpoll.listen():
             d = Date()
             s = Schedule(d.today)
             schedule = s.get()
-            bot.send_message(
-                msg=schedule,
-                pid=bot.event.object.from_id
-            )
+            bot.send_message(msg=schedule, pid=bot.event.object.from_id)
         elif payload["button"] == "tomorrow":
             d = Date()
             s = Schedule(d.today)
             schedule = s.get()
-            bot.send_message(
-                msg=schedule,
-                pid=bot.event.object.from_id
-            )
+            bot.send_message(msg=schedule, pid=bot.event.object.from_id)
         elif payload["button"] == "chconv":
             bot.change_conversation()
         elif payload["button"] == "cancel":

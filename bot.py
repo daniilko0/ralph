@@ -24,7 +24,6 @@
 # CRITICAL: A serious error, indicating that the program itself may be unable to
 # continue running.
 
-import glob
 import json
 import os
 import random

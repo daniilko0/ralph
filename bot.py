@@ -60,7 +60,7 @@ class Bot:
 
         # Инициализация и настройка logging
         self.log = logging.getLogger()
-        self.log.setLevel(logging.DEBUG)
+        self.log.setLevel(self.log_level)
 
         log_format = "%(asctime)s %(levelname)s: %(message)s"
         logging.basicConfig(

@@ -32,6 +32,8 @@ import re
 from binascii import Error as binErr
 from typing import NoReturn
 from typing import Union
+from typing import Tuple
+from typing import List
 import logging
 
 import gspread
@@ -158,7 +160,7 @@ class Bot:
         self,
         msg: str,
         pid: int = None,
-        keyboard="",
+        keyboard: str = "",
         attachments: str = None,
         user_ids: str = None,
     ) -> NoReturn:
@@ -185,13 +187,22 @@ class Bot:
         except FileNotFoundError:
             self.log.error("Такого файла не существует.")
 
-    def send_mailing(self, msg: str = "", attach: str = None):
+    def send_mailing(self, msg: str = "", attach: str = None) -> NoReturn:
+
+        """
+        FIXME
+        Отправка рассылки всем пользователям, активировавшим бота
+        """
+
         if msg == "":
             msg = "Это просто тест."
         pids = ",".join(self.get_conversations_ids())
         self.send_message(msg=msg, attachments=attach, user_ids=pids)
 
-    def get_conversations_ids(self):
+    def get_conversations_ids(self) -> list:
+        """
+        Получает идентификаторы пользователей последних 200 диалогов
+        """
         q = self.bot_vk.messages.getConversations(count=200, group_id=self.gid)
         _l = []
         for i in range(len(q["items"])):
@@ -200,7 +211,7 @@ class Bot:
         self.log.debug(_l)
         return _l
 
-    def send_call(self) -> None:
+    def send_call(self) -> NoReturn:
 
         """
         Призывает всех студентов в активной беседе.
@@ -225,7 +236,7 @@ class Bot:
                 pid=self.event.object.from_id, msg="У тебя нет доступа к этой функции.",
             )
 
-    def send_conversation(self) -> None:
+    def send_conversation(self) -> NoReturn:
 
         """
         Сообщает, какая беседа активна (тестовая или основная)
@@ -246,7 +257,7 @@ class Bot:
                 pid=self.event.object.from_id, msg="У тебя нет доступа к этой функции."
             )
 
-    def get_schedule_for_tomorrow(self) -> None:
+    def get_schedule_for_tomorrow(self) -> NoReturn:
         """
         Получает строку с завтрашней датой (послезавтрашней, если сегодня суббота) и вы-
         зывает self.get_schedule()
@@ -258,7 +269,7 @@ class Bot:
         date = pendulum.now("Europe/Moscow").add(days=a).format("YYYY-MM-DD")
         self.get_schedule(date=date)
 
-    def get_schedule(self, date: Union[str, bool] = False) -> None:
+    def get_schedule(self, date: Union[str, bool] = False) -> NoReturn:
         """
         Запрашивает расписание на указанную дату у сервера.
         """
@@ -322,7 +333,7 @@ class Bot:
                 msg = f"Расписание на {sch_date}:\n{msg}"
             self.send_message(pid=pid, msg=msg)
 
-    def handle_table(self, col):
+    def handle_table(self, col: int) -> Tuple[str]:
         men, cash, goal = None, None, None
         try:
             self.gc.login()
@@ -346,7 +357,10 @@ class Bot:
         else:
             self.handle_table(col)
 
-    def get_debtors(self, col):
+    def get_debtors(self, col: int) -> NoReturn:
+        """
+        Призывает должников
+        """
         self.send_message(
             pid=self.event.object.from_id,
             msg="Эта команда может работать медленно. Прошу немного подождать.",
@@ -356,7 +370,7 @@ class Bot:
         self.send_message(pid=self.cid, msg=msg)
         self.send_gui(text="Команда успешно выполнена.")
 
-    def get_users_info(self, ids: list) -> list:
+    def get_users_info(self, ids: list) -> List[dict]:
         """
         Получает информацию о пользователях с указанными id
         """
@@ -376,6 +390,9 @@ class Bot:
         return result
 
     def change_conversation(self) -> str:
+        """
+        Меняет активную беседу
+        """
         if self.current_is_admin():
             if self.cid == "2000000001":
                 self.cid = "2000000002"
@@ -396,7 +413,10 @@ class Bot:
         """
         return str(self.event.object.from_id) in self.admins
 
-    def send_gui(self, text: str = "Привет!"):
+    def send_gui(self, text: str = "Привет!") -> NoReturn:
+        """
+        Отправляет клавиатуру в зависимости от статуса пользователя
+        """
         if self.current_is_admin():
             self.send_message(
                 pid=self.event.object.from_id,

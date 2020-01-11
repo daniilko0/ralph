@@ -26,21 +26,17 @@ continue running.
 """
 
 import json
+import logging
 import os
 import random
-import re
 from binascii import Error as binErr
-from typing import NoReturn
-from typing import Union
-from typing import Tuple
 from typing import List
-import logging
+from typing import NoReturn
+from typing import Tuple
 
 import gspread
-import pendulum
 import requests
 import vk_api
-from bs4 import BeautifulSoup
 from oauth2client.service_account import ServiceAccountCredentials
 from vk_api.bot_longpoll import VkBotEventType
 

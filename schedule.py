@@ -41,7 +41,7 @@ def pause():
 
 
 class Schedule:
-    def __init__(self, date: str):
+    def __init__(self, date: str, gid: str = "324"):
 
         self.log_level = int(os.environ["LOG_LEVEL"])
 
@@ -56,7 +56,7 @@ class Schedule:
 
         try:
             self.raw = requests.get(
-                f"http://rating.ivpek.ru/timetable/timetable/show?gid=324&date={date}"
+                f"http://rating.ivpek.ru/timetable/timetable/show?gid={gid}&date={date}"
             ).text
         except requests.exceptions.ConnectionError as e:
             self.log.error(msg=e)

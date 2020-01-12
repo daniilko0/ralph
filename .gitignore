@@ -20,3 +20,6 @@ test/__pycache__
 
 # Log files
 ralph.log
+
+# Data files
+students.txt

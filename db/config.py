@@ -11,5 +11,5 @@ tables["students"] = {
     "tg_id": "BIGINT CHECK (tg_id > 0)",
     "email": "VARCHAR (355) UNIQUE",
     "status": "SMALLINT DEFAULT 1 CHECK (1 <= status), CHECK (status <= 5)",
-    "is_admin": "SMALLINT DEFAULT 0"
+    "is_admin": "SMALLINT DEFAULT 0",
 }

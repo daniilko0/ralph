@@ -197,8 +197,9 @@ class Bot:
         """
         Получает идентификаторы пользователей последних 200 диалогов
         """
-        q = self.bot_vk.messages.getConversations(offset=1, count=200,
-                                                  group_id=self.gid)
+        q = self.bot_vk.messages.getConversations(
+            offset=1, count=200, group_id=self.gid
+        )
         _l = []
         for i in range(len(q["items"])):
             if q["items"][i]["conversation"]["can_write"]["allowed"]:

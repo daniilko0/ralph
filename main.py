@@ -11,7 +11,6 @@ bot = Bot()
 
 for event in bot.longpoll.listen():
     bot.event = event
-    print(bot.mode)
     if (
         bot.event.type == bot.NEW_MESSAGE
         and bot.event.object.text

@@ -60,7 +60,7 @@ class Bot:
 
         log_format = "%(asctime)s %(levelname)s: %(message)s"
         logging.basicConfig(
-            filename="ralph.log", format=log_format, datefmt="%d-%m-%Y %H:%M:%S"
+            format=log_format, datefmt="%d-%m-%Y %H:%M:%S"
         )
 
         self.log.info("Инициализация...")

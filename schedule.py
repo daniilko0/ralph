@@ -1,7 +1,7 @@
+import logging
+import os
 import re
 import time
-import os
-import logging
 from datetime import datetime
 from datetime import timedelta
 
@@ -116,7 +116,10 @@ class Schedule:
     def get(self):
         if self.check() is not None:
             sch = self.make_schedule()
-            return sch
+            if sch != "":
+                return sch
+            else:
+                return "Расписание отсутствует."
         else:
             return "Расписание отсутствует."
 

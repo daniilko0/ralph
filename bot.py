@@ -52,7 +52,7 @@ class Bot:
 
     def __init__(self) -> None:
 
-        self.log_level = os.environ["LOG_LEVEL"]
+        self.log_level = int(os.environ["LOG_LEVEL"])
 
         # Инициализация и настройка logging
         self.log = logging.getLogger()

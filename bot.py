@@ -52,7 +52,7 @@ class Bot:
 
     def __init__(self) -> None:
 
-        self.log_level = int(os.environ["LOG_LEVEL"])
+        self.log_level = os.environ["LOG_LEVEL"]
 
         # Инициализация и настройка logging
         self.log = logging.getLogger()
@@ -202,8 +202,7 @@ class Bot:
         _l = []
         for i in range(len(q["items"])):
             if q["items"][i]["conversation"]["can_write"]["allowed"]:
-                _l.append(q["items"][i]["conversation"]["peer"]["id"])
-        self.log.debug(_l)
+                _l.append(str(q["items"][i]["conversation"]["peer"]["id"]))
         return _l
 
     def send_call(self) -> NoReturn:
@@ -289,7 +288,7 @@ class Bot:
         self.send_message(msg=msg, pid=self.cid)
         self.send_gui(text="Команда успешно выполнена.")
 
-    def get_users_info(self, ids: list) -> List[dict, ..., ...]:
+    def get_users_info(self, ids: list) -> List[dict]:
         """
         Получает информацию о пользователях с указанными id
         """

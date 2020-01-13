@@ -3,14 +3,15 @@ import json
 import apiai
 
 from bot import Bot
-from students import students
 from schedule import Date
 from schedule import Schedule
+from students import students
 
 bot = Bot()
 
 for event in bot.longpoll.listen():
     bot.event = event
+    print(bot.mode)
     if (
         bot.event.type == bot.NEW_MESSAGE
         and bot.event.object.text
@@ -64,7 +65,7 @@ for event in bot.longpoll.listen():
                 'отправке, нажмите "Сохранить"',
                 pid=bot.event.object.from_id,
             )
-        elif payload["button"] == "confirm":
+        elif payload["button"] == "confirm" and bot.mode == "ask_for_msg":
             bot.send_message(pid=bot.cid, msg=bot.text)
             bot.text = ""
             bot.ids = []
@@ -130,7 +131,7 @@ for event in bot.longpoll.listen():
                 keyboard="keyboards/call.json",
             )
         elif bot.mode == "wait_for_newsletter_message":
-            bot.mode = "prompt_for_newletter"
+            bot.mode = "prompt_for_newsletter"
             bot.text = bot.event.object.text
             bot.send_message(
                 msg="Всем пользователям, активировавшим бота будет отправлено "
@@ -141,9 +142,6 @@ for event in bot.longpoll.listen():
         elif payload["button"] == "confirm" and bot.mode == "prompt_for_newsletter":
             bot.send_mailing(msg=bot.text)
             bot.send_gui(text="Рассылка отправлена")
-        elif payload["button"] == "confirm" and bot.mode == "prompt_for_newsletter":
-            bot.text = ""
-            bot.send_gui(text="Отправка рассылки отменена.")
         elif payload["button"] == "cancel" and bot.mode == "select_letter":
             bot.text = ""
             bot.ids = []

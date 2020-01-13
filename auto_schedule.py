@@ -100,7 +100,7 @@ while True:
             if msg:
                 msg = "Расписание на {}:\n".format(msg_date) + msg
                 bot.send_mailing(msg=msg)
-                bot.send_message(pid=bot.cid, msg=msg)
+                bot.send_message(msg=msg, pid=bot.cid)
                 update_table()
 
             hour = datetime.now().hour

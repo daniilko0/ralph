@@ -59,9 +59,7 @@ class Bot:
         self.log.setLevel(self.log_level)
 
         log_format = "%(asctime)s %(levelname)s: %(message)s"
-        logging.basicConfig(
-            format=log_format, datefmt="%d-%m-%Y %H:%M:%S"
-        )
+        logging.basicConfig(format=log_format, datefmt="%d-%m-%Y %H:%M:%S")
 
         self.log.info("Инициализация...")
 
@@ -73,7 +71,6 @@ class Bot:
         self.db_url = os.environ["DATABASE_URL"]
 
         # Авторизация в PostgreSQL - базе данных
-
         self.log.info("Авторизация базы данных...")
         try:
             self.db = Database(self.db_url)
@@ -132,14 +129,16 @@ class Bot:
             self.sh_sch = self.table_auth.get_worksheet(1)
             self.log.info("Успех.")
 
+        # API ключ Dialogflow (Искусственный интеллект)
         self.df_key = os.environ["DIALOGFLOW"]
 
         # Переименование обрабатываемых типов событий
         self.NEW_MESSAGE = VkBotEventType.MESSAGE_NEW
         self.NEW_POST = VkBotEventType.WALL_POST_NEW
 
-        self.log.info("Беседа...")
-        self.log.info("Тестовая" if self.cid == "2000000001" else "Основная")
+        self.log.info(
+            f"Беседа... {'Тестовая' if self.cid.endswith('1') else 'Основная'}"
+        )
 
         self.log.info("Обновление версии в статусе группы...")
         try:
@@ -149,7 +148,7 @@ class Bot:
         except vk_api.exceptions.ApiError as e:
             self.log.error(f"Ошибка {e.__str__()}")
         else:
-            self.log.info(f"Успех. {v}.")
+            self.log.info(f"Успех.")
         self.log.info("Инициализация завершена.")
 
     def send_message(
@@ -179,9 +178,9 @@ class Bot:
             )
 
         except vk_api.exceptions.ApiError as e:
-            self.log.error(f"[ОШИБКА]: {e.__str__()}")
-        except FileNotFoundError:
-            self.log.error("Такого файла не существует.")
+            self.log.error(msg=e.__str__())
+        except FileNotFoundError as e:
+            self.log.error(msg=e)
 
     def send_mailing(self, msg: str = "", attach: str = None) -> NoReturn:
 
@@ -192,10 +191,10 @@ class Bot:
 
         if msg == "":
             msg = "Это просто тест."
-        pids = ",".join(self.get_conversations_ids())
+        pids = ",".join(self._get_conversations_ids())
         self.send_message(msg=msg, attachments=attach, user_ids=pids)
 
-    def get_conversations_ids(self) -> list:
+    def _get_conversations_ids(self) -> list:
         """
         Получает идентификаторы пользователей последних 200 диалогов
         """
@@ -223,13 +222,13 @@ class Bot:
                     msg=members, pid=self.cid,
                 )
                 self.send_message(
-                    pid=self.event.object.from_id, msg=f"Cтуденты призваны."
+                    msg=f"Cтуденты призваны.", pid=self.event.object.from_id
                 )
                 self.mode = "wait_for_command"
 
         else:
             self.send_message(
-                pid=self.event.object.from_id, msg="У тебя нет доступа к этой функции.",
+                msg="У тебя нет доступа к этой функции.", pid=self.event.object.from_id
             )
 
     def send_conversation(self) -> NoReturn:
@@ -242,18 +241,18 @@ class Bot:
         if self.current_is_admin():
             if self.cid == "2000000001":
                 self.send_message(
-                    pid=self.event.object.from_id, msg="Тестовая беседа активна."
+                    msg="Тестовая беседа активна.", pid=self.event.object.from_id
                 )
             if self.cid == "2000000002":
                 self.send_message(
-                    pid=self.event.object.from_id, msg="Основная беседа активна."
+                    msg="Основная беседа активна.", pid=self.event.object.from_id
                 )
         else:
             self.send_message(
-                pid=self.event.object.from_id, msg="У тебя нет доступа к этой функции."
+                msg="У тебя нет доступа к этой функции.", pid=self.event.object.from_id
             )
 
-    def handle_table(self, col: int) -> Tuple[str]:
+    def handle_table(self, col: int) -> Tuple[str, str, str]:
         men, cash, goal = None, None, None
         try:
             self.gc.login()
@@ -282,15 +281,15 @@ class Bot:
         Призывает должников
         """
         self.send_message(
-            pid=self.event.object.from_id,
             msg="Эта команда может работать медленно. Прошу немного подождать.",
+            pid=self.event.object.from_id,
         )
         men, cash, goal = self.handle_table(col)
         msg = f"{men} вам нужно принести по {cash} на {goal.lower()}."
-        self.send_message(pid=self.cid, msg=msg)
+        self.send_message(msg=msg, pid=self.cid)
         self.send_gui(text="Команда успешно выполнена.")
 
-    def get_users_info(self, ids: list) -> List[dict]:
+    def get_users_info(self, ids: list) -> List[dict, ..., ...]:
         """
         Получает информацию о пользователях с указанными id
         """
@@ -324,7 +323,7 @@ class Bot:
                 return self.cid
         else:
             self.send_message(
-                pid=self.event.object.from_id, msg="У тебя нет доступа к этой функции."
+                msg="У тебя нет доступа к этой функции.", pid=self.event.object.from_id
             )
 
     def current_is_admin(self) -> bool:
@@ -339,13 +338,13 @@ class Bot:
         """
         if self.current_is_admin():
             self.send_message(
-                pid=self.event.object.from_id,
                 msg=text,
+                pid=self.event.object.from_id,
                 keyboard="keyboards/admin.json",
             )
         else:
             self.send_message(
-                pid=self.event.object.from_id, msg=text, keyboard="keyboards/user.json",
+                msg=text, pid=self.event.object.from_id, keyboard="keyboards/user.json",
             )
         self.mode = "wait_for_command"
 
@@ -353,14 +352,14 @@ class Bot:
         self.mode = "ask_for_msg"
         if self.current_is_admin():
             self.send_message(
-                pid=self.event.object.from_id,
                 msg="Отправьте сообщение с текстом объявления"
                 "(вложения пока не поддерживаются).",
+                pid=self.event.object.from_id,
                 keyboard=open("keyboards/empty.json", "r", encoding="UTF-8").read(),
             )
 
     def show_msg(self, text: str):
         self.text = text
         self.send_message(
-            pid=self.event.object.from_id, msg=text, keyboard="keyboards/prompt.json",
+            msg=text, pid=self.event.object.from_id, keyboard="keyboards/prompt.json",
         )

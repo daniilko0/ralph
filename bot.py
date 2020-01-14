@@ -41,7 +41,6 @@ from oauth2client.service_account import ServiceAccountCredentials
 from vk_api.bot_longpoll import VkBotEventType
 
 from db import Database
-from students import students
 from vkbotlongpoll import RalphVkBotLongPoll
 
 
@@ -217,26 +216,6 @@ class Bot:
             if q["items"][i]["conversation"]["can_write"]["allowed"]:
                 _l.append(str(q["items"][i]["conversation"]["peer"]["id"]))
         return _l
-
-    @auth
-    def send_call(self) -> NoReturn:
-
-        """
-        Призывает всех студентов в активной беседе.
-
-        Важно: Требует права администратора.
-        """
-        self.mode = "execute"
-        members = self.generate_mentions(list(students.keys()), names=False)
-        if members is not None:
-            self.mode = "wait_for_command"
-            self.send_message(
-                msg=members, pid=self.cid,
-            )
-            self.send_message(
-                msg=f"Cтуденты призваны.", pid=self.event.object.from_id
-            )
-            self.mode = "wait_for_command"
 
     def send_conversation(self) -> NoReturn:
 

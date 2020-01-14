@@ -10,6 +10,15 @@
         },
         "color": "secondary"
       }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Отмена",
+          "payload": "{\"button\": \"home\"}"
+        }
+      }
     ]
   ]
 }

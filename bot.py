@@ -1,11 +1,11 @@
 """
 :project: ralph
 :version: see VERSION.txt
-:authors: dadyarri & 6a16ec
-:contact: https://vk.me/dadyarri & https://vk.me/6a16ec
+:authors: dadyarri, 6a16ec
+:contact: https://vk.me/dadyarri, https://vk.me/6a16ec
 :license: MIT
 
-:copyright: (c) 2019 - 2020 dadyarri & 6a16ec
+:copyright: (c) 2019 - 2020 dadyarri, 6a16ec
 
 Info about logging levels:
 

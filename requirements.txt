@@ -40,7 +40,7 @@ rsa==4.0
 six==1.13.0
 soupsieve==1.9.5
 toml==0.10.0
-typed-ast==1.4.0
+typed-ast==1.4.1
 urllib3==1.25.7
 virtualenv==16.7.9
 vk-api==11.6.1

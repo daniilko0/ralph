@@ -53,6 +53,7 @@ def auth(func):
             )
         else:
             func(self)
+
     return wrapper
 
 
@@ -117,9 +118,11 @@ class Bot:
         self.event = {}
         self.admins = os.environ["ADMINS_IDS"].split(",")
 
+        # Переменные состояния сессии (для администраторов)
         self.mode = ""
         self.text = ""
         self.ids = []
+        self.col = 0
 
         # Авторизация в API Google Sheets и подключение к заданной таблице
         self.log.info("Авторизация в Google Cloud...")
@@ -258,7 +261,7 @@ class Bot:
             self._handle_table(col)
 
     @auth
-    def get_debtors(self, col: int) -> NoReturn:
+    def get_debtors(self) -> NoReturn:
         """
         Призывает должников
         """
@@ -266,7 +269,7 @@ class Bot:
             msg="Эта команда может работать медленно. Прошу немного подождать.",
             pid=self.event.object.from_id,
         )
-        men, cash, goal = self._handle_table(col)
+        men, cash, goal = self._handle_table(self.col)
         msg = f"{men} вам нужно принести по {cash} на {goal.lower()}."
         self.send_message(msg=msg, pid=self.cid)
         self.send_gui(text="Команда успешно выполнена.")

@@ -80,7 +80,8 @@ for event in bot.longpoll.listen():
                 keyboard="keyboards/select_col.json",
             )
         elif payload["button"] == "col_id":
-            bot.get_debtors(col=payload["id"])
+            bot.col = payload["id"]
+            bot.get_debtors()
         elif payload["button"] == "schedule":
             bot.send_message(
                 msg="Отправка клавиатуры с расписанием.",

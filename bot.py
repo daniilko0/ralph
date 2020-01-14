@@ -47,10 +47,7 @@ from vkbotlongpoll import RalphVkBotLongPoll
 def auth(func):
     def wrapper(self):
         if not self._current_is_admin():
-            self.send_message(
-                msg="У тебя нет доступа к этой функции",
-                pid=self.event.object.from_id
-            )
+            self.send_gui(text="У тебя нет доступа к этой функции.")
         else:
             func(self)
 

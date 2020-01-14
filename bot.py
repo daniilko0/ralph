@@ -45,6 +45,18 @@ from students import students
 from vkbotlongpoll import RalphVkBotLongPoll
 
 
+def auth(func):
+    def wrapper(self):
+        if not self.current_is_admin():
+            self.send_message(
+                msg="У тебя нет доступа к этой функции",
+                pid=self.event.object.from_id
+            )
+        else:
+            func(self)
+    return wrapper
+
+
 class Bot:
     """
     Класс, описывающий объект бота, включая авторизацию в API, и все методы бота.
@@ -206,6 +218,7 @@ class Bot:
                 _l.append(str(q["items"][i]["conversation"]["peer"]["id"]))
         return _l
 
+    @auth
     def send_call(self) -> NoReturn:
 
         """
@@ -213,23 +226,17 @@ class Bot:
 
         Важно: Требует права администратора.
         """
-        if self.current_is_admin():
-            self.mode = "execute"
-            members = self.generate_mentions(list(students.keys()), names=False)
-            if members is not None:
-                self.mode = "wait_for_command"
-                self.send_message(
-                    msg=members, pid=self.cid,
-                )
-                self.send_message(
-                    msg=f"Cтуденты призваны.", pid=self.event.object.from_id
-                )
-                self.mode = "wait_for_command"
-
-        else:
+        self.mode = "execute"
+        members = self.generate_mentions(list(students.keys()), names=False)
+        if members is not None:
+            self.mode = "wait_for_command"
             self.send_message(
-                msg="У тебя нет доступа к этой функции.", pid=self.event.object.from_id
+                msg=members, pid=self.cid,
             )
+            self.send_message(
+                msg=f"Cтуденты призваны.", pid=self.event.object.from_id
+            )
+            self.mode = "wait_for_command"
 
     def send_conversation(self) -> NoReturn:
 
@@ -238,18 +245,13 @@ class Bot:
 
         Важно: Требует права администратора.
         """
-        if self.current_is_admin():
-            if self.cid == "2000000001":
-                self.send_message(
-                    msg="Тестовая беседа активна.", pid=self.event.object.from_id
-                )
-            if self.cid == "2000000002":
-                self.send_message(
-                    msg="Основная беседа активна.", pid=self.event.object.from_id
-                )
-        else:
+        if self.cid == "2000000001":
             self.send_message(
-                msg="У тебя нет доступа к этой функции.", pid=self.event.object.from_id
+                msg="Тестовая беседа активна.", pid=self.event.object.from_id
+            )
+        if self.cid == "2000000002":
+            self.send_message(
+                msg="Основная беседа активна.", pid=self.event.object.from_id
             )
 
     def handle_table(self, col: int) -> Tuple[str, str, str]:
@@ -276,6 +278,7 @@ class Bot:
         else:
             self.handle_table(col)
 
+    @auth
     def get_debtors(self, col: int) -> NoReturn:
         """
         Призывает должников
@@ -308,23 +311,19 @@ class Bot:
         )
         return result
 
+    @auth
     def change_conversation(self) -> str:
         """
         Меняет активную беседу
         """
-        if self.current_is_admin():
-            if self.cid == "2000000001":
-                self.cid = "2000000002"
-                self.send_conversation()
-                return self.cid
-            elif self.cid == "2000000002":
-                self.cid = "2000000001"
-                self.send_conversation()
-                return self.cid
-        else:
-            self.send_message(
-                msg="У тебя нет доступа к этой функции.", pid=self.event.object.from_id
-            )
+        if self.cid == "2000000001":
+            self.cid = "2000000002"
+            self.send_conversation()
+            return self.cid
+        elif self.cid == "2000000002":
+            self.cid = "2000000001"
+            self.send_conversation()
+            return self.cid
 
     def current_is_admin(self) -> bool:
         """
@@ -348,15 +347,15 @@ class Bot:
             )
         self.mode = "wait_for_command"
 
+    @auth
     def ask_for_msg(self):
         self.mode = "ask_for_msg"
-        if self.current_is_admin():
-            self.send_message(
-                msg="Отправьте сообщение с текстом объявления"
-                "(вложения пока не поддерживаются).",
-                pid=self.event.object.from_id,
-                keyboard=open("keyboards/empty.json", "r", encoding="UTF-8").read(),
-            )
+        self.send_message(
+            msg="Отправьте сообщение с текстом объявления"
+            "(вложения пока не поддерживаются).",
+            pid=self.event.object.from_id,
+            keyboard=open("keyboards/empty.json", "r", encoding="UTF-8").read(),
+        )
 
     def show_msg(self, text: str):
         self.text = text

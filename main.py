@@ -44,7 +44,7 @@ for event in bot.longpoll.listen():
                 keyboard="keyboards/call.json",
             )
         elif payload["button"] == "call":
-            bot.mode = "ask_for_msg"
+            bot.mode = "_ask_for_msg"
             bot.send_message(
                 msg="Отправьте сообщение к призыву (вложения не поддерживаются)",
                 pid=bot.event.object.from_id,
@@ -64,7 +64,7 @@ for event in bot.longpoll.listen():
                 'отправке, нажмите "Сохранить"',
                 pid=bot.event.object.from_id,
             )
-        elif payload["button"] == "confirm" and bot.mode == "ask_for_msg":
+        elif payload["button"] == "confirm" and bot.mode == "_ask_for_msg":
             bot.send_message(pid=bot.cid, msg=bot.text)
             bot.text = ""
             bot.ids = []
@@ -113,8 +113,8 @@ for event in bot.longpoll.listen():
                 f = True
             else:
                 f = False
-            bot.text = f"{bot.generate_mentions(ids=bot.ids, names=f)}\n{bot.text}"
-            bot.show_msg(f"{bot.text}")
+            bot.text = f"{bot._generate_mentions(ids=bot.ids, names=f)}\n{bot.text}"
+            bot._show_msg(f"{bot.text}")
         elif payload["button"] == "newsletter":
             bot.send_message(
                 msg="Введите текст рассылки.", pid=bot.event.object.from_id
@@ -122,7 +122,7 @@ for event in bot.longpoll.listen():
             bot.mode = "wait_for_newsletter_message"
         elif payload["button"] == "home":
             bot.send_gui(text="Главный экран")
-        elif bot.mode == "ask_for_msg":
+        elif bot.mode == "_ask_for_msg":
             bot.text = bot.event.object.text
             bot.send_message(
                 msg="Отправка клавиатуры призыва",
@@ -137,7 +137,7 @@ for event in bot.longpoll.listen():
                 "следующее сообщение: ",
                 pid=bot.event.object.from_id,
             )
-            bot.show_msg(text=bot.text)
+            bot._show_msg(text=bot.text)
         elif payload["button"] == "confirm" and bot.mode == "prompt_for_newsletter":
             bot.send_mailing(msg=bot.text)
             bot.send_gui(text="Рассылка отправлена")

@@ -46,7 +46,7 @@ from vkbotlongpoll import RalphVkBotLongPoll
 
 def auth(func):
     def wrapper(self):
-        if not self.current_is_admin():
+        if not self._current_is_admin():
             self.send_message(
                 msg="У тебя нет доступа к этой функции",
                 pid=self.event.object.from_id
@@ -140,12 +140,11 @@ class Bot:
             self.sh_sch = self.table_auth.get_worksheet(1)
             self.log.info("Успех.")
 
-        # API ключ Dialogflow (Искусственный интеллект)
+        # API ключ Dialogflow (Искусственный интеллект для чат - модуля)
         self.df_key = os.environ["DIALOGFLOW"]
 
         # Переименование обрабатываемых типов событий
         self.NEW_MESSAGE = VkBotEventType.MESSAGE_NEW
-        self.NEW_POST = VkBotEventType.WALL_POST_NEW
 
         self.log.info(
             f"Беседа... {'Тестовая' if self.cid.endswith('1') else 'Основная'}"
@@ -217,12 +216,10 @@ class Bot:
                 _l.append(str(q["items"][i]["conversation"]["peer"]["id"]))
         return _l
 
-    def send_conversation(self) -> NoReturn:
+    def _send_conversation(self) -> NoReturn:
 
         """
         Сообщает, какая беседа активна (тестовая или основная)
-
-        Важно: Требует права администратора.
         """
         if self.cid == "2000000001":
             self.send_message(
@@ -233,7 +230,10 @@ class Bot:
                 msg="Основная беседа активна.", pid=self.event.object.from_id
             )
 
-    def handle_table(self, col: int) -> Tuple[str, str, str]:
+    def _handle_table(self, col: int) -> Tuple[str, str, str]:
+        """
+        Обрабатывает гугл-таблицу и составляет кортеж с данными о должниках
+        """
         men, cash, goal = None, None, None
         try:
             self.gc.login()
@@ -245,17 +245,17 @@ class Bot:
             self.log.error(
                 f"[ERROR]: [{e.response.error.code}] – {e.response.error.message}"
             )
-            self.handle_table(col)
+            self._handle_table(col)
         except (AttributeError, KeyError, ValueError):
             self.log.error("Херню ты натворил, Даня!")
         else:
-            men = self.generate_mentions(debtor_ids, True)
+            men = self._generate_mentions(debtor_ids, True)
             cash = self.sh.cell(41, col).value
             goal = self.sh.cell(4, col).value
         if men is not None and cash is not None and goal is not None:
             return men, cash, goal
         else:
-            self.handle_table(col)
+            self._handle_table(col)
 
     @auth
     def get_debtors(self, col: int) -> NoReturn:
@@ -266,22 +266,22 @@ class Bot:
             msg="Эта команда может работать медленно. Прошу немного подождать.",
             pid=self.event.object.from_id,
         )
-        men, cash, goal = self.handle_table(col)
+        men, cash, goal = self._handle_table(col)
         msg = f"{men} вам нужно принести по {cash} на {goal.lower()}."
         self.send_message(msg=msg, pid=self.cid)
         self.send_gui(text="Команда успешно выполнена.")
 
-    def get_users_info(self, ids: list) -> List[dict]:
+    def _get_users_info(self, ids: list) -> List[dict]:
         """
         Получает информацию о пользователях с указанными id
         """
         return self.bot_vk.users.get(user_ids=",".join(map(str, ids)))
 
-    def generate_mentions(self, ids: list, names: bool) -> str:
+    def _generate_mentions(self, ids: list, names: bool) -> str:
         """
         Генерирует строку с упоминаниями из списка идентификаторов
         """
-        users_info = self.get_users_info(ids)
+        users_info = self._get_users_info(ids)
         users_names = [
             users_info[i]["first_name"] if names else "!" for i in range(len(ids))
         ]
@@ -297,14 +297,14 @@ class Bot:
         """
         if self.cid == "2000000001":
             self.cid = "2000000002"
-            self.send_conversation()
+            self._send_conversation()
             return self.cid
         elif self.cid == "2000000002":
             self.cid = "2000000001"
-            self.send_conversation()
+            self._send_conversation()
             return self.cid
 
-    def current_is_admin(self) -> bool:
+    def _current_is_admin(self) -> bool:
         """
         Проверяет, является ли текущий пользователь администратором бота
         """
@@ -314,7 +314,7 @@ class Bot:
         """
         Отправляет клавиатуру в зависимости от статуса пользователя
         """
-        if self.current_is_admin():
+        if self._current_is_admin():
             self.send_message(
                 msg=text,
                 pid=self.event.object.from_id,
@@ -327,8 +327,8 @@ class Bot:
         self.mode = "wait_for_command"
 
     @auth
-    def ask_for_msg(self):
-        self.mode = "ask_for_msg"
+    def _ask_for_msg(self):
+        self.mode = "_ask_for_msg"
         self.send_message(
             msg="Отправьте сообщение с текстом объявления"
             "(вложения пока не поддерживаются).",
@@ -336,7 +336,7 @@ class Bot:
             keyboard=open("keyboards/empty.json", "r", encoding="UTF-8").read(),
         )
 
-    def show_msg(self, text: str):
+    def _show_msg(self, text: str):
         self.text = text
         self.send_message(
             msg=text, pid=self.event.object.from_id, keyboard="keyboards/prompt.json",

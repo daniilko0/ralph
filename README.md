@@ -35,7 +35,8 @@ RALPH - это платформа, созданная для того, чтоб�
 
 ### Вклад
 Я очень благодарен каждому человеку, принесшему пользу проекту:
-<div style="display:flex; flex-direction: row; align-items: space-between; border: 1px solid black">
-<img src="https://avatars3.githubusercontent.com/u/26770482?v=" width="60">
-<p><a href="https://github.com/6a16ec">6a16ec</a></p>
-</div>
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/6a16ec"><img src="https://avatars3.githubusercontent.com/u/26770482?v=" width="60"><br><sub><b>Nikita Semaev</b></sub></a></td>
+  </tr>
+</table>

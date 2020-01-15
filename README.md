@@ -3,7 +3,7 @@
 ![Code style](https://img.shields.io/static/v1?label=Code%20style&message=black&color=black&logo=python&logoColor=white)
 [![License: MIT](https://img.shields.io/static/v1?label=License&message=MIT&color=brightgreen)](https://opensource.org/licenses/MIT)
 
-![Pyup](https://pyup.io/repos/github/dadyarri/ralph/shield.svg)
+[![Pyup](https://pyup.io/repos/github/dadyarri/ralph/shield.svg)](https://pyup.io/account/repos/github/dadyarri/ralph/)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/dadyarri/ralph/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/dadyarri/ralph/?branch=master)
 [![Build Status](https://travis-ci.org/dadyarri/ralph.svg?branch=master)](https://travis-ci.org/dadyarri/ralph)
 ### О проекте
@@ -33,4 +33,9 @@ RALPH - это платформа, созданная для того, чтоб�
         4 - иностранец  
         5 - отчислен  
 
-
+### Вклад
+Я очень благодарен каждому человеку, принесшему пользу проекту:
+<div style="display:flex; flex-direction: row; align-items: space-between; border: 1px solid black">
+<img src="https://avatars3.githubusercontent.com/u/26770482?v=" width="60">
+<p><a href="https://github.com/6a16ec">6a16ec</a></p>
+</div>

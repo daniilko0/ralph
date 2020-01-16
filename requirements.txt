@@ -37,7 +37,7 @@ PyYAML==5.3
 regex==2020.1.8
 requests==2.22.0
 rsa==4.0
-six==1.13.0
+six==1.14.0
 soupsieve==1.9.5
 toml==0.10.0
 typed-ast==1.4.1

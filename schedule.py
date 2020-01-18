@@ -137,5 +137,5 @@ class Schedule:
 
 if __name__ == "__main__":
     d = Date()
-    a = Schedule(d.today)
+    a = Schedule(d.tomorrow)
     a.listen()

@@ -95,7 +95,7 @@ for event in bot.longpoll.listen():
             bot.send_message(msg=schedule, pid=bot.event.object.from_id)
         elif payload["button"] == "tomorrow":
             d = Date()
-            s = Schedule(d.today)
+            s = Schedule(d.tomorrow)
             schedule = s.get()
             bot.send_message(msg=schedule, pid=bot.event.object.from_id)
         elif payload["button"] == "day_after_tomorrow":

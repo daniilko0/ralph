@@ -16,11 +16,14 @@ bot = Bot()
 class Date:
     def __init__(self):
         self.today = datetime.today().strftime("%Y-%m-%d")
+        self.day_after_tomorrow = datetime.strftime(
+            datetime.now() + timedelta(2), "%Y-%m-%d"
+        )
 
     @property
     def tomorrow(self):
         if datetime.today().weekday() == 5:
-            return datetime.strftime(datetime.now() + timedelta(2), "%Y-%m-%d")
+            return self.day_after_tomorrow
         return datetime.strftime(datetime.now() + timedelta(1), "%Y-%m-%d")
 
 

@@ -23,6 +23,24 @@
       {
         "action": {
           "type": "text",
+          "label": "На послезавтра",
+          "payload": "{\"button\": \"day_after_tomorrow\"}"
+        },
+        "color": "secondary"
+      },
+      {
+        "action": {
+          "type": "text",
+          "label": "Выбрать дату",
+          "payload": "{\"button\": \"arbitrary\"}"
+        },
+        "color": "secondary"
+      }
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
           "label": "Назад",
           "payload": "{\"button\": \"home\"}"
         },

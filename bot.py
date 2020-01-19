@@ -40,7 +40,7 @@ import vk_api
 from oauth2client.service_account import ServiceAccountCredentials
 from vk_api.bot_longpoll import VkBotEventType
 
-from db import Database
+from database import Database
 from students import students
 from vkbotlongpoll import RalphVkBotLongPoll
 
@@ -74,7 +74,6 @@ class Bot:
         self.log.info("Авторизация базы данных...")
         try:
             self.db = Database(self.db_url)
-            self.db.connect()
         except TypeError:
             self.log.error("Неудача. Ошибка авторизации.")
         else:

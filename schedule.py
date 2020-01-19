@@ -57,6 +57,8 @@ class Schedule:
             filename="ralph.log", format=log_format, datefmt="%d-%m-%Y %H:%M:%S"
         )
 
+        self.date = date
+
         try:
             self.raw = requests.get(
                 f"http://rating.ivpek.ru/timetable/timetable/show?gid={gid}&date={date}"
@@ -81,7 +83,7 @@ class Schedule:
             schedule.append([el for el in cols if el])
         schedule = [el for el in schedule if len(el) > 1]
 
-        msg = ""
+        msg = f"Расписание на {self.date}\n"
         replacements = {
             "Лекция": "(Л)",
             "Лабораторная работа": "(Л/Р)",

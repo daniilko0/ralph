@@ -1,5 +1,7 @@
 # RALPH
 ## Бот – платформа, призванный управлять студеческой беседой и упростить работу старост.
+[![GitHub version](https://badge.fury.io/gh/dadyarri%2Fralph.svg)](https://badge.fury.io/gh/dadyarri%2Fralph)  
+
 ![Code style](https://img.shields.io/static/v1?label=Code%20style&message=black&color=black&logo=python&logoColor=white)
 [![License: MIT](https://img.shields.io/static/v1?label=License&message=MIT&color=brightgreen)](https://opensource.org/licenses/MIT)
 

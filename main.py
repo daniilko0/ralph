@@ -1,4 +1,6 @@
+import datetime
 import json
+import re
 
 import apiai
 
@@ -103,6 +105,11 @@ for event in bot.longpoll.listen():
             s = Schedule(d.day_after_tomorrow)
             schedule = s.get()
             bot.send_message(msg=schedule, pid=bot.event.object.from_id)
+        elif payload["button"] == "arbitrary":
+            bot.send_message(
+                msg="Напишите дату в формате ДД-ММ-ГГГГ.", pid=bot.event.object.from_id
+            )
+            bot.mode = "ask_for_schedule_date"
         elif payload["button"] == "chconv":
             bot.change_conversation()
         elif payload["button"] == "cancel":
@@ -151,6 +158,27 @@ for event in bot.longpoll.listen():
             bot.text = ""
             bot.ids = []
             bot.send_gui("Выполнение команды отменено.")
+        elif bot.mode == "ask_for_schedule_date":
+            if re.match(r"^\d\d(.|-|/)\d\d(.|-|/)20\d\d$", bot.event.object.text):
+                try:
+                    d = datetime.datetime.strptime(
+                        bot.event.object.text, "%d-%m-%Y"
+                    ).strftime("%Y-%m-%d")
+                except ValueError:
+                    bot.send_message(
+                        msg="Неверный формат даты. Попробуйте еще раз.",
+                        pid=bot.event.object.from_id,
+                    )
+                else:
+                    s = Schedule(d)
+                    schedule = s.get()
+                    bot.send_message(msg=schedule, pid=bot.event.object.from_id)
+                    bot.mode = ""
+            else:
+                bot.send_message(
+                    msg="Неверный формат даты. Попробуйте еще раз.",
+                    pid=bot.event.object.from_id,
+                )
         else:
             if bot.event.object.from_id != bot.gid:
                 df_request = apiai.ApiAI(bot.df_key).text_request()

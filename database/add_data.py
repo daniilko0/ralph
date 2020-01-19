@@ -1,7 +1,7 @@
 import os
 from pprint import pprint
 
-from db import Database
+from database import Database
 
 
 def return_str(itr):

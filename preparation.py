@@ -11,18 +11,14 @@ def generate_tables(db):
         if not db.find_table(name):
             try:
                 db.create_table(name, table)
-                print(f"> > > Таблица {name} создана.", end="\n\n")
+                print(f"Таблица {name} создана.", end="\n\n")
             except psycopg2.errors.SyntaxError as error:
                 print(
-                    f"> > > Неудача. В описании таблицы {name} допущены ошибки.\n{error}"
-                )
-                # print('Ошибка:\n', traceback.format_exc())
-                print(
-                    "> > > Работать дальше не собираюсь, исправьте ошибки и возвращайтесь...."
+                    f"Неудача. В описании таблицы {name} допущены ошибки.\n{error}"
                 )
                 return
         else:
-            print(f"> > > Таблица {name} уже существует.", end="\n\n")
+            print(f"Таблица {name} уже существует.", end="\n\n")
 
 
 def migrations_6_1_0(db):

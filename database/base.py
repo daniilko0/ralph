@@ -1,4 +1,5 @@
 import urllib.parse as urlparse
+
 import psycopg2
 
 
@@ -21,7 +22,9 @@ class Base:
         self.query(f"CREATE TABLE {name} ({', '.join(columns)}) ")
 
     def find_table(self, name):
-        res = self.query(f"SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME='{name}'")
+        res = self.query(
+            f"SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME='{name}'"
+        )
         return len(res) > 0
 
     def query(self, query: str, args=None, fetchone=False, fetchall=False):

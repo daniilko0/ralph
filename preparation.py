@@ -13,9 +13,7 @@ def generate_tables(db):
                 db.create_table(name, table)
                 print(f"Таблица {name} создана.", end="\n\n")
             except psycopg2.errors.SyntaxError as error:
-                print(
-                    f"Неудача. В описании таблицы {name} допущены ошибки.\n{error}"
-                )
+                print(f"Неудача. В описании таблицы {name} допущены ошибки.\n{error}")
                 return
         else:
             print(f"Таблица {name} уже существует.", end="\n\n")

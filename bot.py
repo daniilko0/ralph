@@ -248,7 +248,7 @@ class Bot:
         except (AttributeError, KeyError, ValueError):
             self.log.error("Херню ты натворил, Даня!")
         else:
-            men = self._generate_mentions(debtor_ids, True)
+            men = self.generate_mentions(debtor_ids, True)
             cash = self.sh.cell(41, col).value
             goal = self.sh.cell(4, col).value
         if men is not None and cash is not None and goal is not None:
@@ -276,7 +276,7 @@ class Bot:
         """
         return self.bot_vk.users.get(user_ids=",".join(map(str, ids)))
 
-    def _generate_mentions(self, ids: list, names: bool) -> str:
+    def generate_mentions(self, ids: list, names: bool) -> str:
         """
         Генерирует строку с упоминаниями из списка идентификаторов
         """
@@ -335,7 +335,7 @@ class Bot:
             keyboard=open("keyboards/empty.json", "r", encoding="UTF-8").read(),
         )
 
-    def _show_msg(self, text: str):
+    def show_msg(self, text: str):
         self.text = text
         self.send_message(
             msg=text, pid=self.event.object.from_id, keyboard="keyboards/prompt.json",

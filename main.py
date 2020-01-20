@@ -126,8 +126,8 @@ for event in bot.longpoll.listen():
                 f = True
             else:
                 f = False
-            bot.text = f"{bot._generate_mentions(ids=bot.ids, names=f)}\n{bot.text}"
-            bot._show_msg(f"{bot.text}")
+            bot.text = f"{bot.generate_mentions(ids=bot.ids, names=f)}\n{bot.text}"
+            bot.show_msg(f"{bot.text}")
         elif payload["button"] == "newsletter":
             bot.send_message(
                 msg="Введите текст рассылки.", pid=bot.event.object.from_id
@@ -150,7 +150,7 @@ for event in bot.longpoll.listen():
                 "следующее сообщение: ",
                 pid=bot.event.object.from_id,
             )
-            bot._show_msg(text=bot.text)
+            bot.show_msg(text=bot.text)
         elif payload["button"] == "confirm" and bot.mode == "prompt_for_newsletter":
             bot.send_mailing(msg=bot.text)
             bot.send_gui(text="Рассылка отправлена")

@@ -59,7 +59,7 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",
                 pid=bot.event.object.from_id,
-                keyboard="keyboards/call.json",
+                keyboard=bot.generate_alphabet_keyboard(),
             )
         elif payload["button"] == "send_to_all":
             bot.ids = list(students.keys())

@@ -39,6 +39,7 @@ import requests
 import vk_api
 from oauth2client.service_account import ServiceAccountCredentials
 from vk_api.bot_longpoll import VkBotEventType
+from vk_api.keyboard import VkKeyboard
 
 from database import Database
 from vkbotlongpoll import RalphVkBotLongPoll
@@ -255,7 +256,7 @@ class Bot:
             self._handle_table(col)
 
     @auth
-    def get_debtors(self) -> NoReturn:
+    def get_debtors(self):
         """
         Призывает должников
         """
@@ -340,3 +341,24 @@ class Bot:
         self.send_message(
             msg=text, pid=self.event.object.from_id, keyboard="keyboards/prompt.json",
         )
+
+    def generate_alphabet_keyboard(self):
+        alphabet = VkKeyboard()
+        letters = self.db.get_last_names_letters()
+        for i, v in enumerate(letters):
+            if len(alphabet.lines[-1]) < 4:
+                alphabet.add_button(label=v, payload={"button": "letter", "letter": v})
+            else:
+                alphabet.add_line()
+        alphabet.add_line()
+        alphabet.add_button(
+            label="Отмена", color="negative", payload='{"button": "cancel"}'
+        )
+        alphabet.add_button(
+            label="Сохранить", color="positive", payload='{"button": "save"}'
+        )
+        alphabet.add_line()
+        alphabet.add_button(
+            label="Отправить всем", color="primary", payload='{"button": "send_to_all"}'
+        )
+        return alphabet.get_keyboard()

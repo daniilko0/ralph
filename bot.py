@@ -174,14 +174,12 @@ class Bot:
         с клавиатурой keyboard (не отправляется, если не указан json файл)
         """
 
-        kb = open(keyboard, "r", encoding="UTF-8").read() if keyboard != "" else ""
-
         try:
             self.bot_vk.messages.send(
                 peer_id=pid,
                 random_id=random.getrandbits(64),
                 message=msg,
-                keyboard=kb,
+                keyboard=keyboard,
                 attachments=attachments,
                 user_ids=user_ids,
             )
@@ -317,11 +315,13 @@ class Bot:
             self.send_message(
                 msg=text,
                 pid=self.event.object.from_id,
-                keyboard="keyboards/admin.json",
+                keyboard=open(f"keyboards/admin.json", "r", encoding="UTF-8").read(),
             )
         else:
             self.send_message(
-                msg=text, pid=self.event.object.from_id, keyboard="keyboards/user.json",
+                msg=text,
+                pid=self.event.object.from_id,
+                keyboard=open(f"keyboards/user.json", "r", encoding="UTF-8").read(),
             )
         self.mode = "wait_for_command"
 

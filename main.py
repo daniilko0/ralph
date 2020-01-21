@@ -29,23 +29,17 @@ for event in bot.longpoll.listen():
             bot.send_gui()
         elif payload["button"] == "letter":
             bot.send_message(
-                msg="Отправка клавиатуры.",
+                msg=f"Отправка клавиатуры с фамилиями на букву \"{payload['letter']}\"",
                 pid=bot.event.object.from_id,
-                keyboard=open(
-                    f'keyboards/names/{payload["letter"]}.json', "r", encoding="UTF-8"
-                ).read(),
+                keyboard=bot.generate_names_keyboard(payload["letter"])
             )
         elif payload["button"] == "student":
-            bot.ids.append(payload["id"])
-            bot.send_message(
-                pid=bot.event.object.from_id,
-                msg=f'{payload["name"]} добавлен к списку призыва.',
-            )
+            pass
         elif payload["button"] == "back":
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",
                 pid=bot.event.object.from_id,
-                keyboard=open(f"keyboards/call.json", "r", encoding="UTF-8").read(),
+                keyboard=bot.generate_alphabet_keyboard(),
             )
         elif payload["button"] == "call":
             bot.mode = "_ask_for_msg"

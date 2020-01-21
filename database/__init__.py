@@ -12,9 +12,17 @@ class Database(Base):
         """
         Получает из базы данных все уникальные первые буквы фамилий
         """
-        p = self.query("SELECT second_name FROM users_info")
+        r = self.query("SELECT second_name FROM users_info")
         names = []
-        for i, v in enumerate(p):
+        for i, v in enumerate(r):
             names.append(v[0][0])
         names = [el for el, _ in groupby(names)]
         return names
+
+    def get_list_of_names(self, letter):
+        """
+        Получает из базы данных все фамилии, начинающиеся на букву
+        """
+        r = self.query("SELECT user_id, first_name, second_name FROM users_info WHERE "
+                       "substring(second_name from '^.') = %s", (letter, ))
+        return r

@@ -379,9 +379,4 @@ class Bot:
         kb.add_button(
             label="Назад", color="default", payload={"button": "back"}
         )
-        print(kb.get_keyboard())
-
-
-if __name__ == "__main__":
-    b = Bot()
-    b.generate_names_keyboard("А")
+        return kb.get_keyboard()

@@ -15,8 +15,9 @@ class Database(Base):
         r = self.query("SELECT second_name FROM users_info")
         names = []
         for i, v in enumerate(r):
-            names.append(v[0][0])
-        names = [el for el, _ in groupby(names)]
+            if not v[0][0] in names:
+                names.append(v[0][0])
+        print(names)
         return names
 
     def get_list_of_names(self, letter):

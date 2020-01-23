@@ -15,7 +15,6 @@ class Database(Base):
         for i, v in enumerate(r):
             if not v[0][0] in names:
                 names.append(v[0][0])
-        print(names)
         return names
 
     def get_list_of_names(self, letter):

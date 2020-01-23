@@ -31,7 +31,7 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg=f"Отправка клавиатуры с фамилиями на букву \"{payload['letter']}\"",
                 pid=bot.event.object.from_id,
-                keyboard=bot.generate_names_keyboard(payload["letter"])
+                keyboard=bot.generate_names_keyboard(payload["letter"]),
             )
         elif payload["button"] == "student":
             pass

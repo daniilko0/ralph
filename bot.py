@@ -376,7 +376,5 @@ class Bot:
             else:
                 kb.add_line()
         kb.add_line()
-        kb.add_button(
-            label="Назад", color="default", payload={"button": "back"}
-        )
+        kb.add_button(label="Назад", payload={"button": "back"})
         return kb.get_keyboard()

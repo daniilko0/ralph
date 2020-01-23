@@ -1,5 +1,3 @@
-import logging
-import os
 import re
 import time
 from datetime import datetime
@@ -9,6 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from bot import Bot
+from logger import Logger
 
 bot = Bot()
 
@@ -46,16 +45,7 @@ def pause():
 class Schedule:
     def __init__(self, date: str, gid: str = "324"):
 
-        self.log_level = int(os.environ["LOG_LEVEL"])
-
-        # Инициализация и настройка logging
-        self.log = logging.getLogger()
-        self.log.setLevel(self.log_level)
-
-        log_format = "%(asctime)s %(levelname)s: %(message)s"
-        logging.basicConfig(
-            filename="ralph.log", format=log_format, datefmt="%d-%m-%Y %H:%M:%S"
-        )
+        self.log = Logger()
 
         self.date = date
 
@@ -64,7 +54,7 @@ class Schedule:
                 f"http://rating.ivpek.ru/timetable/timetable/show?gid={gid}&date={date}"
             ).text
         except requests.exceptions.ConnectionError as e:
-            self.log.error(msg=e)
+            self.log.log.error(msg=e)
         else:
             self.s = BeautifulSoup(self.raw, "lxml")
 
@@ -113,9 +103,9 @@ class Schedule:
         warn = self.s.find_all("div", {"class": "msg warning"})
         err = self.s.find_all("div", {"class": "msg error"})
         if warn or err:
-            self.log.info("Расписание отсутствует.")
+            self.log.log.info("Расписание отсутствует.")
             return None
-        self.log.info("Расписание составлено.")
+        self.log.log.info("Расписание составлено.")
         return self.s
 
     def get(self):
@@ -132,7 +122,7 @@ class Schedule:
         while True:
             if self.check() is not None:
                 sch = self.make_schedule()
-                self.log.info("Расписание отправлено.")
+                self.log.log.info("Расписание отправлено.")
                 bot.send_message(msg=sch, pid=bot.cid)
                 bot.send_mailing(msg=sch)
                 pause()

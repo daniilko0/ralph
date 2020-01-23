@@ -26,7 +26,6 @@ continue running.
 """
 
 import json
-import logging
 import os
 import random
 from binascii import Error as binErr
@@ -41,6 +40,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from vk_api.bot_longpoll import VkBotEventType
 
 from database import Database
+from logger import Logger
 from vkbotlongpoll import RalphVkBotLongPoll
 
 
@@ -61,16 +61,9 @@ class Bot:
 
     def __init__(self) -> None:
 
-        self.log_level = int(os.environ["LOG_LEVEL"])
+        self.log = Logger()
 
-        # Инициализация и настройка logging
-        self.log = logging.getLogger()
-        self.log.setLevel(self.log_level)
-
-        log_format = "%(asctime)s %(levelname)s: %(message)s"
-        logging.basicConfig(format=log_format, datefmt="%d-%m-%Y %H:%M:%S")
-
-        self.log.info("Инициализация...")
+        self.log.log.info("Инициализация...")
 
         self.token = os.environ["VK_TOKEN"]
         self.user_token = os.environ["VK_USER_TOKEN"]
@@ -80,21 +73,21 @@ class Bot:
         self.db_url = os.environ["DATABASE_URL"]
 
         # Авторизация в PostgreSQL - базе данных
-        self.log.info("Авторизация базы данных...")
+        self.log.log.info("Авторизация базы данных...")
         try:
             self.db = Database(self.db_url)
         except TypeError:
-            self.log.error("Неудача. Ошибка авторизации.")
+            self.log.log.error("Неудача. Ошибка авторизации.")
         else:
-            self.log.info("Успех.")
+            self.log.log.info("Успех.")
 
         # Авторизация в API ВКонтакте
-        self.log.info("Авторизация ВКонтакте...")
+        self.log.log.info("Авторизация ВКонтакте...")
         try:
             self.bot_session = vk_api.VkApi(token=self.token, api_version="5.103")
             self.user_session = vk_api.VkApi(token=self.user_token, api_version="5.103")
         except vk_api.exceptions.AuthError:
-            self.log.error("Неудача. Ошибка авторизации.")
+            self.log.log.error("Неудача. Ошибка авторизации.")
         else:
             try:
                 self.bot_vk = self.bot_session.get_api()
@@ -103,12 +96,14 @@ class Bot:
                     vk=self.bot_session, group_id=self.gid
                 )
             except requests.exceptions.ConnectionError:
-                self.log.error("Неудача. Превышен лимит попыток подключения.")
+                self.log.log.error("Неудача. Превышен лимит попыток подключения.")
             except vk_api.exceptions.ApiError:
-                self.log.error("Неудача. Ошибка доступа.")
+                self.log.log.error("Неудача. Ошибка доступа.")
             else:
-                self.log.info("Успех.")
-                self.log.debug(f"Версия API ВКонтакте: {self.bot_session.api_version}.")
+                self.log.log.info("Успех.")
+                self.log.log.debug(
+                    f"Версия API ВКонтакте: {self.bot_session.api_version}."
+                )
 
         # Инициализация дополнительных переменных
         self.event = {}
@@ -121,7 +116,7 @@ class Bot:
         self.col = 0
 
         # Авторизация в API Google Sheets и подключение к заданной таблице
-        self.log.info("Авторизация в Google Cloud...")
+        self.log.log.info("Авторизация в Google Cloud...")
         self.scope = [
             "https://spreadsheets.google.com/feeds",
             "https://www.googleapis.com/auth/drive",
@@ -131,13 +126,13 @@ class Bot:
                 keyfile_dict=json.loads(os.environ["GOOGLE_CREDS"]), scopes=self.scope
             )
         except binErr:
-            self.log.error("Неудача.")
+            self.log.log.error("Неудача.")
         else:
             self.gc = gspread.authorize(credentials=credentials)
             self.table_auth = self.gc.open_by_key(key=self.table)
             self.sh = self.table_auth.get_worksheet(0)
             self.sh_sch = self.table_auth.get_worksheet(1)
-            self.log.info("Успех.")
+            self.log.log.info("Успех.")
 
         # API ключ Dialogflow (Искусственный интеллект для чат - модуля)
         self.df_key = os.environ["DIALOGFLOW"]
@@ -145,20 +140,20 @@ class Bot:
         # Переименование обрабатываемых типов событий
         self.NEW_MESSAGE = VkBotEventType.MESSAGE_NEW
 
-        self.log.info(
+        self.log.log.info(
             f"Беседа... {'Тестовая' if self.cid.endswith('1') else 'Основная'}"
         )
 
-        self.log.info("Обновление версии в статусе группы...")
+        self.log.log.info("Обновление версии в статусе группы...")
         try:
             with open("VERSION.txt", "r") as f:
                 v = f"Версия: {f.read()}"
             self.user_vk.status.set(text=v, group_id=self.gid)
         except vk_api.exceptions.ApiError as e:
-            self.log.error(f"Ошибка {e.__str__()}")
+            self.log.log.error(f"Ошибка {e.__str__()}")
         else:
-            self.log.info(f"Успех.")
-        self.log.info("Инициализация завершена.")
+            self.log.log.info(f"Успех.")
+        self.log.log.info("Инициализация завершена.")
 
     def send_message(
         self,
@@ -185,9 +180,9 @@ class Bot:
             )
 
         except vk_api.exceptions.ApiError as e:
-            self.log.error(msg=e.__str__())
+            self.log.log.error(msg=e.__str__())
         except FileNotFoundError as e:
-            self.log.error(msg=e)
+            self.log.log.error(msg=e)
 
     def send_mailing(self, msg: str = "", attach: str = None) -> NoReturn:
 
@@ -239,12 +234,12 @@ class Bot:
                 if self.sh.cell(i, col).value != self.sh.cell(41, col).value:
                     debtor_ids.append(self.sh.cell(i, 3).value)
         except gspread.exceptions.APIError as e:
-            self.log.error(
+            self.log.log.error(
                 f"[ERROR]: [{e.response.error.code}] – {e.response.error.message}"
             )
             self._handle_table(col)
         except (AttributeError, KeyError, ValueError):
-            self.log.error("Херню ты натворил, Даня!")
+            self.log.log.error("Херню ты натворил, Даня!")
         else:
             men = self.generate_mentions(debtor_ids, True)
             cash = self.sh.cell(41, col).value

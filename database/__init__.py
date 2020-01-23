@@ -1,5 +1,3 @@
-from itertools import groupby
-
 from database.base import Base
 
 
@@ -26,7 +24,7 @@ class Database(Base):
         """
         r = self.query(
             "SELECT user_id, first_name, second_name FROM users_info WHERE "
-            "substring(second_name from '^.') = %s",
+            "substring(second_name from '^.') = %s AND academic_status > 0",
             (letter,),
         )
         return r

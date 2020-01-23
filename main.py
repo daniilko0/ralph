@@ -5,11 +5,13 @@ import re
 import apiai
 
 from bot import Bot
+from keyboard import Keyboards
 from schedule import Date
 from schedule import Schedule
 from students import students
 
 bot = Bot()
+kbs = Keyboards()
 
 for event in bot.longpoll.listen():
     bot.event = event
@@ -31,7 +33,7 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg=f"Отправка клавиатуры с фамилиями на букву \"{payload['letter']}\"",
                 pid=bot.event.object.from_id,
-                keyboard=bot.generate_names_keyboard(payload["letter"]),
+                keyboard=kbs.generate_names_keyboard(payload["letter"]),
             )
         elif payload["button"] == "student":
             pass
@@ -39,7 +41,7 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",
                 pid=bot.event.object.from_id,
-                keyboard=bot.generate_alphabet_keyboard(),
+                keyboard=kbs.generate_alphabet_keyboard(),
             )
         elif payload["button"] == "call":
             bot.mode = "_ask_for_msg"
@@ -53,7 +55,7 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",
                 pid=bot.event.object.from_id,
-                keyboard=bot.generate_alphabet_keyboard(),
+                keyboard=kbs.generate_alphabet_keyboard(),
             )
         elif payload["button"] == "send_to_all":
             bot.ids = list(students.keys())

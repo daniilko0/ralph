@@ -39,7 +39,6 @@ import requests
 import vk_api
 from oauth2client.service_account import ServiceAccountCredentials
 from vk_api.bot_longpoll import VkBotEventType
-from vk_api.keyboard import VkKeyboard
 
 from database import Database
 from vkbotlongpoll import RalphVkBotLongPoll
@@ -341,40 +340,3 @@ class Bot:
         self.send_message(
             msg=text, pid=self.event.object.from_id, keyboard="keyboards/prompt.json",
         )
-
-    def generate_alphabet_keyboard(self):
-        alphabet = VkKeyboard()
-        letters = self.db.get_last_names_letters()
-        for i, v in enumerate(letters):
-            if len(alphabet.lines[-1]) < 4:
-                alphabet.add_button(label=v, payload={"button": "letter", "letter": v})
-            else:
-                alphabet.add_line()
-        alphabet.add_line()
-        alphabet.add_button(
-            label="Отмена", color="negative", payload={"button": "cancel"}
-        )
-        alphabet.add_button(
-            label="Сохранить", color="positive", payload={"button": "save"}
-        )
-        alphabet.add_line()
-        alphabet.add_button(
-            label="Отправить всем", color="primary", payload={"button": "send_to_all"}
-        )
-        return alphabet.get_keyboard()
-
-    def generate_names_keyboard(self, letter):
-        names = self.db.get_list_of_names(letter=letter)
-        kb = VkKeyboard()
-        for i, v in enumerate(names):
-            if len(kb.lines[-1]) < 2:
-                label = f"{v[2]} {v[1][0]}."
-                kb.add_button(
-                    label=label,
-                    payload={"button": "student", "name": label, "id": v[0]},
-                )
-            else:
-                kb.add_line()
-        kb.add_line()
-        kb.add_button(label="Назад", payload={"button": "back"})
-        return kb.get_keyboard()

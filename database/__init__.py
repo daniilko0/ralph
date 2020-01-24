@@ -32,4 +32,4 @@ class Database(Base):
 
     def get_vk_id(self, _id):
         r = self.query(f"SELECT vk_id from users WHERE id={_id}")[0][0]
-        print(r)
+        return r

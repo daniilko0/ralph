@@ -1,15 +1,18 @@
 import datetime
 import json
+import os
 import re
 
 import apiai
 
 from bot import Bot
+from database import Database
 from keyboard import Keyboards
 from schedule import Date
 from schedule import Schedule
 from students import students
 
+db = Database(os.environ["DATABASE_URL"])
 bot = Bot()
 kbs = Keyboards()
 
@@ -36,7 +39,15 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.generate_names_keyboard(payload["letter"]),
             )
         elif payload["button"] == "student":
-            pass
+            bot.ids.append(db.get_vk_id(payload["id"]))
+            bot.send_message(
+                msg=f"{payload['name']} добавлен к списку призыва.",
+                pid=bot.event.object.from_id
+            )
+            bot.send_message(
+                msg=f"{bot.ids}",
+                pid=bot.event.object.from_id
+            )
         elif payload["button"] == "back":
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",
@@ -122,14 +133,14 @@ for event in bot.longpoll.listen():
                 msg=f"В {'тестовую ' if bot.cid.endswith('1') else 'основную '}"
                 f"беседу будет отправлено сообщение:",
                 pid=bot.event.object.from_id,
-                keyboard="keyboards/prompt.json",
+                keyboard=open("keyboards/prompt.json", "r", encoding="UTF-8").read(),
             )
             if len(bot.ids) < 33:
                 f = True
             else:
                 f = False
             bot.text = f"{bot.generate_mentions(ids=bot.ids, names=f)}\n{bot.text}"
-            bot.show_msg(f"{bot.text}")
+            bot.show_msg(bot.text)
         elif payload["button"] == "newsletter":
             bot.send_message(
                 msg="Введите текст рассылки.", pid=bot.event.object.from_id

@@ -10,11 +10,12 @@ class Database(Base):
         """
         Получает из базы данных все уникальные первые буквы фамилий
         """
-        r = self.query("SELECT second_name FROM users_info")
+        r = self.query(
+            "SELECT DISTINCT substring(second_name from  '^.') FROM users_info ORDER BY substring(second_name from  '^.')"
+        )
         names = []
-        for i, v in enumerate(r):
-            if not v[0][0] in names:
-                names.append(v[0][0])
+        for (item, ) in r:
+            names.append(item)
         return names
 
     def get_list_of_names(self, letter):

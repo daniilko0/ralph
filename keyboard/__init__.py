@@ -17,25 +17,25 @@ class Keyboards:
         """
         Генерирует клавиатуру с алфавитными кнопками для меню Призыва
         """
-        alphabet = VkKeyboard()
+        kb = VkKeyboard()
         letters = self.db.get_last_names_letters()
         for i, v in enumerate(letters):
-            if len(alphabet.lines[-1]) < 4:
-                alphabet.add_button(label=v, payload={"button": "letter", "letter": v})
+            if len(kb.lines[-1]) < 4:
+                kb.add_button(label=v, payload={"button": "letter", "letter": v})
             else:
-                alphabet.add_line()
-        alphabet.add_line()
-        alphabet.add_button(
+                kb.add_line()
+        kb.add_line()
+        kb.add_button(
             label="Отмена", color="negative", payload={"button": "cancel"}
         )
-        alphabet.add_button(
+        kb.add_button(
             label="Сохранить", color="positive", payload={"button": "save"}
         )
-        alphabet.add_line()
-        alphabet.add_button(
+        kb.add_line()
+        kb.add_button(
             label="Отправить всем", color="primary", payload={"button": "send_to_all"}
         )
-        return alphabet.get_keyboard()
+        return kb.get_keyboard()
 
     def generate_names_keyboard(self, letter):
         """

@@ -154,7 +154,7 @@ for event in bot.longpoll.listen():
                 msg="Отправка клавиатуры призыва",
                 pid=bot.event.object.from_id,
                 keyboard=open(
-                    f"keyboards/call.json.json", "r", encoding="UTF-8"
+                    f"keyboards/call.json", "r", encoding="UTF-8"
                 ).read(),
             )
         elif bot.mode == "wait_for_newsletter_message":

@@ -333,5 +333,5 @@ class Bot:
     def show_msg(self, text: str):
         self.text = text
         self.send_message(
-            msg=text, pid=self.event.object.from_id, keyboard="keyboards/prompt.json",
+            msg=text, pid=self.event.object.from_id,
         )

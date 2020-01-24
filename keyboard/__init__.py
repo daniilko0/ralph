@@ -25,12 +25,8 @@ class Keyboards:
             else:
                 kb.add_line()
         kb.add_line()
-        kb.add_button(
-            label="Отмена", color="negative", payload={"button": "cancel"}
-        )
-        kb.add_button(
-            label="Сохранить", color="positive", payload={"button": "save"}
-        )
+        kb.add_button(label="Отмена", color="negative", payload={"button": "cancel"})
+        kb.add_button(label="Сохранить", color="positive", payload={"button": "save"})
         kb.add_line()
         kb.add_button(
             label="Отправить всем", color="primary", payload={"button": "send_to_all"}

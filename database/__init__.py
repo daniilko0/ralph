@@ -15,7 +15,7 @@ class Database(Base):
             "ORDER BY substring(second_name from  '^.')"
         )
         names = []
-        for (item, ) in r:
+        for (item,) in r:
             names.append(item)
         return names
 

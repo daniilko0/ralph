@@ -24,9 +24,9 @@ class Database(Base):
         Получает из базы данных все фамилии, начинающиеся на букву
         """
         r = self.query(
-            "SELECT user_id, first_name, second_name FROM users_info WHERE "
-            "substring(second_name from '^.') = %s AND academic_status > 0",
-            (letter,),
+            f"SELECT user_id, first_name, second_name FROM users_info "
+            f"WHERE substring(second_name from '^.') = '{letter}' "
+            f"AND academic_status > 0 ORDER BY user_id"
         )
         return r
 

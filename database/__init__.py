@@ -11,7 +11,8 @@ class Database(Base):
         Получает из базы данных все уникальные первые буквы фамилий
         """
         r = self.query(
-            "SELECT DISTINCT substring(second_name from  '^.') FROM users_info ORDER BY substring(second_name from  '^.')"
+            "SELECT DISTINCT substring(second_name from  '^.') FROM users_info "
+            "ORDER BY substring(second_name from  '^.')"
         )
         names = []
         for (item, ) in r:

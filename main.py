@@ -89,7 +89,7 @@ for event in bot.longpoll.listen():
                 msg="Выберите статью расходов (колонку в таблице)",
                 pid=bot.event.object.from_id,
                 keyboard=open(
-                    f"keyboards/select_col.json.json", "r", encoding="UTF-8"
+                    f"keyboards/select_col.json", "r", encoding="UTF-8"
                 ).read(),
             )
         elif payload["button"] == "col_id":
@@ -100,7 +100,7 @@ for event in bot.longpoll.listen():
                 msg="Отправка клавиатуры с расписанием.",
                 pid=bot.event.object.from_id,
                 keyboard=open(
-                    f"keyboards/schedule.json.json", "r", encoding="UTF-8"
+                    f"keyboards/schedule.json", "r", encoding="UTF-8"
                 ).read(),
             )
         elif payload["button"] == "today":

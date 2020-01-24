@@ -47,7 +47,7 @@ class Keyboards:
             )
             if len(kb.lines[-1]) == 2:
                 kb.add_line()
-        if len(kb.lines) > 2:
+        if kb.lines[-1]:
             kb.add_line()
         kb.add_button(label="Назад", payload={"button": "back"})
         return kb.get_keyboard()

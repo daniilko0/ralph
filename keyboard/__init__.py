@@ -45,8 +45,9 @@ class Keyboards:
                 label=label,
                 payload={"button": "student", "name": label, "id": v[0]},
             )
-            if len(kb.lines[-1]) > 1:
+            if len(kb.lines[-1]) == 2:
                 kb.add_line()
-        kb.add_line()
+        if len(kb.lines) > 2:
+            kb.add_line()
         kb.add_button(label="Назад", payload={"button": "back"})
         return kb.get_keyboard()

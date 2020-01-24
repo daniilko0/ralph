@@ -40,13 +40,12 @@ class Keyboards:
         names = self.db.get_list_of_names(letter=letter)
         kb = VkKeyboard()
         for i, v in enumerate(names):
-            if len(kb.lines[-1]) < 2:
-                label = f"{v[2]} {v[1][0]}."
-                kb.add_button(
-                    label=label,
-                    payload={"button": "student", "name": label, "id": v[0]},
-                )
-            else:
+            label = f"{v[2]} {v[1][0]}."
+            kb.add_button(
+                label=label,
+                payload={"button": "student", "name": label, "id": v[0]},
+            )
+            if len(kb.lines[-1]) > 1:
                 kb.add_line()
         kb.add_line()
         kb.add_button(label="Назад", payload={"button": "back"})

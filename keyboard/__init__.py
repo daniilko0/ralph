@@ -42,12 +42,13 @@ class Keyboards:
         for i, v in enumerate(names):
             label = f"{v[2]} {v[1][0]}."
             kb.add_button(
-                label=label,
-                payload={"button": "student", "name": label, "id": v[0]},
+                label=label, payload={"button": "student", "name": label, "id": v[0]},
             )
             if len(kb.lines[-1]) == 2:
                 kb.add_line()
         if kb.lines[-1]:
             kb.add_line()
-        kb.add_button(label="Назад", payload={"button": "back"})
+        kb.add_button(
+            label="Назад", color="primary", payload={"button": "back"},
+        )
         return kb.get_keyboard()

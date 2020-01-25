@@ -42,12 +42,9 @@ for event in bot.longpoll.listen():
             bot.ids.append(db.get_vk_id(payload["id"]))
             bot.send_message(
                 msg=f"{payload['name']} добавлен к списку призыва.",
-                pid=bot.event.object.from_id
+                pid=bot.event.object.from_id,
             )
-            bot.send_message(
-                msg=f"{bot.ids}",
-                pid=bot.event.object.from_id
-            )
+            bot.send_message(msg=f"{bot.ids}", pid=bot.event.object.from_id)
         elif payload["button"] == "back":
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",
@@ -99,9 +96,7 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg="Отправка клавиатуры с расписанием.",
                 pid=bot.event.object.from_id,
-                keyboard=open(
-                    f"keyboards/schedule.json", "r", encoding="UTF-8"
-                ).read(),
+                keyboard=open(f"keyboards/schedule.json", "r", encoding="UTF-8").read(),
             )
         elif payload["button"] == "today":
             d = Date()
@@ -153,9 +148,7 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg="Отправка клавиатуры призыва",
                 pid=bot.event.object.from_id,
-                keyboard=open(
-                    f"keyboards/call.json", "r", encoding="UTF-8"
-                ).read(),
+                keyboard=open(f"keyboards/call.json", "r", encoding="UTF-8").read(),
             )
         elif bot.mode == "wait_for_newsletter_message":
             bot.mode = "prompt_for_newsletter"

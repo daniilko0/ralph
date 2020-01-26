@@ -140,7 +140,7 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg="Отправка клавиатуры со списком рассылок.",
                 pid=bot.event.object.from_id,
-                keyboard=kbs.generate_list_of_mailings()
+                keyboard=kbs.generate_mailings_keyboard()
             )
         elif payload["button"] == "home":
             bot.send_gui(text="Главный экран")

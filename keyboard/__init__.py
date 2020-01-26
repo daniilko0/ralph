@@ -53,7 +53,7 @@ class Keyboards:
         )
         return kb.get_keyboard()
     
-    def generate_list_of_mailings(self):
+    def generate_mailings_keyboard(self):
         mailings = self.db.get_mailings_list()
         kb = VkKeyboard()
         for i, v in enumerate(mailings):

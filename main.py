@@ -136,11 +136,12 @@ for event in bot.longpoll.listen():
                 f = False
             bot.text = f"{bot.generate_mentions(ids=bot.ids, names=f)}\n{bot.text}"
             bot.show_msg(bot.text)
-        elif payload["button"] == "newsletter":
+        elif payload["button"] == "newsletters":
             bot.send_message(
-                msg="Введите текст рассылки.", pid=bot.event.object.from_id
+                msg="Отправка клавиатуры со списком рассылок.",
+                pid=bot.event.object.from_id,
+                keyboard=kbs.generate_list_of_mailings()
             )
-            bot.mode = "wait_for_newsletter_message"
         elif payload["button"] == "home":
             bot.send_gui(text="Главный экран")
         elif bot.mode == "_ask_for_msg":

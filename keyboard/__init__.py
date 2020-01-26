@@ -52,3 +52,19 @@ class Keyboards:
             label="Назад", color="primary", payload={"button": "back"},
         )
         return kb.get_keyboard()
+    
+    def generate_list_of_mailings(self):
+        mailings = self.db.get_mailings_list()
+        kb = VkKeyboard()
+        for i, v in enumerate(mailings):
+            kb.add_button(
+                label=v[1], payload={"button": "mailing", "id": v[0]},
+            )
+            if len(kb.lines[-1]) == 2:
+                kb.add_line()
+        if kb.lines[-1]:
+            kb.add_line()
+        kb.add_button(
+            label="Назад", color="primary", payload={"button": "back"},
+        )
+        return kb.get_keyboard()

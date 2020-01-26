@@ -65,6 +65,6 @@ class Keyboards:
         if kb.lines[-1]:
             kb.add_line()
         kb.add_button(
-            label="Назад", color="primary", payload={"button": "back"},
+            label="Назад", color="primary", payload={"button": "home"},
         )
         return kb.get_keyboard()

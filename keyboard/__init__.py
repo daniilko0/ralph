@@ -54,6 +54,9 @@ class Keyboards:
         return kb.get_keyboard()
     
     def generate_mailings_keyboard(self):
+        """
+        Генерация клавиатуры со списком доступных рассылок
+        """
         mailings = self.db.get_mailings_list()
         kb = VkKeyboard()
         for i, v in enumerate(mailings):

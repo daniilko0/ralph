@@ -9,6 +9,16 @@
           "payload": "{\"button\": \"schedule\"}"
         }
       }
-    ]
+    ],
+    [
+      {
+        "action": {
+          "type": "text",
+          "label": "Управление рассылками",
+          "payload": "{\"button\": \"newsletters\"}"
+        },
+        "color": "secondary"
+      }
+    ],
   ]
 }

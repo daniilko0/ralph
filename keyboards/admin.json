@@ -23,8 +23,8 @@
       {
         "action": {
           "type": "text",
-          "label": "Создать рассылку",
-          "payload": "{\"button\": \"newsletter\"}"
+          "label": "Управление рассылками",
+          "payload": "{\"button\": \"newsletters\"}"
         },
         "color": "secondary"
       }

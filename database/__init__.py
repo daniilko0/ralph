@@ -20,13 +20,16 @@ class Database(Base):
         """
         Получает из базы данных все фамилии, начинающиеся на букву
         """
-        r = self.query(
+        names = self.query(
             f"SELECT user_id, first_name, second_name FROM users_info "
             f"WHERE substring(second_name from '^.') = '{letter}' "
             f"AND academic_status > 0 ORDER BY user_id"
         )
-        return r
+        return names
 
     def get_vk_id(self, _id):
-        r = self.query(f"SELECT vk_id from users WHERE id={_id}")[0][0]
-        return r
+        """
+        Получает из базы данных идентификатор ВКонтакте по идентификатору студента
+        """
+        vk_ids = self.query(f"SELECT vk_id from users WHERE id={_id}")[0][0]
+        return vk_ids

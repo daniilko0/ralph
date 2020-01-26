@@ -33,3 +33,10 @@ class Database(Base):
         """
         vk_ids = self.query(f"SELECT vk_id from users WHERE id={_id}")[0][0]
         return vk_ids
+
+    def get_mailings_list(self):
+        """
+        Получает из базы данных весь список доступных рассылок
+        """
+        mailings = self.query("SELECT mailing_id, mailing_name from mailings")
+        return mailings

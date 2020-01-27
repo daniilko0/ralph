@@ -25,6 +25,8 @@ for event in bot.longpoll.listen():
         and bot.event.object.from_id == bot.event.object.peer_id
     ):
         payload = {"button": ""}
+        if not db.is_user_exist(bot.event.object.from_id):
+            db.create_user(bot.event.object.from_id)
         try:
             payload = json.loads(bot.event.object.payload)
         except TypeError:

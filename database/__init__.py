@@ -31,8 +31,15 @@ class Database(Base):
         """
         Получает из базы данных идентификатор ВКонтакте по идентификатору студента
         """
-        vk_ids = self.query(f"SELECT vk_id from users WHERE id={_id}")[0][0]
-        return vk_ids
+        vk_id = self.query(f"SELECT vk_id from users WHERE id={_id}")[0][0]
+        return vk_id
+
+    def get_user_id(self, vk_id):
+        """
+        Получает из базы данных идентификатор студента по идентификатору ВКонтакте
+        """
+        user_id = self.query(f"SELECT id from users WHERE vk_id={vk_id}")[0][0]
+        return user_id
 
     def get_mailings_list(self):
         """

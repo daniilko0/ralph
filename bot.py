@@ -46,7 +46,7 @@ from vkbotlongpoll import RalphVkBotLongPoll
 
 def auth(func):
     def wrapper(self):
-        if not self._current_is_admin():
+        if not self.current_is_admin():
             self.send_gui(text="У тебя нет доступа к этой функции.")
         else:
             func(self)
@@ -296,7 +296,7 @@ class Bot:
             self._send_conversation()
             return self.cid
 
-    def _current_is_admin(self) -> bool:
+    def current_is_admin(self) -> bool:
         """
         Проверяет, является ли текущий пользователь администратором бота
         """
@@ -306,7 +306,7 @@ class Bot:
         """
         Отправляет клавиатуру в зависимости от статуса пользователя
         """
-        if self._current_is_admin():
+        if self.current_is_admin():
             self.send_message(
                 msg=text,
                 pid=self.event.object.from_id,

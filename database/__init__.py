@@ -57,3 +57,10 @@ class Database(Base):
         return self.query(
             f"SELECT {slug} FROM vk_subscriptions WHERE user_id={user_id}"
         )[0][0]
+
+    def is_user_exist(self, user_id: int):
+        """
+        Возвращает информацию о том, существует ли пользователь в базе данных
+        """
+        user = self.query(f"SELECT id FROM users WHERE vk_id={user_id}")
+        return bool(user)

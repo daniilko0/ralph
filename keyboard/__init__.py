@@ -96,3 +96,8 @@ class Keyboards:
             label="Назад", color="primary", payload={"button": "newsletters"},
         )
         return kb.get_keyboard()
+
+    @property
+    def empty(self):
+        kb = VkKeyboard()
+        return kb.get_empty_keyboard()

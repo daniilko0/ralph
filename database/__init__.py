@@ -49,3 +49,8 @@ class Database(Base):
             "SELECT mailing_id, mailing_name, mailing_slug from mailings"
         )
         return mailings
+
+    def get_subscription_status(self, slug: str, user_id: int):
+        return self.query(
+            f"SELECT {slug} FROM vk_subscriptions WHERE user_id={user_id}"
+        )[0][0]

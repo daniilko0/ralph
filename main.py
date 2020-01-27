@@ -152,6 +152,34 @@ for event in bot.longpoll.listen():
                     user_id=bot.event.object.from_id,
                 ),
             )
+        elif payload["button"] == "subscribe":
+            db.query(
+                f"UPDATE vk_subscriptions SET {payload['slug']}=1 WHERE "
+                f"user_id={payload['user_id']}"
+            )
+            bot.send_message(
+                msg="Вы были успешно подписаны на рассылку.",
+                pid=bot.event.object.from_id,
+                keyboard=kbs.generate_mailing_mgmt(
+                    is_admin=bot.current_is_admin(),
+                    slug=payload["slug"],
+                    user_id=bot.event.object.from_id,
+                ),
+            )
+        elif payload["button"] == "unsubscribe":
+            db.query(
+                f"UPDATE vk_subscriptions SET {payload['slug']}=0 WHERE "
+                f"user_id={payload['user_id']}"
+            )
+            bot.send_message(
+                msg="Вы были успешно отписаны от рассылки.",
+                pid=bot.event.object.from_id,
+                keyboard=kbs.generate_mailing_mgmt(
+                    is_admin=bot.current_is_admin(),
+                    slug=payload["slug"],
+                    user_id=bot.event.object.from_id,
+                ),
+            )
         elif payload["button"] == "home":
             bot.send_gui(text="Главный экран")
         elif bot.mode == "_ask_for_msg":

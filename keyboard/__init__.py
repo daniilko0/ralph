@@ -61,7 +61,7 @@ class Keyboards:
         kb = VkKeyboard()
         for i, v in enumerate(mailings):
             kb.add_button(
-                label=v[1], payload={"button": "mailing", "id": v[0]},
+                label=v[1], payload={"button": "mailing", "name": v[1], "slug": v[2]},
             )
             if len(kb.lines[-1]) == 2:
                 kb.add_line()
@@ -69,5 +69,30 @@ class Keyboards:
             kb.add_line()
         kb.add_button(
             label="Назад", color="primary", payload={"button": "home"},
+        )
+        return kb.get_keyboard()
+
+    def generate_mailing_mgmt(self, user_id: int, is_admin: bool, slug: str):
+        uid = self.db.get_user_id(vk_id=user_id)
+        status = self.db.get_subscription_status(slug=slug, user_id=uid)
+
+        kb = VkKeyboard()
+        if is_admin:
+            kb.add_button(
+                label="Отправить рассылку",
+                color="default",
+                payload={"button": "send_mailing", "mailing": slug},
+            )
+        kb.add_button(
+            label=f"{'Отписаться' if status else 'Подписаться'}",
+            payload={
+                "button": f"{'unsubscribe' if status else 'subcribe'}",
+                "slug": slug,
+                "user_id": uid,
+            },
+        )
+        kb.add_line()
+        kb.add_button(
+            label="Назад", color="primary", payload={"button": "newsletters"},
         )
         return kb.get_keyboard()

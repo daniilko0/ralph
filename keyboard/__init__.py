@@ -86,7 +86,7 @@ class Keyboards:
         kb.add_button(
             label=f"{'Отписаться' if status else 'Подписаться'}",
             payload={
-                "button": f"{'unsubscribe' if status else 'subcribe'}",
+                "button": f"{'unsubscribe' if status else 'subscribe'}",
                 "slug": slug,
                 "user_id": uid,
             },

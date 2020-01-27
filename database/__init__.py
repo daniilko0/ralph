@@ -51,6 +51,9 @@ class Database(Base):
         return mailings
 
     def get_subscription_status(self, slug: str, user_id: int):
+        """
+        Получает статус подписки пользователя на рассылку
+        """
         return self.query(
             f"SELECT {slug} FROM vk_subscriptions WHERE user_id={user_id}"
         )[0][0]

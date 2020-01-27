@@ -52,7 +52,7 @@ class Keyboards:
             label="Назад", color="primary", payload={"button": "back"},
         )
         return kb.get_keyboard()
-    
+
     def generate_mailings_keyboard(self):
         """
         Генерация клавиатуры со списком доступных рассылок

@@ -14,7 +14,7 @@ class Database(Base):
             "SELECT DISTINCT substring(second_name from  '^.') FROM users_info "
             "ORDER BY substring(second_name from  '^.')"
         )
-        return [letter for (letter, ) in letters]
+        return [letter for (letter,) in letters]
 
     def get_list_of_names(self, letter):
         """
@@ -45,5 +45,7 @@ class Database(Base):
         """
         Получает из базы данных весь список доступных рассылок
         """
-        mailings = self.query("SELECT mailing_id, mailing_name from mailings")
+        mailings = self.query(
+            "SELECT mailing_id, mailing_name, mailing_slug from mailings"
+        )
         return mailings

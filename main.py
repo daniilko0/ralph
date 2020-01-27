@@ -142,6 +142,16 @@ for event in bot.longpoll.listen():
                 pid=bot.event.object.from_id,
                 keyboard=kbs.generate_mailings_keyboard(),
             )
+        elif payload["button"] == "mailing":
+            bot.send_message(
+                msg=f"Меню управления рассылкой \"{payload['name']}\":",
+                pid=bot.event.object.from_id,
+                keyboard=kbs.generate_mailing_mgmt(
+                    is_admin=bot.current_is_admin(),
+                    slug=payload["slug"],
+                    user_id=bot.event.object.from_id,
+                ),
+            )
         elif payload["button"] == "home":
             bot.send_gui(text="Главный экран")
         elif bot.mode == "_ask_for_msg":

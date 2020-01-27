@@ -64,3 +64,10 @@ class Database(Base):
         """
         user = self.query(f"SELECT id FROM users WHERE vk_id={user_id}")
         return bool(user)
+
+    def create_user(self, user_id: int):
+        """
+        Добавляет нового пользователя в таблицы информации и рассылок
+        """
+        self.query(f"INSERT INTO users (vk_id) VALUES ({user_id})")
+        self.query(f"INSERT INTO vk_subscriptions DEFAULT VALUES")

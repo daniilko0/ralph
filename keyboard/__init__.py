@@ -23,9 +23,7 @@ class Keyboards:
             kb.add_button(label="Призыв", payload={"button": "call"})
             kb.add_button(label="Должники", payload={"button": "debtors"})
             kb.add_line()
-        kb.add_button(
-            label="Расписание", color="primary", payload={"button": "schedule"}
-        )
+        kb.add_button(label="Расписание", payload={"button": "schedule"})
         kb.add_line()
         kb.add_button(
             label="Управление рассылками (в разработке)",

@@ -323,7 +323,7 @@ class Bot:
             msg="Отправьте сообщение с текстом объявления"
             "(вложения пока не поддерживаются).",
             pid=self.event.object.from_id,
-            keyboard=open("keyboards/empty.json", "r", encoding="UTF-8").read(),
+            keyboard=self.kbs.empty(),
         )
 
     def show_msg(self, text: str):

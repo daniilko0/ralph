@@ -122,13 +122,44 @@ class Keyboards:
         )
         return kb.get_keyboard()
 
-    @property
-    def empty(self):
+    @staticmethod
+    def generate_schedule_keyboard():
+        """
+        Возвращает клавиатуру с выбором даты получения расписания
+        """
+        kb = VkKeyboard()
+        kb.add_button(label="На сегодня", color="default", payload={"button": "today"})
+        kb.add_button(
+            label="На завтра", color="default", payload={"button": "tomorrow"}
+        )
+        kb.add_line()
+        kb.add_button(
+            label="На послезавтра",
+            color="default",
+            payload={"button": "day_after_tomorrow"},
+        )
+        kb.add_button(
+            label="Выбрать дату", color="default", payload={"button": "arbitrary"},
+        )
+        kb.add_line()
+        kb.add_button(
+            label="Назад", color="default", payload={"button": "home"},
+        )
+        return kb.get_keyboard()
+
+    @staticmethod
+    def empty():
+        """
+        Возвращает пустую клавиатуру
+        """
         kb = VkKeyboard()
         return kb.get_empty_keyboard()
 
-    @property
-    def prompt(self):
+    @staticmethod
+    def prompt():
+        """
+        Возвращает клавиатуру с подтверждением действия
+        """
         kb = VkKeyboard()
         kb.add_button(
             label="Подтвердить", color="positive", payload={"button": "confirm"}

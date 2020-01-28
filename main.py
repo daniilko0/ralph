@@ -98,7 +98,7 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg="Отправка клавиатуры с расписанием.",
                 pid=bot.event.object.from_id,
-                keyboard=open(f"keyboards/schedule.json", "r", encoding="UTF-8").read(),
+                keyboard=kbs.generate_schedule_keyboard(),
             )
         elif payload["button"] == "today":
             d = Date()
@@ -130,7 +130,7 @@ for event in bot.longpoll.listen():
                 msg=f"В {'тестовую ' if bot.cid.endswith('1') else 'основную '}"
                 f"беседу будет отправлено сообщение:",
                 pid=bot.event.object.from_id,
-                keyboard=kbs.prompt,
+                keyboard=kbs.prompt(),
             )
             if len(bot.ids) < 33:
                 f = True

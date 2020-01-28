@@ -13,6 +13,27 @@ class Keyboards:
     def __init__(self):
         self.db = Database(os.environ["DATABASE_URL"])
 
+    @staticmethod
+    def generate_main_menu(is_admin: bool):
+        """
+        Генерирует клавиатуру с главным меню
+        """
+        kb = VkKeyboard()
+        if is_admin:
+            kb.add_button(label="Призыв", payload={"button": "call"})
+            kb.add_button(label="Должники", payload={"button": "debtors"})
+            kb.add_line()
+        kb.add_button(label="Расписание", payload={"button": "schedule"})
+        kb.add_line()
+        kb.add_button(
+            label="Управление рассылками (в разработке)",
+            payload={"button": "newsletters"},
+        )
+        if is_admin:
+            kb.add_line()
+            kb.add_button(label="Сменить беседу", payload={"button": "chconv"})
+        return kb.get_keyboard()
+
     def generate_alphabet_keyboard(self):
         """
         Генерирует клавиатуру с алфавитными кнопками для меню Призыва

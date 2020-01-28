@@ -40,6 +40,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from vk_api.bot_longpoll import VkBotEventType
 
 from database import Database
+from keyboard import Keyboards
 from logger import Logger
 from vkbotlongpoll import RalphVkBotLongPoll
 
@@ -71,6 +72,8 @@ class Bot:
         self.cid = os.environ["CID_ID"]
         self.table = os.environ["TABLE_ID"]
         self.db_url = os.environ["DATABASE_URL"]
+
+        self.kbs = Keyboards()
 
         # Авторизация в PostgreSQL - базе данных
         self.log.log.info("Авторизация базы данных...")
@@ -306,18 +309,11 @@ class Bot:
         """
         Отправляет клавиатуру в зависимости от статуса пользователя
         """
-        if self.current_is_admin():
-            self.send_message(
-                msg=text,
-                pid=self.event.object.from_id,
-                keyboard=open(f"keyboards/admin.json", "r", encoding="UTF-8").read(),
-            )
-        else:
-            self.send_message(
-                msg=text,
-                pid=self.event.object.from_id,
-                keyboard=open(f"keyboards/user.json", "r", encoding="UTF-8").read(),
-            )
+        self.send_message(
+            msg=text,
+            pid=self.event.object.from_id,
+            keyboard=self.kbs.generate_main_menu(self.current_is_admin()),
+        )
         self.mode = "wait_for_command"
 
     @auth

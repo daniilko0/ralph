@@ -130,7 +130,7 @@ for event in bot.longpoll.listen():
                 msg=f"В {'тестовую ' if bot.cid.endswith('1') else 'основную '}"
                 f"беседу будет отправлено сообщение:",
                 pid=bot.event.object.from_id,
-                keyboard=open("keyboards/prompt.json", "r", encoding="UTF-8").read(),
+                keyboard=kbs.prompt,
             )
             if len(bot.ids) < 33:
                 f = True

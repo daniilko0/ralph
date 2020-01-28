@@ -126,3 +126,12 @@ class Keyboards:
     def empty(self):
         kb = VkKeyboard()
         return kb.get_empty_keyboard()
+
+    @property
+    def prompt(self):
+        kb = VkKeyboard()
+        kb.add_button(
+            label="Подтвердить", color="positive", payload={"button": "confirm"}
+        )
+        kb.add_button(label="Отмена", color="negative", payload={"button": "deny"})
+        return kb.get_keyboard()

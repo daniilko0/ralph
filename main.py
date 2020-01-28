@@ -58,7 +58,7 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg="Отправьте сообщение к призыву (вложения не поддерживаются)",
                 pid=bot.event.object.from_id,
-                keyboard=open(f"keyboards/skip.json", "r", encoding="UTF-8").read(),
+                keyboard=kbs.skip(),
             )
         elif payload["button"] == "skip":
             bot.text = ""

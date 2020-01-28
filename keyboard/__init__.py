@@ -166,3 +166,12 @@ class Keyboards:
         )
         kb.add_button(label="Отмена", color="negative", payload={"button": "deny"})
         return kb.get_keyboard()
+
+    @staticmethod
+    def skip():
+        """
+        Возвращает клавиатуру с кнопкой "Пропустить"
+        """
+        kb = VkKeyboard()
+        kb.add_button(label="Пропустить", payload={"button": "skip"})
+        return kb.get_keyboard()

@@ -3,6 +3,7 @@ import time
 from datetime import datetime
 from datetime import timedelta
 
+import schedule
 import requests
 from bs4 import BeautifulSoup
 
@@ -24,22 +25,6 @@ class Date:
         if datetime.today().weekday() == 5:
             return self.day_after_tomorrow
         return datetime.strftime(datetime.now() + timedelta(1), "%Y-%m-%d")
-
-
-def pause():
-    hour = datetime.now().hour
-    p = 0
-    if 0 <= hour <= 5:
-        p = 5
-    if 5 < hour < 10:
-        p = 24
-    if 9 < hour < 15:
-        p = 19
-    if 14 < hour < 19:
-        p = 15
-    if 18 < hour <= 23:
-        p = 11
-    time.sleep(p * 3600)
 
 
 class Schedule:
@@ -65,13 +50,13 @@ class Schedule:
             self.s.br.insert_before(" ")
             br.decompose()
         schedule_html = self.s.find_all("table", {"class": "tbl"})[1]
-        schedule = []
+        sch = []
         rows = schedule_html.find_all("tr")
         for row in rows:
             cols = row.find_all("td")
             cols = [el.text.strip() for el in cols]
-            schedule.append([el for el in cols if el])
-        schedule = [el for el in schedule if len(el) > 1]
+            sch.append([el for el in cols if el])
+        sch = [el for el in sch if len(el) > 1]
 
         msg = ""
         replacements = {
@@ -83,9 +68,9 @@ class Schedule:
             "Экзамен": "(Э)",
             "(английский язык)": "",
         }
-        for i in range(len(schedule)):
-            for j in range(len(schedule[i])):
-                item = schedule[i][j]
+        for i in range(len(sch)):
+            for j in range(len(sch[i])):
+                item = sch[i][j]
                 for k, v in replacements.items():
                     item = re.sub(k, v, item)
                 if re.findall("Иностранный язык", item):
@@ -94,7 +79,7 @@ class Schedule:
                         f"Английский язык ({lesson[1]}) "
                         f"Кузнецова И.Н/Коротина М.А. 12/13а"
                     )
-                    schedule[i][j + 1] = ""
+                    sch[i][j + 1] = ""
                 msg += f"{item} "
             msg += "\n"
         if msg != "":
@@ -120,19 +105,20 @@ class Schedule:
         else:
             return "Расписание отсутствует."
 
-    def listen(self):
-        while True:
-            if self.check() is not None:
-                sch = self.make_schedule()
-                self.log.log.info("Расписание отправлено.")
-                bot.send_message(msg=sch, pid=bot.cid)
-                bot.send_mailing(msg=sch)
-                pause()
-            else:
-                time.sleep(15 * 60)
+
+def listen():
+    d = Date()
+    s = Schedule(d.tomorrow)
+    if s.check():
+        print(s.get())
+        sch = s.make_schedule()
+        bot.send_message(msg=sch, pid=bot.cid)
+        bot.send_mailing(msg=sch)
+    else:
+        time.sleep(15 * 60)
 
 
 if __name__ == "__main__":
-    d = Date()
-    a = Schedule(d.tomorrow)
-    a.listen()
+    schedule.every().day.at("09:20").do(listen)
+    while True:
+        schedule.run_pending()

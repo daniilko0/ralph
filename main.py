@@ -227,8 +227,16 @@ for event in bot.longpoll.listen():
                 else:
                     s = Schedule(d)
                     schedule = s.get()
-                    bot.send_message(msg=schedule, pid=bot.event.object.from_id)
-                    bot.mode = ""
+                    keyboard = ""
+                    if schedule != "Расписание отсутствует.":
+                        keyboard = kbs.generate_schedule_keyboard()
+                        bot.mode = ""
+                    else:
+                        schedule += "\nПопробуй указать другую дату."
+                        bot.mode = "ask_for_schedule_date"
+                    bot.send_message(
+                        msg=schedule, pid=bot.event.object.from_id, keyboard=keyboard,
+                    )
             else:
                 bot.send_message(
                     msg="Неверный формат даты. Попробуйте еще раз.",

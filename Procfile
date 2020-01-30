@@ -1,2 +1,2 @@
 bot: python main.py
-sch: python schedule.py
+sch: python scheduler.py

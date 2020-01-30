@@ -44,7 +44,6 @@ for event in bot.longpoll.listen():
                 msg=f"{payload['name']} добавлен к списку призыва.",
                 pid=bot.event.object.from_id,
             )
-            bot.send_message(msg=f"{bot.ids}", pid=bot.event.object.from_id)
         elif payload["button"] == "back":
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",

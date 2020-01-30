@@ -268,7 +268,7 @@ class Bot:
 
     def _get_users_names(self, ids: list) -> List[str]:
         """
-        Получает информацию о пользователях с указанными id
+        Получает имена пользователей по идентификаторам из списка
         """
         user_ids = [
             self.db.query(f"SELECT id FROM users WHERE vk_id={i}")[0][0] for i in ids

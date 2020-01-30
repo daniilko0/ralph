@@ -7,7 +7,7 @@ venv_ralph/
 
 # IDEs config files
 .vscode/
-.idea/
+.idea/workspace.xml
 
 # Python's caches
 **/__pycache__/

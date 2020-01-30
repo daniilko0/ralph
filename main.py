@@ -6,8 +6,8 @@ import re
 from bot import Bot
 from database import Database
 from keyboard import Keyboards
-from schedule import Date
-from schedule import Schedule
+from scheduler import Date
+from scheduler import Schedule
 from students import students
 
 db = Database(os.environ["DATABASE_URL"])

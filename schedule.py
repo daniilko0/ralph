@@ -97,8 +97,8 @@ class Schedule:
                     schedule[i][j + 1] = ""
                 msg += f"{item} "
             msg += "\n"
-            if msg != "":
-                msg = f"Расписание на {self.date}\n" + msg
+        if msg != "":
+            msg = f"Расписание на {self.date}\n" + msg
         return msg
 
     def check(self):

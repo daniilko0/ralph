@@ -73,7 +73,7 @@ class Schedule:
             schedule.append([el for el in cols if el])
         schedule = [el for el in schedule if len(el) > 1]
 
-        msg = f"Расписание на {self.date}\n"
+        msg = ""
         replacements = {
             "Лекция": "(Л)",
             "Лабораторная работа": "(Л/Р)",
@@ -97,6 +97,8 @@ class Schedule:
                     schedule[i][j + 1] = ""
                 msg += f"{item} "
             msg += "\n"
+            if msg != "":
+                msg = f"Расписание на {self.date}\n" + msg
         return msg
 
     def check(self):

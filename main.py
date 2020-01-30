@@ -117,7 +117,9 @@ for event in bot.longpoll.listen():
             bot.send_message(msg=schedule, pid=bot.event.object.from_id)
         elif payload["button"] == "arbitrary":
             bot.send_message(
-                msg="Напишите дату в формате ДД-ММ-ГГГГ.", pid=bot.event.object.from_id
+                msg="Напишите дату в формате ДД-ММ-ГГГГ.",
+                pid=bot.event.object.from_id,
+                keyboard=kbs.cancel(),
             )
             bot.mode = "ask_for_schedule_date"
         elif payload["button"] == "chconv":
@@ -125,6 +127,13 @@ for event in bot.longpoll.listen():
         elif payload["button"] == "cancel":
             bot.ids = []
             bot.send_gui("Выполнение команды отменено.")
+        elif payload["button"] == "cancel_sch":
+            bot.mode = "wait_for_command"
+            bot.send_message(
+                msg="Выполнение команды отменено.",
+                pid=bot.event.object.from_id,
+                keyboard=kbs.generate_schedule_keyboard(),
+            )
         elif payload["button"] == "save":
             bot.send_message(
                 msg=f"В {'тестовую ' if bot.cid.endswith('1') else 'основную '}"

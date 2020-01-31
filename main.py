@@ -195,7 +195,7 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg="Отправка клавиатуры призыва",
                 pid=bot.event.object.from_id,
-                keyboard=open(f"keyboards/call.json", "r", encoding="UTF-8").read(),
+                keyboard=kbs.generate_alphabet_keyboard(),
             )
         elif bot.mode == "wait_for_newsletter_message":
             bot.mode = "prompt_for_newsletter"

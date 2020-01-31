@@ -72,6 +72,7 @@ for event in bot.longpoll.listen():
                 pid=bot.event.object.from_id,
             )
         elif payload["button"] == "confirm" and bot.mode == "_ask_for_msg":
+            bot.log.log.info("Отправка призыва...")
             bot.send_message(pid=bot.cid, msg=bot.text)
             bot.text = ""
             bot.ids = []

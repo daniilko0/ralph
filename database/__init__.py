@@ -65,9 +65,22 @@ class Database(Base):
         user = self.query(f"SELECT id FROM users WHERE vk_id={user_id}")
         return bool(user)
 
+    def is_session_exist(self, user_id: int):
+        user = self.query(f"SELECT id FROM sessions WHERE vk_id={user_id}")
+        return bool(user)
+
     def create_user(self, user_id: int):
         """
         Добавляет нового пользователя в таблицы информации и рассылок
         """
         self.query(f"INSERT INTO users (vk_id) VALUES ({user_id})")
         self.query(f"INSERT INTO vk_subscriptions DEFAULT VALUES")
+
+    def create_session(self, user_id: int):
+        """
+        Создает новую сессию для пользователя
+        """
+        _id = self.query(f"SELECT id from users WHERE vk_id={user_id}")[0][0]
+        self.query(
+            f"INSERT INTO sessions (id, vk_id, state) VALUES ({_id}, {user_id}, main)"
+        )

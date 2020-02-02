@@ -80,7 +80,14 @@ class Database(Base):
         """
         Создает новую сессию для пользователя
         """
-        _id = self.query(f"SELECT id from users WHERE vk_id={user_id}")[0][0]
+        _id = self.query(f"SELECT id FROM users WHERE vk_id={user_id}")[0][0]
         self.query(
             f"INSERT INTO sessions (id, vk_id, state) VALUES ({_id}, {user_id}, main)"
         )
+
+    def get_session_state(self, user_id: int):
+        """
+        Получает текущий статус бота из сессии
+        """
+        st = self.query(f"SELECT state FROM sessions WHERE vk_id={user_id}")
+        return st[0][0]

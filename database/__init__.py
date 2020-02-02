@@ -91,3 +91,9 @@ class Database(Base):
         """
         st = self.query(f"SELECT state FROM sessions WHERE vk_id={user_id}")
         return st[0][0]
+
+    def update_session_state(self, user_id: int, state: str):
+        """
+        Изменяет текущий статус бота из сессии
+        """
+        self.query(f"UPDATE sessions SET state={state} WHERE vk_id={user_id}")

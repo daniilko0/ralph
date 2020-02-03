@@ -173,6 +173,9 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.generate_mailings_keyboard(),
             )
         elif payload["button"] == "mailing":
+            if not db.mailing_session_exist(bot.event.object.from_id):
+                db.create_mailing_session(bot.event.object.from_id)
+            db.update_mailing_session(bot.event.object.from_id, payload["slug"])
             bot.send_message(
                 msg=f"Меню управления рассылкой \"{payload['name']}\":",
                 pid=bot.event.object.from_id,

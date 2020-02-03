@@ -157,3 +157,19 @@ class Database(Base):
     def update_conversation(self, user_id: int, conv_id: int):
         s_id = self.get_session_id(user_id)
         self.query(f"UPDATE sessions SET conversation={conv_id} WHERE id" f"={s_id}")
+
+    def mailing_session_exist(self, user_id: int):
+        s_id = self.get_session_id(user_id)
+        return self.query(
+            f"SELECT session_id FROM mailing_mgmt WHERE session_id={s_id}"
+        )
+
+    def create_mailing_session(self, user_id: int):
+        s_id = self.get_session_id(user_id)
+        self.query(f"INSERT INTO mailing_mgmt (session_id) VALUES ({s_id})")
+
+    def update_mailing_session(self, user_id: int, m_slug: str):
+        s_id = self.get_session_id(user_id)
+        self.query(
+            f"UPDATE mailing_mgmt SET mailing='{m_slug}' WHERE session_id={s_id}"
+        )

@@ -131,7 +131,16 @@ for event in bot.longpoll.listen():
             )
             db.update_session_state(bot.event.object.from_id, "ask_for_schedule_date")
         elif payload["button"] == "chconv":
-            bot.change_conversation()
+            if db.get_conversation(bot.event.object.from_id) == 2000000001:
+                db.update_conversation(bot.event.object.from_id, 2000000002)
+                bot.send_message(
+                    msg="Основная беседа активна.", pid=bot.event.object.from_id
+                )
+            else:
+                db.update_conversation(bot.event.object.from_id, 2000000001)
+                bot.send_message(
+                    msg="Тестовая беседа активна.", pid=bot.event.object.from_id
+                )
         elif payload["button"] == "cancel":
             db.empty_call_storage(bot.event.object.from_id)
             db.update_session_state(bot.event.object.from_id, "main")

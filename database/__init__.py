@@ -155,4 +155,5 @@ class Database(Base):
         return self.query(f"SELECT conversation FROM sessions WHERE id={s_id}")[0][0]
 
     def update_conversation(self, user_id: int, conv_id: int):
-        pass
+        s_id = self.get_session_id(user_id)
+        self.query(f"UPDATE sessions SET conversation={conv_id} WHERE id" f"={s_id}")

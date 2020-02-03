@@ -211,20 +211,6 @@ class Bot:
                 _l.append(str(q["items"][i]["conversation"]["peer"]["id"]))
         return _l
 
-    def _send_conversation(self) -> NoReturn:
-
-        """
-        Сообщает, какая беседа активна (тестовая или основная)
-        """
-        if self.cid == "2000000001":
-            self.send_message(
-                msg="Тестовая беседа активна.", pid=self.event.object.from_id
-            )
-        if self.cid == "2000000002":
-            self.send_message(
-                msg="Основная беседа активна.", pid=self.event.object.from_id
-            )
-
     def _handle_table(self, col: int) -> Tuple[str, str, str]:
         """
         Обрабатывает гугл-таблицу и составляет кортеж с данными о должниках
@@ -286,20 +272,6 @@ class Bot:
         )
         return result
 
-    @auth
-    def change_conversation(self) -> str:
-        """
-        Меняет активную беседу
-        """
-        if self.cid == "2000000001":
-            self.cid = "2000000002"
-            self._send_conversation()
-            return self.cid
-        elif self.cid == "2000000002":
-            self.cid = "2000000001"
-            self._send_conversation()
-            return self.cid
-
     def current_is_admin(self) -> bool:
         """
         Проверяет, является ли текущий пользователь администратором бота
@@ -316,16 +288,6 @@ class Bot:
             keyboard=self.kbs.generate_main_menu(self.current_is_admin()),
         )
         self.mode = "wait_for_command"
-
-    @auth
-    def _ask_for_msg(self):
-        self.mode = "_ask_for_msg"
-        self.send_message(
-            msg="Отправьте сообщение с текстом объявления"
-            "(вложения пока не поддерживаются).",
-            pid=self.event.object.from_id,
-            keyboard=self.kbs.empty(),
-        )
 
     def show_msg(self, text: str):
         self.text = text

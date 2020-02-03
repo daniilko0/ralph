@@ -272,10 +272,11 @@ class Bot:
         """
         return self.bot_vk.users.get(user_ids=",".join(map(str, ids)))
 
-    def generate_mentions(self, ids: list, names: bool) -> str:
+    def generate_mentions(self, ids: str, names: bool) -> str:
         """
         Генерирует строку с упоминаниями из списка идентификаторов
         """
+        ids = list(filter(bool, ids.replace(" ", "").split(",")))
         users_info = self._get_users_info(ids)
         users_names = [
             users_info[i]["first_name"] if names else "!" for i in range(len(ids))

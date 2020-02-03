@@ -40,7 +40,7 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.generate_names_keyboard(payload["letter"]),
             )
         elif payload["button"] == "student":
-            bot.ids.append(db.get_vk_id(payload["id"]))
+            db.append_to_call_ids(bot.event.object.from_id, db.get_vk_id(payload["id"]))
             bot.send_message(
                 msg=f"{payload['name']} добавлен к списку призыва.",
                 pid=bot.event.object.from_id,
@@ -52,35 +52,44 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.generate_alphabet_keyboard(),
             )
         elif payload["button"] == "call":
-            bot.mode = "_ask_for_msg"
+            db.update_session_state(bot.event.object.from_id, "ask_for_call_message")
+            if not db.call_session_exist(bot.event.object.from_id):
+                db.create_call_session(bot.event.object.from_id)
             bot.send_message(
                 msg="Отправьте сообщение к призыву (вложения не поддерживаются)",
                 pid=bot.event.object.from_id,
                 keyboard=kbs.skip(),
             )
         elif payload["button"] == "skip":
-            bot.text = ""
+            db.update_session_state(bot.event.object.from_id, "call_configuring")
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",
                 pid=bot.event.object.from_id,
                 keyboard=kbs.generate_alphabet_keyboard(),
             )
         elif payload["button"] == "send_to_all":
-            bot.ids = list(students.keys())
+            ids = ",".join(list(students.keys()))
+            db.update_call_ids(bot.event.object.from_id, ids)
             bot.send_message(
                 msg="Все студенты отмечены как получатели уведомления. Готово к "
                 'отправке, нажмите "Сохранить"',
                 pid=bot.event.object.from_id,
             )
-        elif payload["button"] == "confirm" and bot.mode == "_ask_for_msg":
+        elif (
+            payload["button"] == "confirm"
+            and db.get_session_state(bot.event.object.from_id) == "call_configuring"
+        ):
             bot.log.log.info("Отправка призыва...")
-            bot.send_message(pid=bot.cid, msg=bot.text)
-            bot.text = ""
-            bot.ids = []
+            cid = db.get_conversation(bot.event.object.from_id)
+            text = db.get_call_message(bot.event.object.from_id)
+            bot.send_message(pid=cid, msg=text)
+            db.empty_call_storage(bot.event.object.from_id)
+            db.update_session_state(bot.event.object.from_id, "main")
             bot.send_gui(text="Сообщение отправлено.")
         elif payload["button"] == "deny":
-            bot.text = ""
-            bot.ids = []
+            db.update_call_message(bot.event.object.from_id, " ")
+            db.update_call_ids(bot.event.object.from_id, " ")
+            db.update_session_state(bot.event.object.from_id, "main")
             bot.send_gui(text="Выполнение команды отменено.")
         elif payload["button"] == "debtors":
             bot.send_message(
@@ -120,14 +129,15 @@ for event in bot.longpoll.listen():
                 pid=bot.event.object.from_id,
                 keyboard=kbs.cancel(),
             )
-            bot.mode = "ask_for_schedule_date"
+            db.update_session_state(bot.event.object.from_id, "ask_for_schedule_date")
         elif payload["button"] == "chconv":
             bot.change_conversation()
         elif payload["button"] == "cancel":
-            bot.ids = []
+            db.empty_call_storage(bot.event.object.from_id)
+            db.update_session_state(bot.event.object.from_id, "main")
             bot.send_gui("Выполнение команды отменено.")
         elif payload["button"] == "cancel_sch":
-            bot.mode = "wait_for_command"
+            db.update_session_state(bot.event.object.from_id, "main")
             bot.send_message(
                 msg="Выполнение команды отменено.",
                 pid=bot.event.object.from_id,
@@ -140,12 +150,13 @@ for event in bot.longpoll.listen():
                 pid=bot.event.object.from_id,
                 keyboard=kbs.prompt(),
             )
-            if len(bot.ids) < 33:
-                f = True
-            else:
-                f = False
-            bot.text = f"{bot.generate_mentions(ids=bot.ids, names=f)}\n{bot.text}"
-            bot.show_msg(bot.text)
+            f = False
+            text = (
+                f"{bot.generate_mentions(ids=db.get_call_ids(bot.event.object.from_id), names=f)}\n"
+                f"{db.get_call_message(bot.event.object.from_id)}"
+            )
+            db.update_call_message(bot.event.object.from_id, text)
+            bot.show_msg(text)
         elif payload["button"] == "newsletters":
             bot.send_message(
                 msg="Отправка клавиатуры со списком рассылок.",
@@ -192,30 +203,15 @@ for event in bot.longpoll.listen():
             )
         elif payload["button"] == "home":
             bot.send_gui(text="Главный экран")
-        elif bot.mode == "_ask_for_msg":
-            bot.text = bot.event.object.text
+        elif db.get_session_state(bot.event.object.from_id) == "ask_for_call_message":
+            db.update_call_message(bot.event.object.from_id, bot.event.object.text)
             bot.send_message(
                 msg="Отправка клавиатуры призыва",
                 pid=bot.event.object.from_id,
                 keyboard=kbs.generate_alphabet_keyboard(),
             )
-        elif bot.mode == "wait_for_newsletter_message":
-            bot.mode = "prompt_for_newsletter"
-            bot.text = bot.event.object.text
-            bot.send_message(
-                msg="Всем пользователям, активировавшим бота будет отправлено "
-                "следующее сообщение: ",
-                pid=bot.event.object.from_id,
-            )
-            bot.show_msg(text=bot.text)
-        elif payload["button"] == "confirm" and bot.mode == "prompt_for_newsletter":
-            bot.send_mailing(msg=bot.text)
-            bot.send_gui(text="Рассылка отправлена")
-        elif payload["button"] == "cancel" and bot.mode == "select_letter":
-            bot.text = ""
-            bot.ids = []
-            bot.send_gui("Выполнение команды отменено.")
-        elif bot.mode == "ask_for_schedule_date":
+            db.update_session_state(bot.event.object.from_id, "call_configuring")
+        elif db.get_session_state(bot.event.object.from_id) == "ask_for_schedule_date":
             if re.match(r"^\d\d(.|-|/)\d\d(.|-|/)20\d\d$", bot.event.object.text):
                 try:
                     d = datetime.datetime.strptime(
@@ -232,10 +228,12 @@ for event in bot.longpoll.listen():
                     keyboard = ""
                     if schedule != "Расписание отсутствует.":
                         keyboard = kbs.generate_schedule_keyboard()
-                        bot.mode = ""
+                        db.update_session_state(bot.event.object.from_id, "main")
                     else:
                         schedule += "\nПопробуй указать другую дату."
-                        bot.mode = "ask_for_schedule_date"
+                        db.update_session_state(
+                            bot.event.object.from_id, "ask_for_schedule_date"
+                        )
                     bot.send_message(
                         msg=schedule, pid=bot.event.object.from_id, keyboard=keyboard,
                     )

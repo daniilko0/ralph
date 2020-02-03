@@ -82,7 +82,7 @@ class Database(Base):
         """
         _id = self.query(f"SELECT id FROM users WHERE vk_id={user_id}")[0][0]
         self.query(
-            f"INSERT INTO sessions (id, vk_id, state) VALUES ({_id}, {user_id}, main)"
+            f"INSERT INTO sessions (id, vk_id, state) VALUES ({_id}, {user_id}, 'main')"
         )
 
     def get_session_state(self, user_id: int):
@@ -92,8 +92,67 @@ class Database(Base):
         st = self.query(f"SELECT state FROM sessions WHERE vk_id={user_id}")
         return st[0][0]
 
+    def get_session_id(self, user_id: int):
+        s_id = self.query(f"SELECT id FROM sessions WHERE vk_id={user_id}")[0][0]
+        return s_id
+
     def update_session_state(self, user_id: int, state: str):
         """
         Изменяет текущий статус бота из сессии
         """
-        self.query(f"UPDATE sessions SET state={state} WHERE vk_id={user_id}")
+        self.query(f"UPDATE sessions SET state='{state}' WHERE vk_id={user_id}")
+
+    def call_session_exist(self, user_id: int):
+        s_id = self.get_session_id(user_id)
+        call_exist = self.query(f"SELECT session_id FROM calls WHERE session_id={s_id}")
+        texts_exist = self.query(
+            f"SELECT session_id FROM texts WHERE session_id" f"={s_id}"
+        )
+        return bool(call_exist and texts_exist)
+
+    def create_call_session(self, user_id: int):
+        s_id = self.get_session_id(user_id)
+        self.query(f"INSERT INTO calls (session_id) VALUES ({s_id})")
+        self.query(f"INSERT INTO texts (session_id) VALUES ({s_id})")
+
+    def get_call_message(self, user_id: int):
+        s_id = self.get_session_id(user_id)
+        return self.query(f"SELECT text FROM texts WHERE session_id={s_id}")[0][0]
+
+    def update_call_message(self, user_id: int, message: str):
+        s_id = self.get_session_id(user_id)
+        return self.query(f"UPDATE texts SET text='{message}' WHERE session_id={s_id}")
+
+    def get_call_ids(self, user_id: int):
+        s_id = self.get_session_id(user_id)
+        ids = self.query(f"SELECT ids FROM calls WHERE session_id={s_id}")[0][0]
+        return ids
+
+    def update_call_ids(self, user_id: int, ids: str):
+        s_id = self.get_session_id(user_id)
+        self.query(f"UPDATE calls SET ids='{ids}' WHERE session_id={s_id}")
+
+    def append_to_call_ids(self, user_id: int, _id: int):
+        ids = self.get_call_ids(user_id)
+        if ids is None:
+            ids = ""
+        ids += f"{_id},"
+        self.update_call_ids(user_id, ids)
+
+    def empty_call_storage(self, user_id: int):
+        s_id = self.get_session_id(user_id)
+        self.query(f"UPDATE calls SET ids=NULL WHERE session_id={s_id}")
+        self.query(f"UPDATE texts SET text=NULL WHERE session_id={s_id}")
+
+    def get_mailing_message(self, user_id: int):
+        pass
+
+    def update_mailing_message(self, user_id: int, message: str):
+        pass
+
+    def get_conversation(self, user_id: int):
+        s_id = self.get_session_id(user_id)
+        return self.query(f"SELECT conversation FROM sessions WHERE id={s_id}")[0][0]
+
+    def update_conversation(self, user_id: int, conv_id: int):
+        pass

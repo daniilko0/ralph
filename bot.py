@@ -187,16 +187,11 @@ class Bot:
         except FileNotFoundError as e:
             self.log.log.error(msg=e)
 
-    def send_mailing(self, msg: str = "", attach: str = None) -> NoReturn:
-
+    def send_mailing(self, ids: str, msg: str = "") -> NoReturn:
         """
-        Отправка рассылки всем пользователям, активировавшим бота
+        Отправка рассылки
         """
-
-        if msg == "":
-            msg = "Это просто тест."
-        pids = ",".join(self._get_conversations_ids())
-        self.send_message(msg=msg, attachments=attach, user_ids=pids)
+        self.send_message(msg=msg, user_ids=ids)
 
     def _get_conversations_ids(self) -> list:
         """

@@ -144,11 +144,22 @@ class Database(Base):
         self.query(f"UPDATE calls SET ids=NULL WHERE session_id={s_id}")
         self.query(f"UPDATE texts SET text=NULL WHERE session_id={s_id}")
 
+    def empty_mailing_storage(self, user_id: int):
+        s_id = self.get_session_id(user_id)
+        self.query(f"UPDATE mailing_mgmt SET mailing=NULL WHERE session_id={s_id}")
+        self.query(f"UPDATE mailing_mgmt SET m_text=NULL WHERE session_id={s_id}")
+
     def get_mailing_message(self, user_id: int):
-        pass
+        s_id = self.get_session_id(user_id)
+        return self.query(f"SELECT m_text FROM mailing_mgmt WHERE session_id={s_id}")[
+            0
+        ][0]
 
     def update_mailing_message(self, user_id: int, message: str):
-        pass
+        s_id = self.get_session_id(user_id)
+        self.query(
+            f"UPDATE mailing_mgmt SET m_text='{message}' WHERE session_id={s_id}"
+        )
 
     def get_conversation(self, user_id: int):
         s_id = self.get_session_id(user_id)
@@ -173,3 +184,18 @@ class Database(Base):
         self.query(
             f"UPDATE mailing_mgmt SET mailing='{m_slug}' WHERE session_id={s_id}"
         )
+
+    def get_mailing_session(self, user_id: int):
+        s_id = self.get_session_id(user_id)
+        return self.query(f"SELECT mailing FROM mailing_mgmt WHERE session_id={s_id}")[
+            0
+        ][0]
+
+    def fetch_subcribers(self, slug: str):
+        user_ids = self.query(f"SELECT user_id FROM vk_subscriptions WHERE {slug}=1")
+        user_ids = [_id for (_id,) in user_ids]
+        ids = []
+        for i, _id in enumerate(user_ids):
+            ids.append(self.query(f"SELECT vk_id FROM users WHERE id={_id}")[0][0])
+        ids = ",".join(map(str, ids))
+        return ids

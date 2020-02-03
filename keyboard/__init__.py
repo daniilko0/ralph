@@ -184,3 +184,10 @@ class Keyboards:
             label="Отмена", color="negative", payload={"button": "cancel_sch"}
         )
         return kb.get_keyboard()
+
+    @staticmethod
+    def back_to_newsletter():
+        kb = VkKeyboard()
+        kb.add_button(
+            label="Назад", color="default", payload={"button": "newsletter"},
+        )

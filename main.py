@@ -2,6 +2,7 @@ import datetime
 import json
 import os
 import re
+import time
 
 from bot import Bot
 from database import Database
@@ -86,11 +87,44 @@ for event in bot.longpoll.listen():
             db.empty_call_storage(bot.event.object.from_id)
             db.update_session_state(bot.event.object.from_id, "main")
             bot.send_gui(text="Сообщение отправлено.")
-        elif payload["button"] == "deny":
+        elif (
+            payload["button"] == "deny"
+            and db.get_session_state(bot.event.object.from_id) == "call_configuring"
+        ):
             db.update_call_message(bot.event.object.from_id, " ")
             db.update_call_ids(bot.event.object.from_id, " ")
             db.update_session_state(bot.event.object.from_id, "main")
             bot.send_gui(text="Выполнение команды отменено.")
+        elif db.get_session_state(bot.event.object.from_id) == "mailing_config":
+            bot.send_message(
+                msg="Всем подписчикам рассылки будет отправлено сообщение с указанным вами текстом",
+                pid=bot.event.object.from_id,
+                keyboard=kbs.prompt(),
+            )
+            db.update_session_state(bot.event.object.from_id, "prompt_mailing")
+        elif (
+            payload["button"] == "confirm"
+            and db.get_session_state(bot.event.object.from_id) == "prompt_mailing"
+        ):
+            subscs = db.fetch_subcribers(
+                db.get_mailing_session(bot.event.object.from_id)
+            )
+            bot.send_mailing(subscs, db.get_mailing_message(bot.event.object.from_id))
+            bot.send_message(
+                msg="Рассылка отправлена.",
+                pid=bot.event.object.from_id,
+                keyboard=kbs.generate_mailings_keyboard(),
+            )
+        elif (
+            payload["button"] == "deny"
+            and db.get_session_state(bot.event.object.from_id) == "prompt_mailing"
+        ):
+            db.empty_mailing_storage(bot.event.object.from_id)
+            bot.send_message(
+                msg="Отправка рассылки отменена.",
+                pid=bot.event.object.from_id,
+                keyboard=kbs.generate_mailings_keyboard(),
+            )
         elif payload["button"] == "debtors":
             bot.send_message(
                 msg="Выберите статью расходов (колонку в таблице)",
@@ -213,6 +247,14 @@ for event in bot.longpoll.listen():
                     user_id=bot.event.object.from_id,
                 ),
             )
+        elif payload["button"] == "send_mailing":
+            db.update_session_state(bot.event.object.from_id, "ask_for_mailing_message")
+            time.sleep(3)
+            bot.send_message(
+                msg="Отправьте текст рассылки (вложения не поддерживаются)",
+                pid=bot.event.object.from_id,
+                keyboard=kbs.back_to_newsletter(),
+            )
         elif payload["button"] == "home":
             bot.send_gui(text="Главный экран")
         elif db.get_session_state(bot.event.object.from_id) == "ask_for_call_message":
@@ -254,3 +296,8 @@ for event in bot.longpoll.listen():
                     msg="Неверный формат даты. Попробуйте еще раз.",
                     pid=bot.event.object.from_id,
                 )
+        elif (
+            db.get_session_state(bot.event.object.from_id) == "ask_for_mailing_message"
+        ):
+            db.update_mailing_message(bot.event.object.from_id, bot.event.object.text)
+            db.update_session_state(bot.event.object.from_id, "mailing_config")

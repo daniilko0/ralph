@@ -165,6 +165,7 @@ class Bot:
         keyboard: str = "",
         attachments: str = None,
         user_ids: str = None,
+        forward: str = "",
     ) -> NoReturn:
 
         """
@@ -180,6 +181,7 @@ class Bot:
                 keyboard=keyboard,
                 attachments=attachments,
                 user_ids=user_ids,
+                forward_messages=forward,
             )
 
         except vk_api.exceptions.ApiError as e:

@@ -316,5 +316,6 @@ for event in bot.longpoll.listen():
                 msg="Всем подписчикам рассылки будет отправлено сообщение с указанным вами текстом",
                 pid=bot.event.object.from_id,
                 keyboard=kbs.prompt(),
+                forward=f"{bot.event.object.id}",
             )
             db.update_session_state(bot.event.object.from_id, "prompt_mailing")

@@ -1,3 +1,4 @@
+import os
 import re
 import time
 from datetime import datetime
@@ -9,6 +10,7 @@ from bs4 import BeautifulSoup
 
 from bot import Bot
 from logger import Logger
+from database import Database
 
 bot = Bot()
 
@@ -29,27 +31,45 @@ class Date:
 
 class Schedule:
     def __init__(self, date: str, gid: str = "324"):
-
         self.log = Logger()
-
         self.date = date
+        self.gid = gid
 
+    def is_exist(self) -> bool:
+        soup = self.get_raw()
+        warn = soup.find_all("div", {"class": "msg warning"})
+        err = soup.find_all("div", {"class": "msg error"})
+        if warn or err:
+            self.log.log.info("Расписание отсутствует.")
+            return False
+        return True
+
+    def get_raw(self):
+        request = requests.get(
+            f"http://rating.ivpek.ru/timetable/timetable/show?gid={self.gid}&date"
+            f"={self.date}"
+        )
         try:
-            self.raw = requests.get(
-                f"http://rating.ivpek.ru/timetable/timetable/show?gid={gid}&date={date}"
-            ).text
+            if request.status_code != 200:
+                self.log.log.error(
+                    "Подключение неудачно. Автоматический повтор через 5 секунд."
+                )
+                raise requests.exceptions.ConnectionError
         except requests.exceptions.ConnectionError as e:
             self.log.log.error(msg=e)
+            self.get_raw()
         else:
-            self.s = BeautifulSoup(self.raw, "lxml")
+            soup = BeautifulSoup(request.text, "lxml")
+            return soup
 
-    def make_schedule(self):
-        for span in self.s.find_all("span", {"class": "ldur"}):
+    def parse(self):
+        soup = self.get_raw()
+        for span in soup.find_all("span", {"class": "ldur"}):
             span.decompose()
-        for br in self.s.find_all("br"):
-            self.s.br.insert_before(" ")
+        for br in soup.find_all("br"):
+            soup.br.insert_before(" ")
             br.decompose()
-        schedule_html = self.s.find_all("table", {"class": "tbl"})[1]
+        schedule_html = soup.find_all("table", {"class": "tbl"})[1]
         sch = []
         rows = schedule_html.find_all("tr")
         for row in rows:
@@ -82,38 +102,28 @@ class Schedule:
                     sch[i][j + 1] = ""
                 msg += f"{item} "
             msg += "\n"
-        if msg != "":
-            msg = f"Расписание на {self.date}\n" + msg
+        if not msg:
+            self.log.log.info("Расписание отсутствует.")
+            return False
         return msg
 
-    def check(self):
-        warn = self.s.find_all("div", {"class": "msg warning"})
-        err = self.s.find_all("div", {"class": "msg error"})
-        if warn or err:
-            self.log.log.info("Расписание отсутствует.")
-            return None
-        self.log.log.info("Расписание составлено.")
-        return self.s
-
-    def get(self):
-        if self.check() is not None:
-            sch = self.make_schedule()
-            if sch != "":
-                return sch
-            else:
-                return "Расписание отсутствует."
-        else:
-            return "Расписание отсутствует."
+    def send(self):
+        sch = self.parse()
+        if sch:
+            db = Database(os.environ["DATABASE_URL"])
+            subscribers = db.fetch_subcribers("schedule")
+            bot.send_message(msg=sch, pid=bot.cid)
+            bot.send_mailing(ids=subscribers, msg=sch)
 
 
 def listen():
     d = Date()
-    s = Schedule(d.tomorrow)
-    if s.check():
-        print(s.get())
-        sch = s.make_schedule()
-        bot.send_message(msg=sch, pid=bot.cid)
-        bot.send_mailing(msg=sch)
+    sch = Schedule(d.tomorrow)
+    if sch.is_exist():
+        if sch.parse():
+            sch.send()
+        else:
+            time.sleep(15 * 60)
     else:
         time.sleep(15 * 60)
 

@@ -66,6 +66,9 @@ class Database(Base):
         return bool(user)
 
     def is_session_exist(self, user_id: int):
+        """
+        Проверяет существование сессии текущего пользователя
+        """
         user = self.query(f"SELECT id FROM sessions WHERE vk_id={user_id}")
         return bool(user)
 
@@ -93,6 +96,9 @@ class Database(Base):
         return st[0][0]
 
     def get_session_id(self, user_id: int):
+        """
+        Получает идентификатор сессии
+        """
         s_id = self.query(f"SELECT id FROM sessions WHERE vk_id={user_id}")[0][0]
         return s_id
 
@@ -103,6 +109,9 @@ class Database(Base):
         self.query(f"UPDATE sessions SET state='{state}' WHERE vk_id={user_id}")
 
     def call_session_exist(self, user_id: int):
+        """
+        Проверяет существование сессии призыва
+        """
         s_id = self.get_session_id(user_id)
         call_exist = self.query(f"SELECT session_id FROM calls WHERE session_id={s_id}")
         texts_exist = self.query(
@@ -111,28 +120,46 @@ class Database(Base):
         return bool(call_exist and texts_exist)
 
     def create_call_session(self, user_id: int):
+        """
+        Создает новую сессию призыва
+        """
         s_id = self.get_session_id(user_id)
         self.query(f"INSERT INTO calls (session_id) VALUES ({s_id})")
         self.query(f"INSERT INTO texts (session_id) VALUES ({s_id})")
 
     def get_call_message(self, user_id: int):
+        """
+        Получает текст призыва
+        """
         s_id = self.get_session_id(user_id)
         return self.query(f"SELECT text FROM texts WHERE session_id={s_id}")[0][0]
 
     def update_call_message(self, user_id: int, message: str):
+        """
+        Обновляет текст призыва
+        """
         s_id = self.get_session_id(user_id)
         return self.query(f"UPDATE texts SET text='{message}' WHERE session_id={s_id}")
 
     def get_call_ids(self, user_id: int):
+        """
+        Получить список идентификаторов для призыва
+        """
         s_id = self.get_session_id(user_id)
         ids = self.query(f"SELECT ids FROM calls WHERE session_id={s_id}")[0][0]
         return ids
 
     def update_call_ids(self, user_id: int, ids: str):
+        """
+        Перезаписать список идентификаторов для призыва
+        """
         s_id = self.get_session_id(user_id)
         self.query(f"UPDATE calls SET ids='{ids}' WHERE session_id={s_id}")
 
     def append_to_call_ids(self, user_id: int, _id: int):
+        """
+        Добавить идентификатор к списку для призыва
+        """
         ids = self.get_call_ids(user_id)
         if ids is None:
             ids = ""
@@ -140,58 +167,91 @@ class Database(Base):
         self.update_call_ids(user_id, ids)
 
     def empty_call_storage(self, user_id: int):
+        """
+        Очистить хранилище призыва (текст призыва и список идентификатора)
+        """
         s_id = self.get_session_id(user_id)
         self.query(f"UPDATE calls SET ids=NULL WHERE session_id={s_id}")
         self.query(f"UPDATE texts SET text=NULL WHERE session_id={s_id}")
 
     def empty_mailing_storage(self, user_id: int):
+        """
+        Очистить хранилище рассылок (выбранную рассылку и текст рассылки)
+        """
         s_id = self.get_session_id(user_id)
         self.query(f"UPDATE mailing_mgmt SET mailing=NULL WHERE session_id={s_id}")
         self.query(f"UPDATE mailing_mgmt SET m_text=NULL WHERE session_id={s_id}")
 
     def get_mailing_message(self, user_id: int):
+        """
+        Получить текст рассылки
+        """
         s_id = self.get_session_id(user_id)
         return self.query(f"SELECT m_text FROM mailing_mgmt WHERE session_id={s_id}")[
             0
         ][0]
 
     def update_mailing_message(self, user_id: int, message: str):
+        """
+        Перезаписывает текст рассылки
+        """
         s_id = self.get_session_id(user_id)
         self.query(
             f"UPDATE mailing_mgmt SET m_text='{message}' WHERE session_id={s_id}"
         )
 
     def get_conversation(self, user_id: int):
+        """
+        Получает активную беседу
+        """
         s_id = self.get_session_id(user_id)
         return self.query(f"SELECT conversation FROM sessions WHERE id={s_id}")[0][0]
 
     def update_conversation(self, user_id: int, conv_id: int):
+        """
+        Изменяет активную беседу
+        """
         s_id = self.get_session_id(user_id)
         self.query(f"UPDATE sessions SET conversation={conv_id} WHERE id" f"={s_id}")
 
     def mailing_session_exist(self, user_id: int):
+        """
+        Проверяет наличие сессии рассылки
+        """
         s_id = self.get_session_id(user_id)
         return self.query(
             f"SELECT session_id FROM mailing_mgmt WHERE session_id={s_id}"
         )
 
     def create_mailing_session(self, user_id: int):
+        """
+        Создает сессию рассылки
+        """
         s_id = self.get_session_id(user_id)
         self.query(f"INSERT INTO mailing_mgmt (session_id) VALUES ({s_id})")
 
     def update_mailing_session(self, user_id: int, m_slug: str):
+        """
+        Изменяет выбранную рассылку
+        """
         s_id = self.get_session_id(user_id)
         self.query(
             f"UPDATE mailing_mgmt SET mailing='{m_slug}' WHERE session_id={s_id}"
         )
 
     def get_mailing_session(self, user_id: int):
+        """
+        Получает выбранную рассылку
+        """
         s_id = self.get_session_id(user_id)
         return self.query(f"SELECT mailing FROM mailing_mgmt WHERE session_id={s_id}")[
             0
         ][0]
 
     def fetch_subcribers(self, slug: str):
+        """
+        Собирает подписчиков рассылки
+        """
         user_ids = self.query(f"SELECT user_id FROM vk_subscriptions WHERE {slug}=1")
         user_ids = [_id for (_id,) in user_ids]
         ids = []

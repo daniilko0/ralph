@@ -32,7 +32,7 @@ class Database(Base):
         )
         return names
 
-    def get_vk_id(self, _id: Union[str, int]) -> List[Tuple]:
+    def get_vk_id(self, _id: Union[str, int]) -> int:
         """
         Получает из базы данных идентификатор ВКонтакте по идентификатору студента
         """
@@ -206,7 +206,7 @@ class Database(Base):
             f"UPDATE mailing_mgmt SET m_text='{message}' WHERE session_id={s_id}"
         )
 
-    def get_conversation(self, user_id: int) -> str:
+    def get_conversation(self, user_id: int) -> int:
         """
         Получает активную беседу
         """

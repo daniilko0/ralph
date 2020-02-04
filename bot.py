@@ -39,7 +39,6 @@ import vk_api
 from oauth2client.service_account import ServiceAccountCredentials
 from vk_api.bot_longpoll import VkBotEventType
 
-from database import Database
 from keyboard import Keyboards
 from logger import Logger
 from vkbotlongpoll import RalphVkBotLongPoll
@@ -71,18 +70,8 @@ class Bot:
         self.gid = os.environ["GID_ID"]
         self.cid = os.environ["CID_ID"]
         self.table = os.environ["TABLE_ID"]
-        self.db_url = os.environ["DATABASE_URL"]
 
         self.kbs = Keyboards()
-
-        # Авторизация в PostgreSQL - базе данных
-        self.log.log.info("Авторизация базы данных...")
-        try:
-            self.db = Database(self.db_url)
-        except TypeError:
-            self.log.log.error("Неудача. Ошибка авторизации.")
-        else:
-            self.log.log.info("Успех.")
 
         # Авторизация в API ВКонтакте
         self.log.log.info("Авторизация ВКонтакте...")
@@ -113,9 +102,6 @@ class Bot:
         self.admins = os.environ["ADMINS_IDS"].split(",")
 
         # Переменные состояния сессии (для администраторов)
-        self.mode = ""
-        self.text = ""
-        self.ids = []
         self.col = 0
 
         # Авторизация в API Google Sheets и подключение к заданной таблице
@@ -136,9 +122,6 @@ class Bot:
             self.sh = self.table_auth.get_worksheet(0)
             self.sh_sch = self.table_auth.get_worksheet(1)
             self.log.log.info("Успех.")
-
-        # API ключ Dialogflow (Искусственный интеллект для чат - модуля)
-        self.df_key = os.environ["DIALOGFLOW"]
 
         # Переименование обрабатываемых типов событий
         self.NEW_MESSAGE = VkBotEventType.MESSAGE_NEW
@@ -284,10 +267,8 @@ class Bot:
             pid=self.event.object.from_id,
             keyboard=self.kbs.generate_main_menu(self.current_is_admin()),
         )
-        self.mode = "wait_for_command"
 
     def show_msg(self, text: str):
-        self.text = text
         self.send_message(
             msg=text, pid=self.event.object.from_id,
         )

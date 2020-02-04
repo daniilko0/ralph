@@ -105,6 +105,8 @@ class Schedule:
         if not msg:
             self.log.log.info("Расписание отсутствует.")
             return False
+        date = datetime.strptime(self.date, "%Y-%m-%d").strftime("%d.%m.%Y")
+        msg = f"Расписание на {date}:\n{msg}"
         return msg
 
     def send(self):

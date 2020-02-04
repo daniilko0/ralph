@@ -25,6 +25,10 @@ continue running.
 
 """
 
+# TODO: Вытащить варианты режимов в enum`ы
+# TODO: Вытащить вкшные методы в отдельный модуль
+
+
 import json
 import os
 import random

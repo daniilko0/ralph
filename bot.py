@@ -210,6 +210,7 @@ class Bot:
         except (AttributeError, KeyError, ValueError):
             self.log.log.error("Херню ты натворил, Даня!")
         else:
+            debtor_ids = ",".join(debtor_ids)
             men = self.generate_mentions(debtor_ids, True)
             cash = self.sh.cell(41, col).value
             goal = self.sh.cell(4, col).value

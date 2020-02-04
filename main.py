@@ -2,7 +2,6 @@ import datetime
 import json
 import os
 import re
-import time
 
 from bot import Bot
 from database import Database
@@ -257,7 +256,6 @@ for event in bot.longpoll.listen():
             )
         elif payload["button"] == "send_mailing":
             db.update_session_state(bot.event.object.from_id, "ask_for_mailing_message")
-            time.sleep(3)
             bot.send_message(
                 msg="Отправьте текст рассылки (вложения не поддерживаются)",
                 pid=bot.event.object.from_id,

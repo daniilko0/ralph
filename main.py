@@ -95,13 +95,6 @@ for event in bot.longpoll.listen():
             db.update_call_ids(bot.event.object.from_id, " ")
             db.update_session_state(bot.event.object.from_id, "main")
             bot.send_gui(text="Выполнение команды отменено.")
-        elif db.get_session_state(bot.event.object.from_id) == "mailing_config":
-            bot.send_message(
-                msg="Всем подписчикам рассылки будет отправлено сообщение с указанным вами текстом",
-                pid=bot.event.object.from_id,
-                keyboard=kbs.prompt(),
-            )
-            db.update_session_state(bot.event.object.from_id, "prompt_mailing")
         elif (
             payload["button"] == "confirm"
             and db.get_session_state(bot.event.object.from_id) == "prompt_mailing"
@@ -300,4 +293,9 @@ for event in bot.longpoll.listen():
             db.get_session_state(bot.event.object.from_id) == "ask_for_mailing_message"
         ):
             db.update_mailing_message(bot.event.object.from_id, bot.event.object.text)
-            db.update_session_state(bot.event.object.from_id, "mailing_config")
+            bot.send_message(
+                msg="Всем подписчикам рассылки будет отправлено сообщение с указанным вами текстом",
+                pid=bot.event.object.from_id,
+                keyboard=kbs.prompt(),
+            )
+            db.update_session_state(bot.event.object.from_id, "prompt_mailing")

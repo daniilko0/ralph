@@ -138,18 +138,33 @@ for event in bot.longpoll.listen():
         elif payload["button"] == "today":
             d = Date()
             s = Schedule(d.today)
-            schedule = s.get()
-            bot.send_message(msg=schedule, pid=bot.event.object.from_id)
+            schedule = s.parse()
+            if schedule:
+                bot.send_message(msg=schedule, pid=bot.event.object.from_id)
+            else:
+                bot.send_message(
+                    msg="Расписание отсутствует.", pid=bot.event.object.from_id
+                )
         elif payload["button"] == "tomorrow":
             d = Date()
             s = Schedule(d.tomorrow)
-            schedule = s.get()
-            bot.send_message(msg=schedule, pid=bot.event.object.from_id)
+            schedule = s.parse()
+            if schedule:
+                bot.send_message(msg=schedule, pid=bot.event.object.from_id)
+            else:
+                bot.send_message(
+                    msg="Расписание отсутствует.", pid=bot.event.object.from_id
+                )
         elif payload["button"] == "day_after_tomorrow":
             d = Date()
             s = Schedule(d.day_after_tomorrow)
-            schedule = s.get()
-            bot.send_message(msg=schedule, pid=bot.event.object.from_id)
+            schedule = s.parse()
+            if schedule:
+                bot.send_message(msg=schedule, pid=bot.event.object.from_id)
+            else:
+                bot.send_message(
+                    msg="Расписание отсутствует.", pid=bot.event.object.from_id
+                )
         elif payload["button"] == "arbitrary":
             bot.send_message(
                 msg="Напишите дату в формате ДД-ММ-ГГГГ.",
@@ -271,19 +286,23 @@ for event in bot.longpoll.listen():
                     )
                 else:
                     s = Schedule(d)
-                    schedule = s.get()
-                    keyboard = ""
-                    if schedule != "Расписание отсутствует.":
-                        keyboard = kbs.generate_schedule_keyboard()
+                    schedule = s.parse()
+                    if schedule:
+                        bot.send_message(
+                            msg=schedule,
+                            pid=bot.event.object.from_id,
+                            keyboard=kbs.generate_schedule_keyboard(),
+                        )
                         db.update_session_state(bot.event.object.from_id, "main")
                     else:
-                        schedule += "\nПопробуй указать другую дату."
+                        bot.send_message(
+                            msg="Расписание отсутствует.\nПопробуй указать другую "
+                            "дату.",
+                            pid=bot.event.object.from_id,
+                        )
                         db.update_session_state(
                             bot.event.object.from_id, "ask_for_schedule_date"
                         )
-                    bot.send_message(
-                        msg=schedule, pid=bot.event.object.from_id, keyboard=keyboard,
-                    )
             else:
                 bot.send_message(
                     msg="Неверный формат даты. Попробуйте еще раз.",

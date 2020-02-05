@@ -23,3 +23,6 @@ ralph.log
 
 # Data files
 students.txt
+
+# Test scripts
+polygon.py

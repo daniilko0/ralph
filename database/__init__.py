@@ -4,9 +4,13 @@ from typing import Tuple
 from typing import Union
 
 from database.base import Base
+from states import States
+from exceptions import UnknownStateType
+
 """
 МОдуль, содержащий класс с методами для работы с БД, выполняющих конечную цель
 """
+
 
 class Database(Base):
     """
@@ -114,7 +118,10 @@ class Database(Base):
         """
         Изменяет текущий статус бота из сессии
         """
-        self.query(f"UPDATE sessions SET state='{state}' WHERE vk_id={user_id}")
+        if isinstance(state, States):
+            self.query(f"UPDATE sessions SET state='{state}' WHERE vk_id={user_id}")
+        else:
+            raise UnknownStateType(f"{state}")
 
     def call_session_exist(self, user_id: int) -> bool:
         """

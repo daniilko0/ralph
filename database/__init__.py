@@ -4,9 +4,11 @@ from typing import Tuple
 from typing import Union
 
 from database.base import Base
+
 """
-МОдуль, содержащий класс с методами для работы с БД, выполняющих конечную цель
+Модуль, содержащий класс с методами для работы с БД, выполняющих конечную цель
 """
+
 
 class Database(Base):
     """

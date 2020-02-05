@@ -9,6 +9,7 @@ from keyboard import Keyboards
 from scheduler import Date
 from scheduler import Schedule
 from students import students
+from states import States
 
 db = Database(os.environ["DATABASE_URL"])
 bot = Bot()
@@ -52,7 +53,9 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.generate_alphabet_keyboard(),
             )
         elif payload["button"] == "call":
-            db.update_session_state(bot.event.object.from_id, "ask_for_call_message")
+            db.update_session_state(
+                bot.event.object.from_id, States.CALL_MESSAGE_ASK.value
+            )
             if not db.call_session_exist(bot.event.object.from_id):
                 db.create_call_session(bot.event.object.from_id)
             bot.send_message(
@@ -61,7 +64,7 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.skip(),
             )
         elif payload["button"] == "skip":
-            db.update_session_state(bot.event.object.from_id, "call_configuring")
+            db.update_session_state(bot.event.object.from_id, States.CALL_CONFIG.value)
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",
                 pid=bot.event.object.from_id,
@@ -77,26 +80,28 @@ for event in bot.longpoll.listen():
             )
         elif (
             payload["button"] == "confirm"
-            and db.get_session_state(bot.event.object.from_id) == "call_configuring"
+            and db.get_session_state(bot.event.object.from_id)
+            == States.CALL_CONFIG.value
         ):
             bot.log.log.info("Отправка призыва...")
             cid = db.get_conversation(bot.event.object.from_id)
             text = db.get_call_message(bot.event.object.from_id)
             bot.send_message(pid=cid, msg=text)
             db.empty_call_storage(bot.event.object.from_id)
-            db.update_session_state(bot.event.object.from_id, "main")
+            db.update_session_state(bot.event.object.from_id, States.MAIN.value)
             bot.send_gui(text="Сообщение отправлено.")
         elif (
             payload["button"] == "deny"
-            and db.get_session_state(bot.event.object.from_id) == "call_configuring"
+            and db.get_session_state(bot.event.object.from_id)
+            == States.CALL_CONFIG.value
         ):
             db.update_call_message(bot.event.object.from_id, " ")
             db.update_call_ids(bot.event.object.from_id, " ")
-            db.update_session_state(bot.event.object.from_id, "main")
+            db.update_session_state(bot.event.object.from_id, States.MAIN.value)
             bot.send_gui(text="Выполнение команды отменено.")
         elif (
             payload["button"] == "confirm"
-            and db.get_session_state(bot.event.object.from_id) == "prompt_mailing"
+            and db.get_session_state(bot.event.object.from_id) == States.MAILING_CONFIRM
         ):
             subscs = db.fetch_subcribers(
                 db.get_mailing_session(bot.event.object.from_id)
@@ -170,7 +175,9 @@ for event in bot.longpoll.listen():
                 pid=bot.event.object.from_id,
                 keyboard=kbs.cancel(),
             )
-            db.update_session_state(bot.event.object.from_id, "ask_for_schedule_date")
+            db.update_session_state(
+                bot.event.object.from_id, States.SCHEDULE_DATE_ASK.value
+            )
         elif payload["button"] == "chconv":
             if db.get_conversation(bot.event.object.from_id) == 2000000001:
                 db.update_conversation(bot.event.object.from_id, 2000000002)
@@ -184,10 +191,10 @@ for event in bot.longpoll.listen():
                 )
         elif payload["button"] == "cancel":
             db.empty_call_storage(bot.event.object.from_id)
-            db.update_session_state(bot.event.object.from_id, "main")
+            db.update_session_state(bot.event.object.from_id, States.MAIN.value)
             bot.send_gui("Выполнение команды отменено.")
         elif payload["button"] == "cancel_sch":
-            db.update_session_state(bot.event.object.from_id, "main")
+            db.update_session_state(bot.event.object.from_id, States.MAIN.value)
             bot.send_message(
                 msg="Выполнение команды отменено.",
                 pid=bot.event.object.from_id,
@@ -255,7 +262,9 @@ for event in bot.longpoll.listen():
                 ),
             )
         elif payload["button"] == "send_mailing":
-            db.update_session_state(bot.event.object.from_id, "ask_for_mailing_message")
+            db.update_session_state(
+                bot.event.object.from_id, States.MAILING_MESSAGE_ASK.value
+            )
             bot.send_message(
                 msg="Отправьте текст рассылки (вложения не поддерживаются)",
                 pid=bot.event.object.from_id,
@@ -263,15 +272,21 @@ for event in bot.longpoll.listen():
             )
         elif payload["button"] == "home":
             bot.send_gui(text="Главный экран")
-        elif db.get_session_state(bot.event.object.from_id) == "ask_for_call_message":
+        elif (
+            db.get_session_state(bot.event.object.from_id)
+            == States.CALL_MESSAGE_ASK.value
+        ):
             db.update_call_message(bot.event.object.from_id, bot.event.object.text)
             bot.send_message(
                 msg="Отправка клавиатуры призыва",
                 pid=bot.event.object.from_id,
                 keyboard=kbs.generate_alphabet_keyboard(),
             )
-            db.update_session_state(bot.event.object.from_id, "call_configuring")
-        elif db.get_session_state(bot.event.object.from_id) == "ask_for_schedule_date":
+            db.update_session_state(bot.event.object.from_id, States.CALL_CONFIG.value)
+        elif (
+            db.get_session_state(bot.event.object.from_id)
+            == States.SCHEDULE_DATE_ASK.value
+        ):
             if re.match(r"^\d\d(.|-|/)\d\d(.|-|/)20\d\d$", bot.event.object.text):
                 try:
                     d = datetime.datetime.strptime(
@@ -291,7 +306,9 @@ for event in bot.longpoll.listen():
                             pid=bot.event.object.from_id,
                             keyboard=kbs.generate_schedule_keyboard(),
                         )
-                        db.update_session_state(bot.event.object.from_id, "main")
+                        db.update_session_state(
+                            bot.event.object.from_id, States.MAIN.value
+                        )
                     else:
                         bot.send_message(
                             msg="Расписание отсутствует.\nПопробуй указать другую "
@@ -299,7 +316,7 @@ for event in bot.longpoll.listen():
                             pid=bot.event.object.from_id,
                         )
                         db.update_session_state(
-                            bot.event.object.from_id, "ask_for_schedule_date"
+                            bot.event.object.from_id, States.SCHEDULE_DATE_ASK.value
                         )
             else:
                 bot.send_message(
@@ -307,7 +324,8 @@ for event in bot.longpoll.listen():
                     pid=bot.event.object.from_id,
                 )
         elif (
-            db.get_session_state(bot.event.object.from_id) == "ask_for_mailing_message"
+            db.get_session_state(bot.event.object.from_id)
+            == States.MAILING_MESSAGE_ASK.value
         ):
             db.update_mailing_message(bot.event.object.from_id, bot.event.object.text)
             bot.send_message(
@@ -316,4 +334,6 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.prompt(),
                 forward=f"{bot.event.object.id}",
             )
-            db.update_session_state(bot.event.object.from_id, "prompt_mailing")
+            db.update_session_state(
+                bot.event.object.from_id, States.MAILING_CONFIRM.value
+            )

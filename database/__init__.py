@@ -43,7 +43,7 @@ class Database(Base):
         vk_id = self.query(f"SELECT vk_id from users WHERE id={_id}")[0][0]
         return vk_id
 
-    def get_user_id(self, vk_id: int) -> List[Tuple]:
+    def get_user_id(self, vk_id: int) -> int:
         """
         Получает из базы данных идентификатор студента по идентификатору ВКонтакте
         """

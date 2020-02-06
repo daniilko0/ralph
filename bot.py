@@ -176,6 +176,14 @@ class Bot:
         except FileNotFoundError as e:
             self.log.log.error(msg=e)
 
+    def search_messages(self, query: str, pid: int, count: int):
+        """
+        Ищет последние несколько сообщений в диалоге по заданному запросу
+        """
+        return self.bot_vk.messages.search(
+            q=query, peer_id=pid, count=count, group_id=self.cid
+        )
+
     def send_mailing(self, ids: str, msg: str = "") -> NoReturn:
         """
         Отправка рассылки

@@ -26,8 +26,7 @@ class Keyboards:
         kb.add_button(label="Расписание", payload={"button": "schedule"})
         kb.add_line()
         kb.add_button(
-            label="Управление рассылками (в разработке)",
-            payload={"button": "newsletters"},
+            label="Управление рассылками", payload={"button": "newsletters"},
         )
         if is_admin:
             kb.add_line()

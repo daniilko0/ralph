@@ -169,7 +169,7 @@ class Keyboards:
             kb.add_line()
             kb.add_button(
                 label="Сменить беседу",
-                color="negative",
+                color="primary",
                 payload={"button": "chconv_call"},
             )
         return kb.get_keyboard()

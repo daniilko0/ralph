@@ -153,8 +153,7 @@ class Keyboards:
         kb = VkKeyboard()
         return kb.get_empty_keyboard()
 
-    @staticmethod
-    def prompt():
+    def prompt(self, user_id: int = None):
         """
         Возвращает клавиатуру с подтверждением действия
         """
@@ -163,6 +162,16 @@ class Keyboards:
             label="Подтвердить", color="positive", payload={"button": "confirm"}
         )
         kb.add_button(label="Отмена", color="negative", payload={"button": "deny"})
+        if (
+            user_id is not None
+            and self.db.get_session_state(user_id) == "call_configuring"
+        ):
+            kb.add_line()
+            kb.add_button(
+                label="Сменить беседу",
+                color="negative",
+                payload={"button": "chconv_call"},
+            )
         return kb.get_keyboard()
 
     @staticmethod

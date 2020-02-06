@@ -247,15 +247,17 @@ class Bot:
         """
         Генерирует строку с упоминаниями из списка идентификаторов
         """
-        ids = list(filter(bool, ids.replace(" ", "").split(",")))
-        users_info = self._get_users_info(ids)
-        users_names = [
-            users_info[i]["first_name"] if names else "!" for i in range(len(ids))
-        ]
-        result = (", " if names else "").join(
-            [f"@id{_id}({users_names[i]})" for (i, _id) in enumerate(ids)]
-        )
-        return result
+        if ids is not None:
+            ids = list(filter(bool, ids.replace(" ", "").split(",")))
+            users_info = self._get_users_info(ids)
+            users_names = [
+                users_info[i]["first_name"] if names else "!" for i in range(len(ids))
+            ]
+            result = (", " if names else "").join(
+                [f"@id{_id}({users_names[i]})" for (i, _id) in enumerate(ids)]
+            )
+            return result
+        return ""
 
     def current_is_admin(self) -> bool:
         """

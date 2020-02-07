@@ -21,7 +21,6 @@ class Keyboards:
         kb = VkKeyboard()
         if is_admin:
             kb.add_button(label="Призыв", payload={"button": "call"})
-            kb.add_button(label="Должники", payload={"button": "debtors"})
             kb.add_line()
         kb.add_button(label="Расписание", payload={"button": "schedule"})
         kb.add_line()

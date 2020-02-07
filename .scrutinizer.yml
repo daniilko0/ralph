@@ -1,10 +1,11 @@
-# language: python
 checks:
     python:
         typecheck_maybe_no_member: true
         duplicate_code: true
         code_rating: true
 build:
+    environment:
+        python: 3.8.1
     nodes:
         tests: true
         analysis:

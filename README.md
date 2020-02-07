@@ -1,13 +1,13 @@
 # RALPH
 ## Бот – платформа, призванный управлять студеческой беседой и упростить работу старост.
-[![GitHub version](https://badge.fury.io/gh/dadyarri%2Fralph.svg)](https://badge.fury.io/gh/dadyarri%2Fralph)  
+![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/dadyarri/ralph?color=brightgreen&include_prereleases)
 
 [![Code style](https://img.shields.io/static/v1?label=Code%20style&message=black&color=black&logo=python&logoColor=white)](https://github.com/dadyarri/ralph/blob/master/LICENSE.md)
-[![License: MIT](https://img.shields.io/static/v1?label=License&message=MIT&color=brightgreen)](https://opensource.org/licenses/MIT)
+![GitHub](https://img.shields.io/github/license/dadyarri/ralph?color=brightgreen)
 
 [![Pyup](https://pyup.io/repos/github/dadyarri/ralph/shield.svg)](https://pyup.io/account/repos/github/dadyarri/ralph/)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/dadyarri/ralph/badges/quality-score.png?b=dadyarri/6.1.0/sessions)](https://scrutinizer-ci.com/g/dadyarri/ralph/?branch=dadyarri/6.1.0/sessions)
-[![Build Status](https://travis-ci.org/dadyarri/ralph.svg?branch=master)](https://travis-ci.org/dadyarri/ralph)
+![Scrutinizer code quality (GitHub/Bitbucket)](https://img.shields.io/scrutinizer/quality/g/dadyarri/ralph/master)
+![Travis (.org)](https://img.shields.io/travis/dadyarri/ralph)
 ### О проекте
 RALPH - это платформа, созданная для того, чтобы упросить нелёгкий труд старост в студенческих группах.  
 Он работает как бот ВКонтакте, которого можно добавить в беседу, где он и будет выполнять свои функции.

@@ -95,19 +95,21 @@ for event in bot.longpoll.listen():
             db.update_session_state(bot.event.object.from_id, "main")
             bot.send_gui(text="Выполнение команды отменено.")
         elif payload["button"] == "chconv_call":
-            if db.get_conversation(bot.event.object.from_id) == 2000000001:
+            conv = db.get_conversation(bot.event.object.from_id)
+            chat = int(str(conv)[-1])
+            if chat == 1:
                 db.update_conversation(bot.event.object.from_id, 2000000002)
                 chat = 2
-            else:
+            elif chat == 2:
                 db.update_conversation(bot.event.object.from_id, 2000000001)
                 chat = 1
-            m = db.get_call_message(bot.event.object.from_id).strip("\n")
+            msg = db.get_call_message(bot.event.object.from_id)
             bot.send_message(
                 msg=f"Теперь это сообщение будет отправлено в "
                 f"{'тестовую' if chat == 1 else 'основную'} беседу:",
                 pid=bot.event.object.from_id,
             )
-            bot.show_msg(m)
+            bot.show_msg(msg)
         elif (
             payload["button"] == "confirm"
             and db.get_session_state(bot.event.object.from_id) == "prompt_mailing"
@@ -208,8 +210,9 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.generate_schedule_keyboard(),
             )
         elif payload["button"] == "save":
+            chat = db.get_conversation(bot.event.object.from_id)
             bot.send_message(
-                msg=f"В {'тестовую ' if bot.cid.endswith('1') else 'основную '}"
+                msg=f"В {'тестовую ' if chat == 1 else 'основную '}"
                 f"беседу будет отправлено сообщение:",
                 pid=bot.event.object.from_id,
                 keyboard=kbs.prompt(bot.event.object.from_id),

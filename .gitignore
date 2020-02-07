@@ -7,7 +7,7 @@ venv_ralph/
 
 # IDEs config files
 .vscode/
-.idea/
+.idea/workspace.xml
 
 # Python's caches
 **/__pycache__/
@@ -24,5 +24,5 @@ ralph.log
 # Data files
 students.txt
 
-# Test scripts
+# Tesing files
 polygon.py

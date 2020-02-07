@@ -25,22 +25,14 @@ continue running.
 
 """
 
-# TODO: Вытащить варианты режимов в enum`ы
-# TODO: Вытащить вкшные методы в отдельный модуль
 
-
-import json
 import os
 import random
-from binascii import Error as binErr
 from typing import List
 from typing import NoReturn
-from typing import Tuple
 
-import gspread
 import requests
 import vk_api
-from oauth2client.service_account import ServiceAccountCredentials
 from vk_api.bot_longpoll import VkBotEventType
 
 from keyboard import Keyboards
@@ -107,25 +99,6 @@ class Bot:
 
         # Переменные состояния сессии (для администраторов)
         self.col = 0
-
-        # Авторизация в API Google Sheets и подключение к заданной таблице
-        self.log.log.info("Авторизация в Google Cloud...")
-        self.scope = [
-            "https://spreadsheets.google.com/feeds",
-            "https://www.googleapis.com/auth/drive",
-        ]
-        try:
-            credentials = ServiceAccountCredentials.from_json_keyfile_dict(
-                keyfile_dict=json.loads(os.environ["GOOGLE_CREDS"]), scopes=self.scope
-            )
-        except binErr:
-            self.log.log.error("Неудача.")
-        else:
-            self.gc = gspread.authorize(credentials=credentials)
-            self.table_auth = self.gc.open_by_key(key=self.table)
-            self.sh = self.table_auth.get_worksheet(0)
-            self.sh_sch = self.table_auth.get_worksheet(1)
-            self.log.log.info("Успех.")
 
         # Переименование обрабатываемых типов событий
         self.NEW_MESSAGE = VkBotEventType.MESSAGE_NEW
@@ -194,48 +167,6 @@ class Bot:
             if q["items"][i]["conversation"]["can_write"]["allowed"]:
                 _l.append(str(q["items"][i]["conversation"]["peer"]["id"]))
         return _l
-
-    def _handle_table(self, col: int) -> Tuple[str, str, str]:
-        """
-        Обрабатывает гугл-таблицу и составляет кортеж с данными о должниках
-        """
-        men, cash, goal = None, None, None
-        try:
-            self.gc.login()
-            debtor_ids = []
-            for i in range(5, 38):
-                if self.sh.cell(i, col).value != self.sh.cell(41, col).value:
-                    debtor_ids.append(self.sh.cell(i, 3).value)
-        except gspread.exceptions.APIError as e:
-            self.log.log.error(
-                f"[ERROR]: [{e.response.error.code}] – {e.response.error.message}"
-            )
-            self._handle_table(col)
-        except (AttributeError, KeyError, ValueError):
-            self.log.log.error("Херню ты натворил, Даня!")
-        else:
-            debtor_ids = ",".join(debtor_ids)
-            men = self.generate_mentions(debtor_ids, True)
-            cash = self.sh.cell(41, col).value
-            goal = self.sh.cell(4, col).value
-        if men is not None and cash is not None and goal is not None:
-            return men, cash, goal
-        else:
-            self._handle_table(col)
-
-    @auth
-    def get_debtors(self):
-        """
-        Призывает должников
-        """
-        self.send_message(
-            msg="Эта команда может работать медленно. Прошу немного подождать.",
-            pid=self.event.object.from_id,
-        )
-        men, cash, goal = self._handle_table(self.col)
-        msg = f"{men} вам нужно принести по {cash} на {goal.lower()}."
-        self.send_message(msg=msg, pid=self.cid)
-        self.send_gui(text="Команда успешно выполнена.")
 
     def _get_users_info(self, ids: list) -> List[dict]:
         """

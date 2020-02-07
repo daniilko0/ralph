@@ -210,7 +210,7 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.generate_schedule_keyboard(),
             )
         elif payload["button"] == "save":
-            chat = db.get_conversation(bot.event.object.from_id)
+            chat = int(str(db.get_conversation(bot.event.object.from_id))[-1])
             bot.send_message(
                 msg=f"В {'тестовую ' if chat == 1 else 'основную '}"
                 f"беседу будет отправлено сообщение:",
@@ -218,10 +218,10 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.prompt(bot.event.object.from_id),
             )
             f = False
-            text = (
-                f"{bot.generate_mentions(ids=db.get_call_ids(bot.event.object.from_id), names=f)}\n"
-                f"{db.get_call_message(bot.event.object.from_id)}"
+            mentions = bot.generate_mentions(
+                ids=db.get_call_ids(bot.event.object.from_id), names=f
             )
+            text = f"{mentions}\n" f"{db.get_call_message(bot.event.object.from_id)}"
             db.update_call_message(bot.event.object.from_id, text)
             bot.show_msg(text)
         elif payload["button"] == "newsletters":

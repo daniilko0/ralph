@@ -133,17 +133,6 @@ for event in bot.longpoll.listen():
                 pid=bot.event.object.from_id,
                 keyboard=kbs.generate_mailings_keyboard(),
             )
-        elif payload["button"] == "debtors":
-            bot.send_message(
-                msg="Выберите статью расходов (колонку в таблице)",
-                pid=bot.event.object.from_id,
-                keyboard=open(
-                    f"keyboards/select_col.json", "r", encoding="UTF-8"
-                ).read(),
-            )
-        elif payload["button"] == "col_id":
-            bot.col = payload["id"]
-            bot.get_debtors()
         elif payload["button"] == "schedule":
             bot.send_message(
                 msg="Отправка клавиатуры с расписанием.",

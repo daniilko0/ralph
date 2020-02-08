@@ -8,7 +8,6 @@ from database import Database
 from keyboard import Keyboards
 from scheduler import Date
 from scheduler import Schedule
-from students import students
 
 db = Database(os.environ["DATABASE_URL"])
 bot = Bot()
@@ -70,7 +69,7 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.generate_alphabet_keyboard(),
             )
         elif payload["button"] == "send_to_all":
-            ids = ",".join(list(students.keys()))
+            ids = ",".join(db.get_active_students_ids())
             db.update_call_ids(bot.event.object.from_id, ids)
             bot.send_message(
                 msg="Все студенты отмечены как получатели уведомления. Готово к "

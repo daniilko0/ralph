@@ -34,6 +34,66 @@ class Keyboards:
             )
         return kb.get_keyboard()
 
+    @staticmethod
+    def generate_schedule_keyboard():
+        """
+        Возвращает клавиатуру с выбором даты получения расписания
+        """
+        kb = VkKeyboard()
+        kb.add_button(label="На сегодня", color="default", payload={"button": "today"})
+        kb.add_button(
+            label="На завтра", color="default", payload={"button": "tomorrow"}
+        )
+        kb.add_line()
+        kb.add_button(
+            label="На послезавтра",
+            color="default",
+            payload={"button": "day_after_tomorrow"},
+        )
+        kb.add_button(
+            label="Выбрать дату", color="default", payload={"button": "arbitrary"},
+        )
+        kb.add_line()
+        kb.add_button(
+            label="Назад", color="default", payload={"button": "home"},
+        )
+        return kb.get_keyboard()
+
+    @staticmethod
+    def empty():
+        """
+        Возвращает пустую клавиатуру
+        """
+        kb = VkKeyboard()
+        return kb.get_empty_keyboard()
+
+    @staticmethod
+    def skip():
+        """
+        Возвращает клавиатуру с кнопкой "Пропустить"
+        """
+        kb = VkKeyboard()
+        kb.add_button(label="Пропустить", payload={"button": "skip"})
+        return kb.get_keyboard()
+
+    @staticmethod
+    def cancel():
+        """
+        Возвращает клавиатуру с кнопкой "Отмена"
+        """
+        kb = VkKeyboard()
+        kb.add_button(
+            label="Отмена", color="negative", payload={"button": "cancel_sch"}
+        )
+        return kb.get_keyboard()
+
+    @staticmethod
+    def back_to_newsletter():
+        kb = VkKeyboard()
+        kb.add_button(
+            label="Назад", color="default", payload={"button": "newsletter"},
+        )
+
     def generate_alphabet_keyboard(self):
         """
         Генерирует клавиатуру с алфавитными кнопками для меню Призыва
@@ -118,39 +178,6 @@ class Keyboards:
         )
         return kb.get_keyboard()
 
-    @staticmethod
-    def generate_schedule_keyboard():
-        """
-        Возвращает клавиатуру с выбором даты получения расписания
-        """
-        kb = VkKeyboard()
-        kb.add_button(label="На сегодня", color="default", payload={"button": "today"})
-        kb.add_button(
-            label="На завтра", color="default", payload={"button": "tomorrow"}
-        )
-        kb.add_line()
-        kb.add_button(
-            label="На послезавтра",
-            color="default",
-            payload={"button": "day_after_tomorrow"},
-        )
-        kb.add_button(
-            label="Выбрать дату", color="default", payload={"button": "arbitrary"},
-        )
-        kb.add_line()
-        kb.add_button(
-            label="Назад", color="default", payload={"button": "home"},
-        )
-        return kb.get_keyboard()
-
-    @staticmethod
-    def empty():
-        """
-        Возвращает пустую клавиатуру
-        """
-        kb = VkKeyboard()
-        return kb.get_empty_keyboard()
-
     def prompt(self, user_id: int = None):
         """
         Возвращает клавиатуру с подтверждением действия
@@ -171,30 +198,3 @@ class Keyboards:
                 payload={"button": "chconv_call"},
             )
         return kb.get_keyboard()
-
-    @staticmethod
-    def skip():
-        """
-        Возвращает клавиатуру с кнопкой "Пропустить"
-        """
-        kb = VkKeyboard()
-        kb.add_button(label="Пропустить", payload={"button": "skip"})
-        return kb.get_keyboard()
-
-    @staticmethod
-    def cancel():
-        """
-        Возвращает клавиатуру с кнопкой "Отмена"
-        """
-        kb = VkKeyboard()
-        kb.add_button(
-            label="Отмена", color="negative", payload={"button": "cancel_sch"}
-        )
-        return kb.get_keyboard()
-
-    @staticmethod
-    def back_to_newsletter():
-        kb = VkKeyboard()
-        kb.add_button(
-            label="Назад", color="default", payload={"button": "newsletter"},
-        )

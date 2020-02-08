@@ -15,6 +15,13 @@ class Database(Base):
         Класс для методов работы с БД, выполняющих конечную цель
     """
 
+    def get_active_students_ids(self) -> list:
+        ids = self.query(
+            f"SELECT user_id FROM users_info WHERE academic_status > 0 ORDER BY user_id"
+        )
+        vk_ids = [self.get_vk_id(_id) for _id in ids]
+        return vk_ids
+
     def get_last_names_letters(self) -> List[str]:
         """
         Получает из базы данных все уникальные первые буквы фамилий

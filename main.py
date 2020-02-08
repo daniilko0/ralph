@@ -12,8 +12,9 @@ from students import students
 
 db = Database(os.environ["DATABASE_URL"])
 bot = Bot()
-bot.update_version()
 kbs = Keyboards()
+
+bot.update_version()
 
 for event in bot.longpoll.listen():
     bot.event = event

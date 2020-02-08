@@ -19,7 +19,7 @@ class Database(Base):
         ids = self.query(
             f"SELECT user_id FROM users_info WHERE academic_status > 0 ORDER BY user_id"
         )
-        vk_ids = [self.get_vk_id(_id) for _id in ids]
+        vk_ids = [str(self.get_vk_id(_id)) for (_id,) in ids]
         return vk_ids
 
     def get_last_names_letters(self) -> List[str]:

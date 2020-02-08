@@ -205,8 +205,3 @@ class Bot:
             pid=self.event.object.from_id,
             keyboard=self.kbs.generate_main_menu(self.current_is_admin()),
         )
-
-    def show_msg(self, text: str):
-        self.send_message(
-            msg=text, pid=self.event.object.from_id,
-        )

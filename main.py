@@ -109,7 +109,6 @@ for event in bot.longpoll.listen():
                 f"{'тестовую' if chat == 1 else 'основную'} беседу:",
                 pid=bot.event.object.from_id,
             )
-            bot.show_msg(msg)
         elif (
             payload["button"] == "confirm"
             and db.get_session_state(bot.event.object.from_id) == "prompt_mailing"
@@ -213,7 +212,7 @@ for event in bot.longpoll.listen():
             msg = db.get_call_message(bot.event.object.from_id) or ""
             text = f"{mentions}\n{msg}"
             db.update_call_message(bot.event.object.from_id, text)
-            bot.show_msg(text)
+            bot.send_message(msg=text, pid=bot.event.object.from_id)
         elif payload["button"] == "newsletters":
             bot.send_message(
                 msg="Отправка клавиатуры со списком рассылок.",

@@ -104,15 +104,6 @@ class Bot:
             f"Беседа... {'Тестовая' if self.cid.endswith('1') else 'Основная'}"
         )
 
-        self.log.log.info("Обновление версии в статусе группы...")
-        try:
-            with open("VERSION.txt", "r") as f:
-                v = f"Версия: {f.read()}"
-            self.user_vk.status.set(text=v, group_id=self.gid)
-        except vk_api.exceptions.ApiError as e:
-            self.log.log.error(f"Ошибка {e.__str__()}")
-        else:
-            self.log.log.info(f"Успех.")
         self.log.log.info("Инициализация завершена.")
 
     def send_message(
@@ -189,3 +180,17 @@ class Bot:
             pid=self.event.object.from_id,
             keyboard=self.kbs.generate_main_menu(self.current_is_admin()),
         )
+
+    def update_version(self):
+        """
+        Обновляет версию в статусе группы с ботом
+        """
+        self.log.log.info("Обновление версии в статусе группы...")
+        try:
+            with open("VERSION.txt", "r") as f:
+                v = f"Версия: {f.read()}"
+            self.user_vk.status.set(text=v, group_id=self.gid)
+        except vk_api.exceptions.ApiError as e:
+            self.log.log.error(f"Ошибка {e.__str__()}")
+        else:
+            self.log.log.info(f"Успех.")

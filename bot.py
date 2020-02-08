@@ -185,7 +185,7 @@ class Bot:
                 users_info[i]["first_name"] if names else "!" for i in range(len(ids))
             ]
             result = (", " if names else "").join(
-                [f"@id{_id}({users_names[i]})" for (i, _id) in enumerate(ids)]
+                [f"[id{_id}|{users_names[i]}]" for (i, _id) in enumerate(ids)]
             )
             return result
         return ""

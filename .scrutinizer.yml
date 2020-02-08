@@ -5,7 +5,7 @@ checks:
         code_rating: true
 build:
     environment:
-        python: 3.8.1
+        python: 3.7.2
     nodes:
         tests: true
         analysis:

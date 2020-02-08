@@ -7,5 +7,5 @@ class RalphVkBotLongPoll(VkBotLongPoll):
             try:
                 for event in self.check():
                     yield event
-            except Exception as e:
-                print("error", e)
+            except Exception as err:
+                print(f"Error: {err}.")

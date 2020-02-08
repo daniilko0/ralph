@@ -97,9 +97,6 @@ class Bot:
         self.event = {}
         self.admins = os.environ["ADMINS_IDS"].split(",")
 
-        # Переменные состояния сессии (для администраторов)
-        self.col = 0
-
         # Переименование обрабатываемых типов событий
         self.NEW_MESSAGE = VkBotEventType.MESSAGE_NEW
 
@@ -154,19 +151,6 @@ class Bot:
         Отправка рассылки
         """
         self.send_message(msg=msg, user_ids=ids)
-
-    def _get_conversations_ids(self) -> list:
-        """
-        Получает идентификаторы пользователей последних 200 диалогов
-        """
-        q = self.bot_vk.messages.getConversations(
-            offset=1, count=200, group_id=self.gid
-        )
-        _l = []
-        for i in range(len(q["items"])):
-            if q["items"][i]["conversation"]["can_write"]["allowed"]:
-                _l.append(str(q["items"][i]["conversation"]["peer"]["id"]))
-        return _l
 
     def _get_users_info(self, ids: list) -> List[dict]:
         """

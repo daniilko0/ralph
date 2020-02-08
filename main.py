@@ -210,7 +210,8 @@ for event in bot.longpoll.listen():
             mentions = bot.generate_mentions(
                 ids=db.get_call_ids(bot.event.object.from_id), names=f
             )
-            text = f"{mentions}\n" f"{db.get_call_message(bot.event.object.from_id)}"
+            msg = db.get_call_message(bot.event.object.from_id) or ""
+            text = f"{mentions}\n{msg}"
             db.update_call_message(bot.event.object.from_id, text)
             bot.show_msg(text)
         elif payload["button"] == "newsletters":

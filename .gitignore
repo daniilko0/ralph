@@ -15,12 +15,6 @@ test/__pycache__
 **/.pytest_cache/
 .pytest_cache/
 
-# Config files
-.pre-commit-config.yaml
-
-# Log files
-ralph.log
-
 # Data files
 students.txt
 

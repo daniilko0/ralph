@@ -187,34 +187,7 @@ for event in bot.longpoll.listen():
                 bot.send_message(
                     msg="Тестовая беседа активна.", pid=bot.event.object.from_id
                 )
-        elif payload["button"] == "cancel":
-            db.empty_call_storage(bot.event.object.from_id)
-            db.update_session_state(bot.event.object.from_id, "main")
-            bot.send_gui("Выполнение команды отменено.")
-        elif payload["button"] == "cancel_sch":
-            db.update_session_state(bot.event.object.from_id, "main")
-            bot.send_message(
-                msg="Выполнение команды отменено.",
-                pid=bot.event.object.from_id,
-                keyboard=kbs.generate_schedule_keyboard(),
-            )
-        elif payload["button"] == "save":
-            chat = int(str(db.get_conversation(bot.event.object.from_id))[-1])
-            bot.send_message(
-                msg=f"В {'тестовую ' if chat == 1 else 'основную '}"
-                f"беседу будет отправлено сообщение:",
-                pid=bot.event.object.from_id,
-                keyboard=kbs.prompt(bot.event.object.from_id),
-            )
-            f = False
-            mentions = bot.generate_mentions(
-                ids=db.get_call_ids(bot.event.object.from_id), names=f
-            )
-            msg = db.get_call_message(bot.event.object.from_id) or ""
-            text = f"{mentions}\n{msg}"
-            db.update_call_message(bot.event.object.from_id, text)
-            bot.send_message(msg=text, pid=bot.event.object.from_id)
-        elif payload["button"] == "newsletters":
+        elif payload["button"] == "mailings":
             bot.send_message(
                 msg="Отправка клавиатуры со списком рассылок.",
                 pid=bot.event.object.from_id,

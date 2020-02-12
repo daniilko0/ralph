@@ -71,6 +71,13 @@ for event in bot.longpoll.listen():
                 pid=bot.event.object.from_id,
                 keyboard=kbs.generate_alphabet_keyboard(),
             )
+        elif payload["button"] == "skip":
+            db.update_session_state(bot.event.object.from_id, "call_configuring")
+            bot.send_message(
+                msg="Отправка клавиатуры с алфавитом.",
+                pid=bot.event.object.from_id,
+                keyboard=kbs.generate_alphabet_keyboard(),
+            )
         elif db.get_session_state(bot.event.object.from_id) == "ask_for_call_message":
             db.update_call_message(bot.event.object.from_id, bot.event.object.text)
             bot.send_message(
@@ -79,13 +86,6 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.generate_alphabet_keyboard(),
             )
             db.update_session_state(bot.event.object.from_id, "call_configuring")
-        elif payload["button"] == "skip":
-            db.update_session_state(bot.event.object.from_id, "call_configuring")
-            bot.send_message(
-                msg="Отправка клавиатуры с алфавитом.",
-                pid=bot.event.object.from_id,
-                keyboard=kbs.generate_alphabet_keyboard(),
-            )
         elif payload["button"] == "send_to_all":
             ids = ",".join(db.get_active_students_ids())
             db.update_call_ids(bot.event.object.from_id, ids)

@@ -25,7 +25,6 @@ def send_call_confirm():
     )
     message = db.get_call_message(bot.event.object.from_id) or ""
     message = f"{mentions}\n{message}"
-    print(repr(message))
     if message != "\n ":
         bot.send_message(
             msg=f"В {'тестовую ' if chat_id == 1 else 'основную '}"

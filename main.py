@@ -18,20 +18,30 @@ bot.update_version()
 
 def send_call_confirm():
     chat_id = int(str(db.get_conversation(bot.event.object.from_id))[-1])
-    bot.send_message(
-        msg=f"В {'тестовую ' if chat_id == 1 else 'основную '}"
-        f"беседу будет отправлено сообщение:",
-        pid=bot.event.object.from_id,
-        keyboard=kbs.prompt(bot.event.object.from_id),
-    )
     f = False
-    mentions = bot.generate_mentions(
-        ids=db.get_call_ids(bot.event.object.from_id), names=f
+    mentions = (
+        bot.generate_mentions(ids=db.get_call_ids(bot.event.object.from_id), names=f)
+        or ""
     )
     message = db.get_call_message(bot.event.object.from_id) or ""
     message = f"{mentions}\n{message}"
-    db.update_call_message(bot.event.object.from_id, message)
-    bot.send_message(msg=message, pid=bot.event.object.from_id)
+    print(repr(message))
+    if message != "\n ":
+        bot.send_message(
+            msg=f"В {'тестовую ' if chat_id == 1 else 'основную '}"
+            f"беседу будет отправлено сообщение:",
+            pid=bot.event.object.from_id,
+            keyboard=kbs.prompt(bot.event.object.from_id),
+        )
+        db.update_call_message(bot.event.object.from_id, message)
+        bot.send_message(msg=message, pid=bot.event.object.from_id)
+    else:
+        db.empty_call_storage(bot.event.object.from_id)
+        bot.send_message(
+            msg="Сообщение не может быть пустым. Отмена...",
+            pid=bot.event.object.from_id,
+            keyboard=kbs.generate_main_menu(bot.current_is_admin()),
+        )
 
 
 for event in bot.longpoll.listen():

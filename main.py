@@ -15,6 +15,25 @@ kbs = Keyboards()
 
 bot.update_version()
 
+
+def send_call_confirm():
+    chat_id = int(str(db.get_conversation(bot.event.object.from_id))[-1])
+    bot.send_message(
+        msg=f"В {'тестовую ' if chat_id == 1 else 'основную '}"
+        f"беседу будет отправлено сообщение:",
+        pid=bot.event.object.from_id,
+        keyboard=kbs.prompt(bot.event.object.from_id),
+    )
+    f = False
+    mentions = bot.generate_mentions(
+        ids=db.get_call_ids(bot.event.object.from_id), names=f
+    )
+    message = db.get_call_message(bot.event.object.from_id) or ""
+    message = f"{mentions}\n{message}"
+    db.update_call_message(bot.event.object.from_id, message)
+    bot.send_message(msg=message, pid=bot.event.object.from_id)
+
+
 for event in bot.longpoll.listen():
     bot.event = event
     if (
@@ -90,26 +109,12 @@ for event in bot.longpoll.listen():
             ids = ",".join(db.get_active_students_ids())
             db.update_call_ids(bot.event.object.from_id, ids)
             bot.send_message(
-                msg="Все студенты отмечены как получатели уведомления. Готово к "
-                'отправке, нажмите "Сохранить"',
+                msg="Все студенты отмечены как получатели уведомления",
                 pid=bot.event.object.from_id,
             )
+            send_call_confirm()
         elif payload["button"] == "save":
-            chat = int(str(db.get_conversation(bot.event.object.from_id))[-1])
-            bot.send_message(
-                msg=f"В {'тестовую ' if chat == 1 else 'основную '}"
-                f"беседу будет отправлено сообщение:",
-                pid=bot.event.object.from_id,
-                keyboard=kbs.prompt(bot.event.object.from_id),
-            )
-            f = False
-            mentions = bot.generate_mentions(
-                ids=db.get_call_ids(bot.event.object.from_id), names=f
-            )
-            msg = db.get_call_message(bot.event.object.from_id) or ""
-            text = f"{mentions}\n{msg}"
-            db.update_call_message(bot.event.object.from_id, text)
-            bot.send_message(msg=text, pid=bot.event.object.from_id)
+            send_call_confirm()
         elif payload["button"] == "cancel":
             db.empty_call_storage(bot.event.object.from_id)
             db.update_session_state(bot.event.object.from_id, "main")

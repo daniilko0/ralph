@@ -310,7 +310,7 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg="Отправьте текст рассылки (вложения не поддерживаются)",
                 pid=bot.event.object.from_id,
-                keyboard=kbs.back_to_newsletter(),
+                keyboard=kbs.empty(),
             )
         elif (
             db.get_session_state(bot.event.object.from_id) == "ask_for_mailing_message"

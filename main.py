@@ -319,7 +319,7 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg="Отправьте текст рассылки (вложения не поддерживаются)",
                 pid=bot.event.object.from_id,
-                keyboard=kbs.empty(),
+                keyboard=kbs.cancel(),
             )
         elif (
             db.get_session_state(bot.event.object.from_id) == "ask_for_mailing_message"
@@ -332,6 +332,14 @@ for event in bot.longpoll.listen():
                 forward=f"{bot.event.object.id}",
             )
             db.update_session_state(bot.event.object.from_id, "prompt_mailing")
+        elif payload["button"] == "cancel" and db.get_session_state(
+            bot.event.object.from_id
+        ):
+            bot.send_message(
+                msg="Выполнение команды отменено",
+                pid=bot.event.object.from_id,
+                keyboard=kbs.generate_main_menu(bot.current_is_admin()),
+            )
         elif (
             payload["button"] == "confirm"
             and db.get_session_state(bot.event.object.from_id) == "prompt_mailing"

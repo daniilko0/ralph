@@ -53,9 +53,6 @@ class Base:
     def commit(self):
         self.conn.commit()
 
-    def data(self):
-        return self.cur
-
     def connect(self):
         self.conn = psycopg2.connect(**self.db_auth)
         self.cur = self.conn.cursor()

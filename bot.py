@@ -40,16 +40,6 @@ from logger import Logger
 from vkbotlongpoll import RalphVkBotLongPoll
 
 
-def auth(func):
-    def wrapper(self):
-        if not self.current_is_admin():
-            self.send_gui(text="У тебя нет доступа к этой функции.")
-        else:
-            func(self)
-
-    return wrapper
-
-
 class Bot:
     """
     Класс, описывающий объект бота, включая авторизацию в API, и все методы бота.
@@ -65,7 +55,6 @@ class Bot:
         self.user_token = os.environ["VK_USER_TOKEN"]
         self.gid = os.environ["GID_ID"]
         self.cid = os.environ["CID_ID"]
-        self.table = os.environ["TABLE_ID"]
 
         self.kbs = Keyboards()
 

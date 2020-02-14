@@ -87,13 +87,6 @@ class Keyboards:
         )
         return kb.get_keyboard()
 
-    @staticmethod
-    def back_to_newsletter():
-        kb = VkKeyboard()
-        kb.add_button(
-            label="Назад", color="default", payload={"button": "newsletter"},
-        )
-
     def generate_alphabet_keyboard(self):
         """
         Генерирует клавиатуру с алфавитными кнопками для меню Призыва

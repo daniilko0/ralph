@@ -259,20 +259,6 @@ for event in bot.longpoll.listen():
                 )
         # :blockend: Расписание
 
-        # :blockstart: Смена беседы
-        elif payload["button"] == "chconv":
-            if db.get_conversation(bot.event.object.from_id) == 2000000001:
-                db.update_conversation(bot.event.object.from_id, 2000000002)
-                bot.send_message(
-                    msg="Основная беседа активна.", pid=bot.event.object.from_id
-                )
-            else:
-                db.update_conversation(bot.event.object.from_id, 2000000001)
-                bot.send_message(
-                    msg="Тестовая беседа активна.", pid=bot.event.object.from_id
-                )
-        # :blockend: Смена беседы
-
         # :blockstart: Рассылки
         elif payload["button"] == "mailings":
             bot.send_message(
@@ -382,4 +368,19 @@ for event in bot.longpoll.listen():
                 pid=bot.event.object.from_id,
                 keyboard=kbs.generate_prefs_keyboard(),
             )
+
+        elif payload["button"] == "chconv":
+            chat = db.get_conversation(bot.event.object.from_id)
+            if chat == 2000000001:
+                bot.send_message(
+                    msg="Тестовая беседа сейчас активна",
+                    pid=bot.event.object.from_id,
+                    keyboard=kbs.generate_conv_selector(chat),
+                )
+            elif chat == 2000000002:
+                bot.send_message(
+                    msg="Основная беседа сейчас активна",
+                    pid=bot.event.object.from_id,
+                    keyboard=kbs.generate_conv_selector(chat),
+                )
         # :blockend: Параметры

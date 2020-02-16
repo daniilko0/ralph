@@ -374,3 +374,12 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.generate_mailings_keyboard(),
             )
         # :blockend: Рассылки
+
+        # :blockstart: Параметры
+        elif payload["button"] == "prefs":
+            bot.send_message(
+                msg="Параметры",
+                pid=bot.event.object.from_id,
+                keyboard=kbs.generate_prefs_keyboard(),
+            )
+        # :blockend: Параметры

@@ -98,6 +98,28 @@ class Keyboards:
         )
         return kb.get_keyboard()
 
+    @staticmethod
+    def generate_conv_selector(chat: int):
+        """
+        Возвращает клавиатуру-селектор бесед
+        """
+        kb = VkKeyboard()
+        if chat == 2000000001:
+            kb.add_button(
+                label="Переключиться на основную беседу",
+                payload={"button": "select_main_conv"},
+            )
+        elif chat == 2000000002:
+            kb.add_button(
+                label="Переключиться на тестовую беседу",
+                payload={"button": "select_test_conv"},
+            )
+        kb.add_line()
+        kb.add_button(
+            label="Назад", color="default", payload={"button": "home"},
+        )
+        return kb.get_keyboard()
+
     def generate_alphabet_keyboard(self):
         """
         Генерирует клавиатуру с алфавитными кнопками для меню Призыва

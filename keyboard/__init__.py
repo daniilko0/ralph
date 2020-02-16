@@ -126,7 +126,7 @@ class Keyboards:
         if status:
             kb.add_button(label="Выключить", payload={"button": "off_using_names"})
         else:
-            kb.add_button(label="Выключить", payload={"button": "off_using_names"})
+            kb.add_button(label="Включить", payload={"button": "on_using_names"})
         kb.add_line()
         kb.add_button(
             label="Назад", color="default", payload={"button": "prefs"},

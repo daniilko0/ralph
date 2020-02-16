@@ -338,6 +338,7 @@ for event in bot.longpoll.listen():
                 pid=bot.event.object.from_id,
                 keyboard=kbs.generate_main_menu(bot.current_is_admin()),
             )
+            db.update_session_state(bot.event.object.from_id, "main")
         elif (
             db.get_session_state(bot.event.object.from_id) == "ask_for_mailing_message"
         ):

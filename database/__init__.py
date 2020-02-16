@@ -282,9 +282,9 @@ class Database(Base):
         Получает статус использования имён
         """
         s_id = self.get_session_id(user_id)
-        names_using = self.query(
-            f"SELECT using_names FROM sessions WHERE session_id" f"={s_id}"
-        )[0][0]
+        names_using = self.query(f"SELECT names_using FROM sessions WHERE id={s_id}")[
+            0
+        ][0]
         return bool(names_using)
 
     def update_names_using_status(self, user_id: int, value: int):
@@ -292,4 +292,4 @@ class Database(Base):
         Изменяет статус использования имён
         """
         s_id = self.get_session_id(user_id)
-        self.query(f"UPDATE sessions SET using_names={value} WHERE session_id={s_id}")
+        self.query(f"UPDATE sessions SET names_using={value} WHERE id={s_id}")

@@ -412,4 +412,21 @@ for event in bot.longpoll.listen():
                 pid=bot.event.object.from_id,
                 keyboard=kbs.generate_names_selector(status),
             )
+
+        elif payload["button"] == "off_using_names":
+            status = 0
+            db.update_names_using_status(bot.event.object.from_id, status)
+            bot.send_message(
+                msg="Использование имён в призыве отключено.",
+                pid=bot.event.object.from_id,
+                keyboard=kbs.generate_names_selector(bool(status)),
+            )
+        elif payload["button"] == "on_using_names":
+            status = 1
+            db.update_names_using_status(bot.event.object.from_id, status)
+            bot.send_message(
+                msg="Использование имён в призыве включено.",
+                pid=bot.event.object.from_id,
+                keyboard=kbs.generate_names_selector(bool(status)),
+            )
         # :blockend: Параметры

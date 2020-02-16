@@ -85,10 +85,17 @@ class Keyboards:
 
     @staticmethod
     def generate_prefs_keyboard():
+        """
+        Возвращает клавиатуру с настройками бота
+        """
         kb = VkKeyboard()
         kb.add_button(label="Сменить беседу", payload={"button": "chconv"})
         kb.add_line()
         kb.add_button(label="Использование имён в призыве", payload={"button": "names"})
+        kb.add_line()
+        kb.add_button(
+            label="Назад", color="default", payload={"button": "home"},
+        )
         return kb.get_keyboard()
 
     def generate_alphabet_keyboard(self):

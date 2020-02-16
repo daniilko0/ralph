@@ -18,7 +18,7 @@ bot.update_version()
 
 def send_call_confirm():
     chat_id = int(str(db.get_conversation(bot.event.object.from_id))[-1])
-    f = False
+    f = db.get_names_using_status(bot.event.object.from_id)
     mentions = (
         bot.generate_mentions(ids=db.get_call_ids(bot.event.object.from_id), names=f)
         or ""

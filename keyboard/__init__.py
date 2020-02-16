@@ -29,9 +29,7 @@ class Keyboards:
         )
         if is_admin:
             kb.add_line()
-            kb.add_button(
-                label="Сменить беседу", color="negative", payload={"button": "chconv"}
-            )
+            kb.add_button(label="Настройки", payload={"button": "prefs"})
         return kb.get_keyboard()
 
     @staticmethod
@@ -83,6 +81,14 @@ class Keyboards:
         """
         kb = VkKeyboard()
         kb.add_button(label="Отмена", color="negative", payload={"button": "cancel"})
+        return kb.get_keyboard()
+
+    @staticmethod
+    def generate_prefs_keyboard():
+        kb = VkKeyboard()
+        kb.add_button(label="Сменить беседу", payload={"button": "chconv"})
+        kb.add_line()
+        kb.add_button(label="Использование имён в призыве", payload={"button": "names"})
         return kb.get_keyboard()
 
     def generate_alphabet_keyboard(self):

@@ -400,4 +400,16 @@ for event in bot.longpoll.listen():
                 pid=bot.event.object.from_id,
                 keyboard=kbs.generate_conv_selector(chat),
             )
+
+        elif payload["button"] == "names":
+            status = db.get_names_using_status(bot.event.object.from_id)
+            msg = (
+                f"Использование имён в призыве "
+                f"{'активно' if status else 'неактивно'}."
+            )
+            bot.send_message(
+                msg=msg,
+                pid=bot.event.object.from_id,
+                keyboard=kbs.generate_names_selector(status),
+            )
         # :blockend: Параметры

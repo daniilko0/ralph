@@ -120,6 +120,19 @@ class Keyboards:
         )
         return kb.get_keyboard()
 
+    @staticmethod
+    def generate_names_selector(status: bool):
+        kb = VkKeyboard()
+        if status:
+            kb.add_button(label="Выключить", payload={"button": "off_using_names"})
+        else:
+            kb.add_button(label="Выключить", payload={"button": "off_using_names"})
+        kb.add_line()
+        kb.add_button(
+            label="Назад", color="default", payload={"button": "prefs"},
+        )
+        return kb.get_keyboard()
+
     def generate_alphabet_keyboard(self):
         """
         Генерирует клавиатуру с алфавитными кнопками для меню Призыва

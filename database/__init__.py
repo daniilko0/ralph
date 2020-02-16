@@ -276,3 +276,20 @@ class Database(Base):
             ids.append(self.query(f"SELECT vk_id FROM users WHERE id={_id}")[0][0])
         ids = ",".join(map(str, ids))
         return ids
+
+    def get_names_using_status(self, user_id: int) -> bool:
+        """
+        Получает статус использования имён
+        """
+        s_id = self.get_session_id(user_id)
+        names_using = self.query(
+            f"SELECT using_names FROM sessions WHERE session_id" f"={s_id}"
+        )[0][0]
+        return bool(names_using)
+
+    def update_names_using_status(self, user_id: int, value: int):
+        """
+        Изменяет статус использования имён
+        """
+        s_id = self.get_session_id(user_id)
+        self.query(f"UPDATE sessions SET using_names={value} WHERE session_id={s_id}")

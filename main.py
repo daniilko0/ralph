@@ -383,4 +383,21 @@ for event in bot.longpoll.listen():
                     pid=bot.event.object.from_id,
                     keyboard=kbs.generate_conv_selector(chat),
                 )
+
+        elif payload["button"] == "select_main_conv":
+            chat = 2000000002
+            db.update_conversation(bot.event.object.from_id, chat)
+            bot.send_message(
+                msg="Основная беседа активна.",
+                pid=bot.event.object.from_id,
+                keyboard=kbs.generate_conv_selector(chat),
+            )
+        elif payload["button"] == "select_test_conv":
+            chat = 2000000001
+            db.update_conversation(bot.event.object.from_id, chat)
+            bot.send_message(
+                msg="Тестовая беседа активна.",
+                pid=bot.event.object.from_id,
+                keyboard=kbs.generate_conv_selector(chat),
+            )
         # :blockend: Параметры

@@ -124,7 +124,10 @@ for event in bot.longpoll.listen():
             send_call_confirm()
         elif payload["button"] == "save":
             send_call_confirm()
-        elif payload["button"] == "cancel":
+        elif (
+            payload["button"] == "cancel"
+            and db.get_session_state(bot.event.object.from_id) == "call_configuring"
+        ):
             db.empty_call_storage(bot.event.object.from_id)
             db.update_session_state(bot.event.object.from_id, "main")
             bot.send_gui("Выполнение команды отменено.")
@@ -208,6 +211,17 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.cancel(),
             )
             db.update_session_state(bot.event.object.from_id, "ask_for_schedule_date")
+        elif (
+            payload["button"] == "cancel"
+            and db.get_session_state(bot.event.object.from_id)
+            == "ask_for_schedule_date"
+        ):
+            db.update_session_state(bot.event.object.from_id, "main")
+            bot.send_message(
+                msg="Выполнение команды отменено.",
+                pid=bot.event.object.from_id,
+                keyboard=kbs.generate_schedule_keyboard(),
+            )
         elif db.get_session_state(bot.event.object.from_id) == "ask_for_schedule_date":
             if re.match(r"^\d\d(.|-|/)\d\d(.|-|/)20\d\d$", bot.event.object.text):
                 try:
@@ -243,13 +257,6 @@ for event in bot.longpoll.listen():
                     msg="Неверный формат даты. Попробуйте еще раз.",
                     pid=bot.event.object.from_id,
                 )
-        elif payload["button"] == "cancel_sch":
-            db.update_session_state(bot.event.object.from_id, "main")
-            bot.send_message(
-                msg="Выполнение команды отменено.",
-                pid=bot.event.object.from_id,
-                keyboard=kbs.generate_schedule_keyboard(),
-            )
         # :blockend: Расписание
 
         # :blockstart: Смена беседы
@@ -322,6 +329,16 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.cancel(),
             )
         elif (
+            payload["button"] == "cancel"
+            and db.get_session_state(bot.event.object.from_id)
+            == "ask_for_mailing_message"
+        ):
+            bot.send_message(
+                msg="Выполнение команды отменено",
+                pid=bot.event.object.from_id,
+                keyboard=kbs.generate_main_menu(bot.current_is_admin()),
+            )
+        elif (
             db.get_session_state(bot.event.object.from_id) == "ask_for_mailing_message"
         ):
             db.update_mailing_message(bot.event.object.from_id, bot.event.object.text)
@@ -332,14 +349,6 @@ for event in bot.longpoll.listen():
                 forward=f"{bot.event.object.id}",
             )
             db.update_session_state(bot.event.object.from_id, "prompt_mailing")
-        elif payload["button"] == "cancel" and db.get_session_state(
-            bot.event.object.from_id
-        ):
-            bot.send_message(
-                msg="Выполнение команды отменено",
-                pid=bot.event.object.from_id,
-                keyboard=kbs.generate_main_menu(bot.current_is_admin()),
-            )
         elif (
             payload["button"] == "confirm"
             and db.get_session_state(bot.event.object.from_id) == "prompt_mailing"

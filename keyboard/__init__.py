@@ -82,9 +82,7 @@ class Keyboards:
         Возвращает клавиатуру с кнопкой "Отмена"
         """
         kb = VkKeyboard()
-        kb.add_button(
-            label="Отмена", color="negative", payload={"button": "cancel_sch"}
-        )
+        kb.add_button(label="Отмена", color="negative", payload={"button": "cancel"})
         return kb.get_keyboard()
 
     def generate_alphabet_keyboard(self):

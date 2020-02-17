@@ -1,0 +1,5 @@
+version: 6.2.0
+os: linux
+files:
+  - source: /
+    destination: /home/ubuntu/projects/ralph

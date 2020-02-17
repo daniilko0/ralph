@@ -1,27 +1,24 @@
 ---
-name: Bug report
-about: Create a report to help us improve
+name: Отчёт о баге
+about: Напишите отчёт, чтобы помочь мне улучшить Ральфа
 title: ''
 labels: bug, wtf
 assignees: dadyarri
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+**Опишите баг**
+Понятное и подробное описание проблемы
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**Шаги**
+Что нужно сделать, чтобы повторить баг:
+Напишите список шагов, кототрые нужно выполнить, чтобы увидеть баг.
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+**Ожидаемое поведение**
+Понятное и подробное объяснение, того, что вы ожидали увидеть.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+**Скриншоты**
+Если возможно, приложите скриншоты, описывающие вашу проблему
 
-**Additional context**
-Add any other context about the problem here.
+**Дополнительная информация**
+Любая информация, которая может помочь решить проблему

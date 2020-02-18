@@ -5,6 +5,6 @@ files:
     destination: /home/ubuntu/projects/ralph
 hooks:
   BeforeInstall:
-    - location: scripts/remove.sh
+    - location: /home/ubuntu/scripts/remove.sh
   ApplicationStart:
-    - location: scripts/restart.sh
+    - location: /home/ubuntu/scripts/restart.sh

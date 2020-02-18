@@ -4,8 +4,5 @@ files:
   - source: /
     destination: /home/ubuntu/projects/ralph
 hooks:
-  BeforeInstall:
-    - location: scripts/remove.sh
-      timeout: 100
   ApplicationStart:
     - location: scripts/restart.sh

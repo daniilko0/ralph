@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # Stop tmux's session
-tmux kill-server
+tmux kill-session
 
-# Delete all ralph's contain
-rm -rf /home/ubuntu/projects/ralph/*
+# Delete all ralph's contain except .envrc
+rm -r `ls | grep -v ".envrc"`
 echo "Folder with project deleted."

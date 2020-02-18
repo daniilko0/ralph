@@ -6,10 +6,10 @@ files:
 hooks:
   ApplicationStop:
     - location: scripts/remove.sh
-    - runas: ubuntu
+      runas: ubuntu
   Install:
     - location: scripts/install.sh
-    - runas: ubuntu
+      runas: ubuntu
   ApplicationStart:
     - location: scripts/restart.sh
-    - runas: ubuntu
+      runas: ubuntu

@@ -16,7 +16,7 @@ echo "Setting up virtual environment finished."
 
 # Installing requirements
 . /home/ubuntu/projects/ralph/venv_ralph/bin/activate
-pip install -r requirements.txt
+pip install -r /home/ubuntu/projects/ralph/requirements.txt
 
 
 # Starting new session

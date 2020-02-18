@@ -3,6 +3,6 @@ os: linux
 files:
   - source: /
     destination: /home/ubuntu/projects/ralph
-# hooks:
-#   ApplicationStart:
-#     - location: scripts/restart.sh
+hooks:
+  ApplicationStart:
+    - location: scripts/restart.sh

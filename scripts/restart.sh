@@ -4,18 +4,18 @@
 tmux kill-server
 
 # Delete all ralph's contain
-rm -rf projects/ralph
+rm -rf /home/ubuntu/projects/ralph
 echo "Folder with project deleted."
 
 # Create new virtual environment
-mkdir projects/ralph
-cd projects/ralph
+mkdir /home/ubuntu/projects/ralph
+cd /home/ubuntu/projects/ralph
 echo "Setting up virtual environment..."
-python3.8 -m venv venv_ralph
+/home/ubuntu/.python/bin//python3.8 -m venv venv_ralph
 echo "Setting up virtual environment finished."
 
 # Installing requirements
-. venv_ralph/bin/activate
+. /home/ubuntu/projects/ralph/venv_ralph/bin/activate
 pip install -r requirements.txt
 
 

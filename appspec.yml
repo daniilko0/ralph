@@ -8,4 +8,4 @@ hooks:
     - location: scripts/remove.sh
   ApplicationStart:
     - location: scripts/restart.sh
-    timeout: 100
+    - timeout: 100

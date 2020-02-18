@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Copy downloaded bundle to project's directory
-cp {$PWD}/* /home/ubuntu/projects/ralph
+cp -f {$PWD}/* /home/ubuntu/projects/ralph
 
 # Create new virtual environment
 mkdir /home/ubuntu/projects/ralph

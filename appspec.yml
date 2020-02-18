@@ -4,5 +4,9 @@ files:
   - source: /
     destination: /home/ubuntu/projects/ralph
 hooks:
+  ApplicationStop:
+    - location: scripts/remove.sh
+  Install:
+    - location: scripts/install.sh
   ApplicationStart:
     - location: scripts/restart.sh

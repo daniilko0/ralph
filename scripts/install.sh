@@ -1,5 +1,7 @@
 #!/bin/sh
 
+$SOURCE = $PWD
+
 # Copy downloaded bundle to project's directory
 yes | cp -rf {$PWD}/* /home/ubuntu/projects/ralph
 
@@ -14,3 +16,5 @@ echo "Setting up virtual environment finished."
 echo "Activating virtual environment..."
 . /home/ubuntu/projects/ralph/venv_ralph/bin/activate
 echo "Virtual environment activated."
+
+cd $SOURCE

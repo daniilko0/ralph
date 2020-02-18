@@ -4,7 +4,7 @@ files:
   - source: /
     destination: /home/ubuntu/projects/ralph
 hooks:
-  ApplicationStop:
+  BeforeInstall:
     - location: scripts/remove.sh
       runas: ubuntu
   Install:

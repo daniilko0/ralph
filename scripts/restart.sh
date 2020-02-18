@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # Installing requirements
+source venv_ralph/bin/activate
 pip install -r requirements.txt
 
 

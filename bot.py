@@ -132,27 +132,31 @@ class Bot:
         """
         self.send_message(msg=msg, user_ids=ids)
 
-    def _get_users_info(self, ids: list) -> List[dict]:
+    def _get_users_names(self, ids: list) -> List[str]:
         """
-        Получает информацию о пользователях с указанными id
+        Получает имена пользователей по идентификаторам из списка
         """
-        return self.bot_vk.users.get(user_ids=",".join(map(str, ids)))
+        user_ids = [
+            self.db.query(f"SELECT id FROM users WHERE vk_id={i}")[0][0] for i in ids
+        ]
+        user_names = [
+            self.db.query(f"SELECT first_name FROM users_info WHERE user_id={i}")[0][0]
+            for i in user_ids
+        ]
+        return user_names
 
     def generate_mentions(self, ids: str, names: bool) -> str:
         """
         Генерирует строку с упоминаниями из списка идентификаторов
         """
-        if ids is not None:
-            ids = list(filter(bool, ids.replace(" ", "").split(",")))
-            users_info = self._get_users_info(ids)
-            users_names = [
-                users_info[i]["first_name"] if names else "!" for i in range(len(ids))
-            ]
-            result = (", " if names else "").join(
-                [f"[id{_id}|{users_names[i]}]" for (i, _id) in enumerate(ids)]
-            )
-            return result
-        return ""
+        if names:
+            users_names = self._get_users_names(ids)
+        else:
+            users_names = ["!" for i in range(len(ids))]
+        result = (", " if names else "").join(
+            [f"@id{_id}({users_names[i]})" for (i, _id) in enumerate(ids)]
+        )
+        return result
 
     def current_is_admin(self) -> bool:
         """

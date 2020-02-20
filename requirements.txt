@@ -10,7 +10,7 @@ lxml==4.5.0
 pathspec==0.7.0
 psycopg2-binary==2.8.4
 regex==2020.2.18
-requests==2.22.0
+requests==2.23.0
 schedule==0.6.0
 six==1.14.0
 soupsieve==1.9.5

@@ -9,6 +9,8 @@
 .. toctree::
    :maxdepth: 2
    :caption: Содержание:
+   manuals/admin
+   manuals/user
 
 Ralph - бот ВКонтакте, упрощающий рутинные задачи старост студенческих групп.
 

@@ -5,7 +5,8 @@ lotgrgvenfohn
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Содержание:
    
-   manuals/admin
-   manuals/user
+   ../index
+   admin
+   user

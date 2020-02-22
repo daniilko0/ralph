@@ -14,18 +14,15 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
-import sys
-sys.setrecursionlimit(1500)
-
 # -- Project information -----------------------------------------------------
 
 project = 'ralph'
-copyright = '2020, dadyarri'
 author = 'dadyarri'
+copyright = f'2019 - 2020, {author}. Licensed under MIT.'
 
 # The full version, including alpha/beta/rc tags
 with open("../VERSION.txt", "r") as f:
-    release = f.readline()
+    version = release = f.readline()
 
 
 # -- General configuration ---------------------------------------------------

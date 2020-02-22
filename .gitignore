@@ -20,3 +20,6 @@ students.txt
 
 # Tesing files
 polygon.py
+
+# Documentation's build
+docs/_build

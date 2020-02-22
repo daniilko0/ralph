@@ -48,4 +48,5 @@ Ralph - бот ВКонтакте, упрощающий рутинные зад�
    manuals/user
 
    code/bot
+   code/scheduler
    code/date

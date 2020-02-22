@@ -14,6 +14,8 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import sys
+sys.setrecursionlimit(1500)
 
 # -- Project information -----------------------------------------------------
 

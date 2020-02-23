@@ -61,7 +61,6 @@ class Bot:
 
         self.db = Database(os.environ["DATABASE_URL"])
 
-        # Авторизация в API ВКонтакте
         self.log.log.info("Авторизация ВКонтакте...")
         try:
             self.bot_session = vk_api.VkApi(token=self.token, api_version="5.103")
@@ -170,7 +169,7 @@ class Bot:
 
     def send_gui(self, text: str = "Привет!") -> NoReturn:
         """
-        Отправляет клавиатуру в зависимости от статуса пользователя
+        Отправляет клавиатуру главного меню
         """
         self.send_message(
             msg=text,

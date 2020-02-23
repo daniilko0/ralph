@@ -3,6 +3,7 @@ import re
 import time
 from datetime import datetime
 from datetime import timedelta
+from typing import Union
 
 import schedule
 import requests
@@ -46,12 +47,21 @@ class Date:
 
 
 class Schedule:
+
+    """
+    Класс, переводящий расписание из сырой веб-страницы в читаемую строку
+    """
+
     def __init__(self, date: str, gid: str = "324"):
         self.log = Logger()
         self.date = date
         self.gid = gid
 
     def is_exist(self) -> bool:
+        """
+        Проверяет наличие расписания, основываясь на присутствии плашек
+        "Расписание отстутствует" и "Расписание составлено, но не опубликовано"
+        """
         soup = self.get_raw()
         warn = soup.find_all("div", {"class": "msg warning"})
         err = soup.find_all("div", {"class": "msg error"})
@@ -60,7 +70,11 @@ class Schedule:
             return False
         return True
 
-    def get_raw(self):
+    def get_raw(self) -> BeautifulSoup:
+        """
+        Получает с сервера веб-страницу с расписанием и возвращает объект
+        веб-скрапера
+        """
         request = requests.get(
             f"http://rating.ivpek.ru/timetable/timetable/show?gid={self.gid}&date"
             f"={self.date}"
@@ -78,7 +92,10 @@ class Schedule:
             soup = BeautifulSoup(request.text, "lxml")
             return soup
 
-    def parse(self):
+    def parse(self) -> Union[str, bool]:
+        """
+        Форматирует расписание в читаемую строку
+        """
         soup = self.get_raw()
         for span in soup.find_all("span", {"class": "ldur"}):
             span.decompose()
@@ -126,6 +143,10 @@ class Schedule:
         return msg
 
     def send(self):
+        """
+        Отправляет расписание в активную беседу
+        и в ЛС подписчикам рассылки "Расписание"
+        """
         sch = self.parse()
         if sch:
             db = Database(os.environ["DATABASE_URL"])
@@ -135,14 +156,20 @@ class Schedule:
 
 
 def listen():
+    """
+    Слушает сервер на предмет наличия расписания.
+    Если находит - отправляет, иначе ждет 15 минут
+    """
     d = Date()
     sch = Schedule(d.tomorrow)
     if sch.is_exist():
         if sch.parse():
             sch.send()
         else:
+            self.log.log.info("Расписание отстутствует")
             time.sleep(15 * 60)
     else:
+        self.log.log.info("Расписание отстутствует")
         time.sleep(15 * 60)
 
 

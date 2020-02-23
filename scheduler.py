@@ -16,14 +16,30 @@ bot = Bot()
 
 
 class Date:
-    def __init__(self):
-        self.today = datetime.today().strftime("%Y-%m-%d")
-        self.day_after_tomorrow = datetime.strftime(
-            datetime.now() + timedelta(2), "%Y-%m-%d"
-        )
+    """
+    Вспомогательный класс, содержащий строковые представления дат
+    """
 
     @property
-    def tomorrow(self):
+    def today(self) -> str:
+        """
+        Возвращает сегодняшнюю дату в формате ГГГГ-ММ-ДД
+        """
+        return datetime.today().strftime("%Y-%m-%d")
+
+    @property
+    def day_after_tomorrow(self) -> str:
+        """
+        Возвращает послезавтрашнюю дату в формате ГГГГ-ММ-ДД
+        """
+        return datetime.strftime(datetime.now() + timedelta(2), "%Y-%m-%d")
+
+    @property
+    def tomorrow(self) -> str:
+        """
+        Возвращает послезавтрашнюю дату в формате ГГГГ-ММ-ДД,
+        если сегодня суббота, завтрашнюю в любой другой день
+        """
         if datetime.today().weekday() == 5:
             return self.day_after_tomorrow
         return datetime.strftime(datetime.now() + timedelta(1), "%Y-%m-%d")

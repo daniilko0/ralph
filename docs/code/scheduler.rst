@@ -1,8 +1,11 @@
 Schedule
 =========
 
-Класс, обрабатывающий расписание
-
 .. module:: scheduler
 .. autoclass:: Schedule
+    :undoc-members:
+    :members:
+
+.. autoclass:: Date
+    :undoc-members:
     :members:

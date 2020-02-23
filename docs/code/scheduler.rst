@@ -9,3 +9,5 @@ Schedule
 .. autoclass:: Date
     :undoc-members:
     :members:
+
+.. autofunction:: listen

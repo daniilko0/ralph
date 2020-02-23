@@ -35,6 +35,7 @@ import requests
 import vk_api
 from vk_api.bot_longpoll import VkBotEventType
 
+from database import Database
 from keyboard import Keyboards
 from logger import Logger
 from vkbotlongpoll import RalphVkBotLongPoll
@@ -57,6 +58,8 @@ class Bot:
         self.cid = os.environ["CID_ID"]
 
         self.kbs = Keyboards()
+
+        self.db = Database(os.environ["DATABASE_URL"])
 
         # Авторизация в API ВКонтакте
         self.log.log.info("Авторизация ВКонтакте...")

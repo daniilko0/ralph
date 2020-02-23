@@ -152,6 +152,7 @@ class Bot:
         """
         Генерирует строку с упоминаниями из списка идентификаторов
         """
+        ids = ids.split(",")
         if names:
             users_names = self._get_users_names(ids)
         else:

@@ -169,3 +169,6 @@
        :align: center
        :alt: Пример готового призыва со включенными именами
 
+.. toctree::
+       :includehidden:
+

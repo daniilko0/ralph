@@ -1,9 +1,9 @@
 @import "theme.css";
 
-a:visited {
+.wy-breadcrumbs > li > a:visited {
 	color: #2980B9 !important
 }
 
-a.reference.internal:visited {
-	color: #fff !important
+.contents.topic a.refernce.internal {
+	color: #2980B9
 }

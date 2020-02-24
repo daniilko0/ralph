@@ -70,6 +70,8 @@ html_css_files = [
     "css/custom.css"
 ]
 
+html_style = 'css/custom.css'
+
 todo_include_todos = True
 
 master_doc = "index"

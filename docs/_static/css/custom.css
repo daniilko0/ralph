@@ -1,3 +1,9 @@
+@import "theme.css";
+
 a:visited {
-	color: #2980B9
+	color: #2980B9 !important
+}
+
+a.reference.internal:visited {
+	color: #fff !important
 }

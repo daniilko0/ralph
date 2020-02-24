@@ -14,6 +14,7 @@ from logger import Logger
 from database import Database
 
 bot = Bot()
+log = Logger()
 
 
 class Date:
@@ -177,10 +178,10 @@ def listen():
         if sch.parse():
             sch.send()
         else:
-            self.log.log.info("Расписание отстутствует")
+            log.log.info("Расписание отстутствует")
             time.sleep(15 * 60)
     else:
-        self.log.log.info("Расписание отстутствует")
+        log.log.info("Расписание отстутствует")
         time.sleep(15 * 60)
 
 

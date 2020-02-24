@@ -39,13 +39,10 @@ Ralph - бот ВКонтакте, упрощающий рутинные зад�
    + на любую дату в формате ДД-ММ-ГГГГ
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Содержание
-   :name: Содержание
+   :maxdepth: 4
    :hidden:
 
    manuals/admin
    manuals/user
 
-   code/bot
-   code/scheduler
+   code/index

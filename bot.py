@@ -42,8 +42,27 @@ from vkbotlongpoll import RalphVkBotLongPoll
 
 
 class Bot:
-    """
-    Класс, описывающий объект бота, включая авторизацию в API, и все методы бота.
+    """Класс, описывающий объект бота, включая авторизацию в API, и все методы бота.
+    
+    Attributes:
+        log (Logger): Объект класса Logger, содержащий настройки модуля logging
+        token (str): Токен доступа к сообществу ВКонтакте
+        user_token (str): Токен доступа пользователя-администратора ВКонтакте (используется для обновления статуса сообщества)
+        gid (str): Идентификатор сообщества ВКонтакте
+        cid (str): Идентификатор активной беседы (используется в рассылке расписания)
+        kbs (Keyboards): Объект класса Keyboards, содержащий генераторы клавиатур
+        db (Database): Объект класса Database, инициирующий подключение к базе данных
+        admins (List[str]): Список идентификаторов ВКонтакте пользователей, имеющих доступ администратора бота 
+    
+    Example:
+        .. code-block:: python
+        
+            from bot import Bot
+        
+            bot = Bot()
+        
+    Todo:
+        * Почистить атрибуты
     """
 
     def __init__(self) -> None:
@@ -107,9 +126,15 @@ class Bot:
         forward: str = "",
     ) -> NoReturn:
 
-        """
-        Отправка сообщения msg пользователю/в беседу pid
-        с клавиатурой keyboard (не отправляется, если не указан json файл)
+        """Обёртка над API ВКонтакте, отправляющая сообщения
+        
+        Arguments:
+            msg: Текст отправляемого сообщения
+            pid: Идентификатор пользователя/беседы/сообщества получателя сообщения (*не нужен, если указан user_ids*)
+            keyboard: JSON-подобная строка со встроенной клавиатурой
+            attachments: Вложения к сообщению (**не работает**)
+            user_ids: Перечень адресатов для отправки одного сообщения (*не нужен, если указан pid*)
+            forward: Перечень идентификаторов сообщений для пересылки
         """
 
         try:
@@ -129,14 +154,26 @@ class Bot:
             self.log.log.error(msg=e)
 
     def send_mailing(self, ids: str, msg: str = "") -> NoReturn:
-        """
-        Отправка рассылки
+        """Отправка рассылки
+        
+        Arguments:
+            ids: Список идентификаторов пользователей-получателей рассылки
+            msg: Сообщение рассылки
+            
+        Todo:
+            Удалить и заменить на Bot.send_message
+        
         """
         self.send_message(msg=msg, user_ids=ids)
 
-    def _get_users_names(self, ids: list) -> List[str]:
-        """
-        Получает имена пользователей по идентификаторам из списка
+    def get_users_names(self, ids: list) -> List[str]:
+        """Получает имена пользователей  из базы данных по идентификаторам из списка
+        
+        Arguments:
+            ids: Список идентификаторов для формирования списка имён
+        
+        Returns:
+            List[str]: Список имён пользователей
         """
         user_ids = [
             self.db.query(f"SELECT id FROM users WHERE vk_id={i}")[0][0] for i in ids
@@ -148,12 +185,18 @@ class Bot:
         return user_names
 
     def generate_mentions(self, ids: str, names: bool) -> str:
-        """
-        Генерирует строку с упоминаниями из списка идентификаторов
+        """Генерирует строку с упоминаниями из списка идентификаторов
+        
+        Arguments:
+            ids: Перечень идентификаторов пользователей
+            names: Флаг, указывающий на необходимость использования имён
+            
+        Returns:
+            str: Сообщение, упоминающее выбранных пользователей
         """
         ids = ids.split(",")
         if names:
-            users_names = self._get_users_names(ids)
+            users_names = self.get_users_names(ids)
         else:
             users_names = ["!" for i in range(len(ids))]
         result = (", " if names else "").join(
@@ -162,14 +205,21 @@ class Bot:
         return result
 
     def current_is_admin(self) -> bool:
-        """
-        Проверяет, является ли текущий пользователь администратором бота
+        """Проверяет, является ли текущий пользователь администратором бота
+        
+        Returns:
+            bool: Флаг, указывающий на принадлежность текущего пользователя к касте Администраторов
+            
+        Todo:
+            Сделать метод более общим
         """
         return str(self.event.object.from_id) in self.admins
 
     def send_gui(self, text: str = "Привет!") -> NoReturn:
-        """
-        Отправляет клавиатуру главного меню
+        """Отправляет клавиатуру главного меню
+        
+        Arguments:
+            text: Сообщение, вместе с которым будет отправлена клавиатура
         """
         self.send_message(
             msg=text,

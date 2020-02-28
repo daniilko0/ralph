@@ -1,0 +1,13 @@
+database/ @6a16ec
+docs/ @dadyarri
+keyboard/ @dadyarri
+logger/ @dadyarri
+scripts/ @dadyarri
+
+bot.py @dadyarri @6a16ec
+main.py @dadyarri
+
+requirements.txt @dadyarri
+
+scheduler.py @dadyarri
+vkbotlongpoll.py @dadyarri

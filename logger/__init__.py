@@ -12,12 +12,13 @@ class Logger:
         datefmt: str = "%d-%m-%Y %H:%M:%S",
     ) -> NoReturn:
 
-        """
-        Инициализация и настройка logging
-        :param level: Уровень логгирования
-        :param file: Файл для записи логов
-        :param logfmt: Формат логов
-        :param datefmt: Формат даты/времени
+        """Инициализация и настройка logging
+
+        Attrubutes:
+            level: Уровень логгирования
+            file: Файл для записи логов
+            logfmt: Формат логов
+            datefmt: Формат даты/времени
         """
         self.log = logging.getLogger()
         self.log.setLevel(int(level))

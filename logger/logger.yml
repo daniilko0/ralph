@@ -1,0 +1,19 @@
+version: 1
+disable_existing_loggers: False
+formatters:
+  default:
+    (): python_telegram_logger.MarkdownFormatter
+    fmt: " *%(levelname)s* _%(name)s : %(funcName)s_"
+handlers:
+  telegram:
+    class: python_telegram_logger.Handler
+    token: ""
+    chat_ids:
+      - 1234
+      - 123456
+    formatter: default
+loggers:
+  tg:
+    level: WARN
+    handlers:
+      - telegram

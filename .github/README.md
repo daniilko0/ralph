@@ -8,7 +8,7 @@
 [![GitHub](https://img.shields.io/github/license/dadyarri/ralph?color=brightgreen)](https://github.com/dadyarri/ralph/blob/master/LICENSE.md)
 
 [![Pyup](https://pyup.io/repos/github/dadyarri/ralph/shield.svg)](https://pyup.io/account/repos/github/dadyarri/ralph/)
-![Scrutinizer code quality (GitHub/Bitbucket)](https://img.shields.io/scrutinizer/quality/g/dadyarri/ralph/master)
+[![Scrutinizer code quality (GitHub/Bitbucket)](https://img.shields.io/scrutinizer/quality/g/dadyarri/ralph/master)](https://scrutinizer-ci.com/g/dadyarri/ralph/?branch=master)
 
 ### О проекте
 

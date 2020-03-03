@@ -1,9 +1,12 @@
 version: 1
 disable_existing_loggers: False
 formatters:
+  brief:
+    format: '%(message)s'
   default:
     (): python_telegram_logger.MarkdownFormatter
-    fmt: " *%(levelname)s* _%(name)s : %(funcName)s_"
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    datefmt: "%d-%m-%Y %H:%M:%S"
 handlers:
   telegram:
     class: python_telegram_logger.Handler
@@ -12,8 +15,15 @@ handlers:
       - 1234
       - 123456
     formatter: default
+  console:
+    class: logging.StreamHandler
+    formatter: default
+    stream: ext://sys.stdout
 loggers:
   tg:
     level: WARN
     handlers:
       - telegram
+  console:
+    handlers:
+      - console

@@ -29,7 +29,7 @@ def send_call_confirm():
         mentions = ""
     message = db.get_call_message(bot.event["message"]["from_id"]) or ""
     message = f"{mentions}\n{message}"
-    if message != "\n ":
+    if message != "\n":
         bot.send_message(
             msg=f"В {'тестовую ' if chat_id == 1 else 'основную '}"
             f"беседу будет отправлено сообщение:",

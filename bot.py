@@ -213,7 +213,7 @@ class Bot:
         Todo:
             Сделать метод более общим
         """
-        return str(self.event.object.from_id) in self.admins
+        return str(self.event["message"]["from_id"]) in self.admins
 
     def send_gui(self, text: str = "Привет!") -> NoReturn:
         """Отправляет клавиатуру главного меню
@@ -223,7 +223,7 @@ class Bot:
         """
         self.send_message(
             msg=text,
-            pid=self.event.object.from_id,
+            pid=self.event["message"]["from_id"],
             keyboard=self.kbs.generate_main_menu(self.current_is_admin()),
         )
 

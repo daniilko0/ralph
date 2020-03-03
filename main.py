@@ -2,7 +2,6 @@ import datetime
 import json
 import os
 import re
-from pprint import pprint
 
 from bot import Bot
 from database import Database

@@ -6,7 +6,7 @@ import yaml
 
 
 class Logger:
-    def __init__(self):
+    def __init__(self) -> NoReturn:
         try:
             with open("logger.yml", "r") as f:
                 self.config = yaml.safe_load(f.read())

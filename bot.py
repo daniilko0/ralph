@@ -167,8 +167,11 @@ class Bot:
             Удалить и заменить на Bot.send_message
         
         """
-        warnings.warn("Метод 'send_mailing' устарел, "
-                      "используйте 'send_message'", DeprecationWarning, 2)
+        warnings.warn(
+            message="Метод 'send_mailing' устарел, " "используйте 'send_message'",
+            category=DeprecationWarning,
+            stacklevel=2,
+        )
         self.send_message(msg=msg, user_ids=ids)
 
     def get_users_names(self, ids: list) -> List[str]:

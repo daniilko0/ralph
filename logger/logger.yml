@@ -1,19 +1,18 @@
 version: 1
-disable_existing_loggers: False
+disable_existing_loggers: false
 formatters:
   brief:
     format: '%(message)s'
   default:
     (): python_telegram_logger.MarkdownFormatter
-    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    datefmt: "%d-%m-%Y %H:%M:%S"
+    fmt: "[%(levelname)s] %(asctime)s: - %(message)s"
+    datefmt: "%d.%m.%Y %H:%M:%S"
 handlers:
   telegram:
     class: python_telegram_logger.Handler
     token: ""
-    chat_ids:
-      - 1234
-      - 123456
+    chat_ids: ""
+    format: "markdown"
     formatter: default
   console:
     class: logging.StreamHandler
@@ -24,6 +23,4 @@ loggers:
     level: WARN
     handlers:
       - telegram
-  console:
-    handlers:
       - console

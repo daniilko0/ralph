@@ -28,6 +28,7 @@ continue running.
 
 import os
 import random
+import warnings
 from typing import List
 from typing import NoReturn
 
@@ -155,6 +156,8 @@ class Bot:
 
     def send_mailing(self, ids: str, msg: str = "") -> NoReturn:
         """Отправка рассылки
+
+        **Метод устарел!**
         
         Arguments:
             ids: Список идентификаторов пользователей-получателей рассылки
@@ -164,6 +167,8 @@ class Bot:
             Удалить и заменить на Bot.send_message
         
         """
+        warnings.warn("Метод 'send_mailing' устарел, "
+                      "используйте 'send_message'", DeprecationWarning, 2)
         self.send_message(msg=msg, user_ids=ids)
 
     def get_users_names(self, ids: list) -> List[str]:

@@ -213,7 +213,7 @@ class Keyboards:
         )
         kb.add_line()
         kb.add_button(
-            label="Назад", color="primary", payload={"button": "newsletters"},
+            label="Назад", color="primary", payload={"button": "mailings"},
         )
         return kb.get_keyboard()
 

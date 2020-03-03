@@ -22,9 +22,7 @@ def send_call_confirm():
     f = db.get_names_using_status(bot.event["message"]["from_id"])
     students_ids = db.get_call_ids(bot.event["message"]["from_id"])
     if students_ids:
-        mentions = (
-            bot.generate_mentions(ids=students_ids, names=f)
-        )
+        mentions = bot.generate_mentions(ids=students_ids, names=f)
     else:
         mentions = ""
     message = db.get_call_message(bot.event["message"]["from_id"]) or ""
@@ -82,7 +80,9 @@ for event in bot.longpoll.listen():
 
         # :blockstart: Призыв
         elif payload["button"] == "call":
-            db.update_session_state(bot.event["message"]["from_id"], "ask_for_call_message")
+            db.update_session_state(
+                bot.event["message"]["from_id"], "ask_for_call_message"
+            )
             if not db.call_session_exist(bot.event["message"]["from_id"]):
                 db.create_call_session(bot.event["message"]["from_id"])
             bot.send_message(
@@ -97,7 +97,9 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.generate_names_keyboard(payload["letter"]),
             )
         elif payload["button"] == "student":
-            db.append_to_call_ids(bot.event["message"]["from_id"], db.get_vk_id(payload["id"]))
+            db.append_to_call_ids(
+                bot.event["message"]["from_id"], db.get_vk_id(payload["id"])
+            )
             bot.send_message(
                 msg=f"{payload['name']} добавлен к списку призыва.",
                 pid=bot.event["message"]["from_id"],
@@ -115,8 +117,13 @@ for event in bot.longpoll.listen():
                 pid=bot.event["message"]["from_id"],
                 keyboard=kbs.generate_alphabet_keyboard(),
             )
-        elif db.get_session_state(bot.event["message"]["from_id"]) == "ask_for_call_message":
-            db.update_call_message(bot.event["message"]["from_id"], bot.event["message"]["text"])
+        elif (
+            db.get_session_state(bot.event["message"]["from_id"])
+            == "ask_for_call_message"
+        ):
+            db.update_call_message(
+                bot.event["message"]["from_id"], bot.event["message"]["text"]
+            )
             bot.send_message(
                 msg="Отправка клавиатуры призыва",
                 pid=bot.event["message"]["from_id"],
@@ -135,14 +142,16 @@ for event in bot.longpoll.listen():
             send_call_confirm()
         elif (
             payload["button"] == "cancel"
-            and db.get_session_state(bot.event["message"]["from_id"]) == "call_configuring"
+            and db.get_session_state(bot.event["message"]["from_id"])
+            == "call_configuring"
         ):
             db.empty_call_storage(bot.event["message"]["from_id"])
             db.update_session_state(bot.event["message"]["from_id"], "main")
             bot.send_gui("Выполнение команды отменено.")
         elif (
             payload["button"] == "confirm"
-            and db.get_session_state(bot.event["message"]["from_id"]) == "call_configuring"
+            and db.get_session_state(bot.event["message"]["from_id"])
+            == "call_configuring"
         ):
             bot.log.log.info("Отправка призыва...")
             cid = db.get_conversation(bot.event["message"]["from_id"])
@@ -153,7 +162,8 @@ for event in bot.longpoll.listen():
             bot.send_gui(text="Сообщение отправлено.")
         elif (
             payload["button"] == "deny"
-            and db.get_session_state(bot.event["message"]["from_id"]) == "call_configuring"
+            and db.get_session_state(bot.event["message"]["from_id"])
+            == "call_configuring"
         ):
             db.update_call_message(bot.event["message"]["from_id"], " ")
             db.update_call_ids(bot.event["message"]["from_id"], " ")
@@ -219,7 +229,9 @@ for event in bot.longpoll.listen():
                 pid=bot.event["message"]["from_id"],
                 keyboard=kbs.cancel(),
             )
-            db.update_session_state(bot.event["message"]["from_id"], "ask_for_schedule_date")
+            db.update_session_state(
+                bot.event["message"]["from_id"], "ask_for_schedule_date"
+            )
         elif (
             payload["button"] == "cancel"
             and db.get_session_state(bot.event["message"]["from_id"])
@@ -231,8 +243,13 @@ for event in bot.longpoll.listen():
                 pid=bot.event["message"]["from_id"],
                 keyboard=kbs.generate_schedule_keyboard(),
             )
-        elif db.get_session_state(bot.event["message"]["from_id"]) == "ask_for_schedule_date":
-            if re.match(r"^\d\d(.|-|/)\d\d(.|-|/)20\d\d$", bot.event["message"]["text"]):
+        elif (
+            db.get_session_state(bot.event["message"]["from_id"])
+            == "ask_for_schedule_date"
+        ):
+            if re.match(
+                r"^\d\d(.|-|/)\d\d(.|-|/)20\d\d$", bot.event["message"]["text"]
+            ):
                 try:
                     d = datetime.datetime.strptime(
                         bot.event["message"]["text"], "%d-%m-%Y"
@@ -317,7 +334,9 @@ for event in bot.longpoll.listen():
                 ),
             )
         elif payload["button"] == "send_mailing":
-            db.update_session_state(bot.event["message"]["from_id"], "ask_for_mailing_message")
+            db.update_session_state(
+                bot.event["message"]["from_id"], "ask_for_mailing_message"
+            )
             bot.send_message(
                 msg="Отправьте текст рассылки (вложения не поддерживаются)",
                 pid=bot.event["message"]["from_id"],
@@ -335,9 +354,12 @@ for event in bot.longpoll.listen():
             )
             db.update_session_state(bot.event["message"]["from_id"], "main")
         elif (
-            db.get_session_state(bot.event["message"]["from_id"]) == "ask_for_mailing_message"
+            db.get_session_state(bot.event["message"]["from_id"])
+            == "ask_for_mailing_message"
         ):
-            db.update_mailing_message(bot.event["message"]["from_id"], bot.event["message"]["text"])
+            db.update_mailing_message(
+                bot.event["message"]["from_id"], bot.event["message"]["text"]
+            )
             bot.send_message(
                 msg="Всем подписчикам рассылки будет отправлено сообщение с указанным вами текстом",
                 pid=bot.event["message"]["from_id"],
@@ -347,12 +369,15 @@ for event in bot.longpoll.listen():
             db.update_session_state(bot.event["message"]["from_id"], "prompt_mailing")
         elif (
             payload["button"] == "confirm"
-            and db.get_session_state(bot.event["message"]["from_id"]) == "prompt_mailing"
+            and db.get_session_state(bot.event["message"]["from_id"])
+            == "prompt_mailing"
         ):
             subscs = db.fetch_subcribers(
                 db.get_mailing_session(bot.event["message"]["from_id"])
             )
-            bot.send_mailing(subscs, db.get_mailing_message(bot.event["message"]["from_id"]))
+            bot.send_mailing(
+                subscs, db.get_mailing_message(bot.event["message"]["from_id"])
+            )
             bot.send_message(
                 msg="Рассылка отправлена.",
                 pid=bot.event["message"]["from_id"],
@@ -360,7 +385,8 @@ for event in bot.longpoll.listen():
             )
         elif (
             payload["button"] == "deny"
-            and db.get_session_state(bot.event["message"]["from_id"]) == "prompt_mailing"
+            and db.get_session_state(bot.event["message"]["from_id"])
+            == "prompt_mailing"
         ):
             db.empty_mailing_storage(bot.event["message"]["from_id"])
             bot.send_message(

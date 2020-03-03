@@ -53,7 +53,7 @@ class Keyboards:
         )
         kb.add_line()
         kb.add_button(
-            label="Назад", color="default", payload={"button": "home"},
+            label="Назад", color="primary", payload={"button": "home"},
         )
         return kb.get_keyboard()
 
@@ -94,7 +94,7 @@ class Keyboards:
         kb.add_button(label="Использование имён в призыве", payload={"button": "names"})
         kb.add_line()
         kb.add_button(
-            label="Назад", color="default", payload={"button": "home"},
+            label="Назад", color="primary", payload={"button": "home"},
         )
         return kb.get_keyboard()
 
@@ -116,7 +116,7 @@ class Keyboards:
             )
         kb.add_line()
         kb.add_button(
-            label="Назад", color="default", payload={"button": "prefs"},
+            label="Назад", color="primary", payload={"button": "prefs"},
         )
         return kb.get_keyboard()
 
@@ -129,7 +129,7 @@ class Keyboards:
             kb.add_button(label="Включить", payload={"button": "on_using_names"})
         kb.add_line()
         kb.add_button(
-            label="Назад", color="default", payload={"button": "prefs"},
+            label="Назад", color="primary", payload={"button": "prefs"},
         )
         return kb.get_keyboard()
 

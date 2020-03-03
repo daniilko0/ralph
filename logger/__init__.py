@@ -1,25 +1,24 @@
-import logging
-import os
+import logging.config
+from pprint import pprint
 from typing import NoReturn
+
+import yaml
 
 
 class Logger:
-    def __init__(
-        self,
-        level: str = os.environ["LOG_LEVEL"],
-        file: str = "",
-        logfmt: str = os.environ["LOG_FMT"],
-        datefmt: str = "%d-%m-%Y %H:%M:%S",
-    ) -> NoReturn:
+    def __init__(self):
+        with open("logger.yml", "r") as f:
+            self.config = yaml.safe_load(f.read())
+        pprint(self.config)
+        self.log = logging.getLogger("tg")
+        logging.config.dictConfig(config=self.config)
 
-        """Инициализация и настройка logging
 
-        Attrubutes:
-            level: Уровень логгирования
-            file: Файл для записи логов
-            logfmt: Формат логов
-            datefmt: Формат даты/времени
-        """
-        self.log = logging.getLogger()
-        self.log.setLevel(int(level))
-        logging.basicConfig(filename=file, format=logfmt, datefmt=datefmt)
+if __name__ == "__main__":
+    logger = Logger()
+    logger.log.warning("Test.")
+
+    try:
+        a = 3 / 0
+    except ZeroDivisionError:
+        logger.log.exception("Divizion By Zero")

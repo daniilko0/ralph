@@ -236,4 +236,10 @@ class Keyboards:
                 color="primary",
                 payload={"button": "chconv_call"},
             )
+            kb.add_line()
+            kb.add_button(
+                label="Переключить использование имён",
+                color="primary",
+                payload={"button": "chnames_call"},
+            )
         return kb.get_keyboard()

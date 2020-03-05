@@ -16,8 +16,7 @@ kbs = Keyboards()
 bot.update_version()
 
 
-def send_call_confirm():
-    chat_id = int(str(db.get_conversation(bot.event["message"]["from_id"]))[-1])
+def generate_call_message():
     f = db.get_names_using_status(bot.event["message"]["from_id"])
     students_ids = db.get_call_ids(bot.event["message"]["from_id"])
     if students_ids:
@@ -26,6 +25,12 @@ def send_call_confirm():
         mentions = ""
     message = db.get_call_message(bot.event["message"]["from_id"]) or ""
     message = f"{mentions}\n{message}"
+    return message
+
+
+def send_call_confirm():
+    chat_id = int(str(db.get_conversation(bot.event["message"]["from_id"]))[-1])
+    message = generate_call_message()
     if message != "\n":
         bot.send_message(
             msg=f"В {'тестовую ' if chat_id == 1 else 'основную '}"
@@ -33,7 +38,6 @@ def send_call_confirm():
             pid=bot.event["message"]["from_id"],
             keyboard=kbs.prompt(bot.event["message"]["from_id"]),
         )
-        db.update_call_message(bot.event["message"]["from_id"], message)
         bot.send_message(msg=message, pid=bot.event["message"]["from_id"])
     else:
         db.empty_call_storage(bot.event["message"]["from_id"])
@@ -154,7 +158,7 @@ for event in bot.longpoll.listen():
         ):
             bot.log.log.info("Отправка призыва...")
             cid = db.get_conversation(bot.event["message"]["from_id"])
-            text = db.get_call_message(bot.event["message"]["from_id"])
+            text = generate_call_message()
             bot.send_message(pid=cid, msg=text)
             db.empty_call_storage(bot.event["message"]["from_id"])
             db.update_session_state(bot.event["message"]["from_id"], "main")
@@ -183,6 +187,13 @@ for event in bot.longpoll.listen():
                 f"{'тестовую' if chat == 1 else 'основную'} беседу:",
                 pid=bot.event["message"]["from_id"],
             )
+        elif payload["button"] == "chnames_call":
+            if db.get_names_using_status(bot.event["message"]["from_id"]):
+                status = 0
+            else:
+                status = 1
+            db.update_names_using_status(bot.event["message"]["from_id"], status)
+            send_call_confirm()
         # :blockend: Призыв
 
         # :blockstart: Расписание

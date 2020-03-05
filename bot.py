@@ -202,7 +202,7 @@ class Bot:
         Returns:
             str: Сообщение, упоминающее выбранных пользователей
         """
-        ids = ids.split(",")
+        ids = ids.split(",")[:-1]
         if names:
             users_names = self.get_users_names(ids)
         else:

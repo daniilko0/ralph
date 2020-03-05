@@ -77,12 +77,12 @@ for event in bot.longpoll.listen():
 
         # :blockstart: Перезапуск интерфейса
         if text in ["начать", "старт"]:
-            bot.send_gui()
+            bot.send_gui(pid=bot.event["message"]["from_id"])
         # :blockend: Перезапуск интерфейса
 
         # :blockstart: Возврат на главный экран
         elif payload["button"] == "home":
-            bot.send_gui(text="Главный экран")
+            bot.send_gui(text="Главный экран", pid=bot.event["message"]["from_id"])
         # :blockend: Возврат на главный экран
 
         # :blockstart: Призыв
@@ -154,7 +154,9 @@ for event in bot.longpoll.listen():
         ):
             db.empty_call_storage(bot.event["message"]["from_id"])
             db.update_session_state(bot.event["message"]["from_id"], "main")
-            bot.send_gui("Выполнение команды отменено.")
+            bot.send_gui(
+                text="Выполнение команды отменено.", pid=bot.event["message"]["from_id"]
+            )
         elif (
             payload["button"] == "confirm"
             and db.get_session_state(bot.event["message"]["from_id"])
@@ -166,7 +168,9 @@ for event in bot.longpoll.listen():
             bot.send_message(pid=cid, msg=text)
             db.empty_call_storage(bot.event["message"]["from_id"])
             db.update_session_state(bot.event["message"]["from_id"], "main")
-            bot.send_gui(text="Сообщение отправлено.")
+            bot.send_gui(
+                text="Сообщение отправлено.", pid=bot.event["message"]["from_id"]
+            )
         elif (
             payload["button"] == "deny"
             and db.get_session_state(bot.event["message"]["from_id"])
@@ -175,7 +179,9 @@ for event in bot.longpoll.listen():
             db.update_call_message(bot.event["message"]["from_id"], " ")
             db.update_call_ids(bot.event["message"]["from_id"], " ")
             db.update_session_state(bot.event["message"]["from_id"], "main")
-            bot.send_gui(text="Выполнение команды отменено.")
+            bot.send_gui(
+                text="Выполнение команды отменено.", pid=bot.event["message"]["from_id"]
+            )
         elif payload["button"] == "chconv_call":
             conv = db.get_conversation(bot.event["message"]["from_id"])
             chat = int(str(conv)[-1])

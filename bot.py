@@ -185,27 +185,25 @@ class Bot:
         )
         return result
 
-    def current_is_admin(self) -> bool:
-        """Проверяет, является ли текущий пользователь администратором бота
-        
+    def is_admin(self, _id: int) -> bool:
+        """Проверяет, является ли пользователь администратором бота
+
+        Arguments:
+            _id: Идентификатор пользователя для проверки привелегий
         Returns:
             bool: Флаг, указывающий на принадлежность текущего пользователя к касте Администраторов
-            
-        Todo:
-            Сделать метод более общим
         """
-        return str(self.event["message"]["from_id"]) in self.admins
+        return str(_id) in self.admins
 
-    def send_gui(self, text: str = "Привет!") -> NoReturn:
+    def send_gui(self, pid: int, text: str = "Привет!") -> NoReturn:
         """Отправляет клавиатуру главного меню
         
         Arguments:
+            pid: Получатель клавиатуры
             text: Сообщение, вместе с которым будет отправлена клавиатура
         """
         self.send_message(
-            msg=text,
-            pid=self.event["message"]["from_id"],
-            keyboard=self.kbs.generate_main_menu(self.current_is_admin()),
+            msg=text, pid=pid, keyboard=self.kbs.generate_main_menu(self.is_admin(pid)),
         )
 
     def update_version(self):

@@ -46,7 +46,9 @@ def send_call_confirm():
         bot.send_message(
             msg="Сообщение не может быть пустым. Отмена...",
             pid=bot.event["message"]["from_id"],
-            keyboard=kbs.generate_main_menu(bot.current_is_admin()),
+            keyboard=kbs.generate_main_menu(
+                bot.is_admin(bot.event["message"]["from_id"])
+            ),
         )
 
 
@@ -312,7 +314,7 @@ for event in bot.longpoll.listen():
                 msg=f"Меню управления рассылкой \"{payload['name']}\":",
                 pid=bot.event["message"]["from_id"],
                 keyboard=kbs.generate_mailing_mgmt(
-                    is_admin=bot.current_is_admin(),
+                    is_admin=bot.is_admin(bot.event["message"]["from_id"]),
                     slug=payload["slug"],
                     user_id=bot.event["message"]["from_id"],
                 ),
@@ -326,7 +328,7 @@ for event in bot.longpoll.listen():
                 msg="Вы были успешно подписаны на рассылку.",
                 pid=bot.event["message"]["from_id"],
                 keyboard=kbs.generate_mailing_mgmt(
-                    is_admin=bot.current_is_admin(),
+                    is_admin=bot.is_admin(bot.event["message"]["from_id"]),
                     slug=payload["slug"],
                     user_id=bot.event["message"]["from_id"],
                 ),
@@ -340,7 +342,7 @@ for event in bot.longpoll.listen():
                 msg="Вы были успешно отписаны от рассылки.",
                 pid=bot.event["message"]["from_id"],
                 keyboard=kbs.generate_mailing_mgmt(
-                    is_admin=bot.current_is_admin(),
+                    is_admin=bot.is_admin(bot.event["message"]["from_id"]),
                     slug=payload["slug"],
                     user_id=bot.event["message"]["from_id"],
                 ),
@@ -362,7 +364,9 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg="Выполнение команды отменено",
                 pid=bot.event["message"]["from_id"],
-                keyboard=kbs.generate_main_menu(bot.current_is_admin()),
+                keyboard=kbs.generate_main_menu(
+                    bot.is_admin(bot.event["message"]["from_id"])
+                ),
             )
             db.update_session_state(bot.event["message"]["from_id"], "main")
         elif (

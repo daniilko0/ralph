@@ -10,11 +10,10 @@ import requests
 from bs4 import BeautifulSoup
 
 from bot import Bot
-from logger import Logger
+from logger import init_logger
 from database import Database
 
 bot = Bot()
-log = Logger()
 
 
 class Date:
@@ -52,13 +51,11 @@ class Schedule:
     """Класс, переводящий расписание из сырой веб-страницы в читаемую строку
     
     Attributes:
-        log (Logger): Объект класса Logger, содержащий конфигурации модуля logging
         date (str): Дата в формате ГГГГ-ММ-ДД, используемая для получения расписания
         gid (str): Идентификатор группы, для которой нужно получать расписание        
     """
 
     def __init__(self, date: str, gid: str = "324"):
-        self.log = Logger()
         self.date = date
         self.gid = gid
 
@@ -70,11 +67,12 @@ class Schedule:
         Returns:
             bool: Флаг, указывающий на существование расписания
         """
+        log = init_logger()
         soup = self.get_raw()
         warn = soup.find_all("div", {"class": "msg warning"})
         err = soup.find_all("div", {"class": "msg error"})
         if warn or err:
-            self.log.log.info("Расписание отсутствует.")
+            log.info("Расписание отсутствует.")
             return False
         return True
 
@@ -86,18 +84,19 @@ class Schedule:
         Returns:
             BeautifulSoup: Объект веб-скрапера, содержащий сырую веб-страницу с расписанием
         """
+        log = init_logger()
         request = requests.get(
             f"http://rating.ivpek.ru/timetable/timetable/show?gid={self.gid}&date"
             f"={self.date}"
         )
         try:
             if request.status_code != 200:
-                self.log.log.error(
-                    "Подключение неудачно. Автоматический повтор через 5 секунд."
+                log.error(
+                    "Подключение неудачно."
                 )
                 raise requests.exceptions.ConnectionError
         except requests.exceptions.ConnectionError as e:
-            self.log.log.error(msg=e)
+            log.exception(msg=e)
             self.get_raw()
         else:
             soup = BeautifulSoup(request.text, "lxml")
@@ -110,6 +109,7 @@ class Schedule:
             str: Если расписание найдено
             bool: Если расписание еще не опубликовано
         """
+        log = init_logger()
         soup = self.get_raw()
         for span in soup.find_all("span", {"class": "ldur"}):
             span.decompose()
@@ -150,7 +150,7 @@ class Schedule:
                 msg += f"{item} "
             msg += "\n"
         if not msg:
-            self.log.log.info("Расписание отсутствует.")
+            log.info("Расписание отсутствует.")
             return False
         date = datetime.strptime(self.date, "%Y-%m-%d").strftime("%d.%m.%Y")
         msg = f"Расписание на {date}:\n{msg}"
@@ -172,16 +172,17 @@ def listen():
     """Слушает сервер на предмет наличия расписания.
     Если находит - отправляет, иначе ждет 15 минут
     """
+    log = init_logger()
     d = Date()
     sch = Schedule(d.tomorrow)
     if sch.is_exist():
         if sch.parse():
             sch.send()
         else:
-            log.log.info("Расписание отстутствует")
+            log.info("Расписание отстутствует")
             time.sleep(15 * 60)
     else:
-        log.log.info("Расписание отстутствует")
+        log.info("Расписание отстутствует")
         time.sleep(15 * 60)
 
 

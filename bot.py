@@ -38,7 +38,7 @@ from vk_api.bot_longpoll import VkBotEventType
 
 from database import Database
 from keyboard import Keyboards
-from logger import Logger
+from logger import init_logger
 from vkbotlongpoll import RalphVkBotLongPoll
 
 
@@ -46,7 +46,6 @@ class Bot:
     """Класс, описывающий объект бота, включая авторизацию в API, и все методы бота.
     
     Attributes:
-        log (Logger): Объект класса Logger, содержащий настройки модуля logging
         token (str): Токен доступа к сообществу ВКонтакте
         user_token (str): Токен доступа пользователя-администратора ВКонтакте (используется для обновления статуса сообщества)
         gid (str): Идентификатор сообщества ВКонтакте
@@ -68,9 +67,9 @@ class Bot:
 
     def __init__(self) -> None:
 
-        self.log = Logger()
+        log = init_logger()
 
-        self.log.log.info("Инициализация...")
+        log.info("Инициализация...")
 
         self.token = os.environ["VK_TOKEN"]
         self.user_token = os.environ["VK_USER_TOKEN"]
@@ -81,12 +80,12 @@ class Bot:
 
         self.db = Database(os.environ["DATABASE_URL"])
 
-        self.log.log.info("Авторизация ВКонтакте...")
+        log.info("Авторизация ВКонтакте...")
         try:
             self.bot_session = vk_api.VkApi(token=self.token, api_version="5.103")
             self.user_session = vk_api.VkApi(token=self.user_token, api_version="5.103")
         except vk_api.exceptions.AuthError:
-            self.log.log.error("Неудача. Ошибка авторизации.")
+            log.exception("Неудача. Ошибка авторизации.")
         else:
             try:
                 self.bot_vk = self.bot_session.get_api()
@@ -95,14 +94,11 @@ class Bot:
                     vk=self.bot_session, group_id=self.gid
                 )
             except requests.exceptions.ConnectionError:
-                self.log.log.error("Неудача. Превышен лимит попыток подключения.")
+                log.exception("Неудача. Превышен лимит попыток подключения.")
             except vk_api.exceptions.ApiError:
-                self.log.log.error("Неудача. Ошибка доступа.")
+                log.exception("Неудача. Ошибка доступа.")
             else:
-                self.log.log.info("Успех.")
-                self.log.log.debug(
-                    f"Версия API ВКонтакте: {self.bot_session.api_version}."
-                )
+                log.info("Успех.")
 
         # Инициализация дополнительных переменных
         self.event = {}
@@ -111,11 +107,11 @@ class Bot:
         # Переименование обрабатываемых типов событий
         self.NEW_MESSAGE = VkBotEventType.MESSAGE_NEW
 
-        self.log.log.info(
+        log.info(
             f"Беседа... {'Тестовая' if self.cid.endswith('1') else 'Основная'}"
         )
 
-        self.log.log.info("Инициализация завершена.")
+        log.info("Инициализация завершена.")
 
     def send_message(
         self,
@@ -138,6 +134,8 @@ class Bot:
             forward: Перечень идентификаторов сообщений для пересылки
         """
 
+        log = init_logger()
+
         try:
             self.bot_vk.messages.send(
                 peer_id=pid,
@@ -150,9 +148,7 @@ class Bot:
             )
 
         except vk_api.exceptions.ApiError as e:
-            self.log.log.error(msg=e.__str__())
-        except FileNotFoundError as e:
-            self.log.log.error(msg=e)
+            log.exception(msg=e.__str__())
 
     def send_mailing(self, ids: str, msg: str = "") -> NoReturn:
         """Отправка рассылки
@@ -206,7 +202,7 @@ class Bot:
         if names:
             users_names = self.get_users_names(ids)
         else:
-            users_names = ["!" for i in range(len(ids))]
+            users_names = ["!"] * len(ids)
         result = (", " if names else "").join(
             [f"@id{_id}({users_names[i]})" for (i, _id) in enumerate(ids)]
         )
@@ -239,12 +235,14 @@ class Bot:
         """
         Обновляет версию в статусе группы с ботом
         """
-        self.log.log.info("Обновление версии в статусе группы...")
+        log = init_logger()
+
+        log.info("Обновление версии в статусе группы...")
         try:
             with open("VERSION.txt", "r") as f:
                 v = f"Версия: {f.read()}"
             self.user_vk.status.set(text=v, group_id=self.gid)
         except vk_api.exceptions.ApiError as e:
-            self.log.log.error(f"Ошибка {e.__str__()}")
+            log.error(f"Ошибка {e.__str__()}")
         else:
-            self.log.log.info(f"Успех.")
+            log.info(f"Успех.")

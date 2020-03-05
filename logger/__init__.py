@@ -13,7 +13,6 @@ class TelegramHandler(Handler):
         log_entry = self.format(record)
         token = os.environ["TG_TOKEN"]
         chat_ids = os.environ["TG_CHATS"].split(",")
-        print(record.__dict__)
         notifications = False
         if record.levelno < 30:
             notifications = True

@@ -8,10 +8,12 @@ from database import Database
 from keyboard import Keyboards
 from scheduler import Date
 from scheduler import Schedule
+from logger import init_logger
 
 db = Database(os.environ["DATABASE_URL"])
 bot = Bot()
 kbs = Keyboards()
+log = init_logger()
 
 bot.update_version()
 
@@ -156,7 +158,7 @@ for event in bot.longpoll.listen():
             and db.get_session_state(bot.event["message"]["from_id"])
             == "call_configuring"
         ):
-            bot.log.log.info("Отправка призыва...")
+            log.info("Отправка призыва...")
             cid = db.get_conversation(bot.event["message"]["from_id"])
             text = generate_call_message()
             bot.send_message(pid=cid, msg=text)
@@ -385,8 +387,9 @@ for event in bot.longpoll.listen():
             subscs = db.fetch_subcribers(
                 db.get_mailing_session(bot.event["message"]["from_id"])
             )
-            bot.send_mailing(
-                subscs, db.get_mailing_message(bot.event["message"]["from_id"])
+            bot.send_message(
+                msg=db.get_mailing_message(bot.event["message"]["from_id"]),
+                user_ids=subscs,
             )
             bot.send_message(
                 msg="Рассылка отправлена.",

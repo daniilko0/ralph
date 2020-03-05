@@ -28,7 +28,6 @@ continue running.
 
 import os
 import random
-import warnings
 from typing import List
 from typing import NoReturn
 
@@ -107,9 +106,7 @@ class Bot:
         # Переименование обрабатываемых типов событий
         self.NEW_MESSAGE = VkBotEventType.MESSAGE_NEW
 
-        log.info(
-            f"Беседа... {'Тестовая' if self.cid.endswith('1') else 'Основная'}"
-        )
+        log.info(f"Беседа... {'Тестовая' if self.cid.endswith('1') else 'Основная'}")
 
         log.info("Инициализация завершена.")
 
@@ -149,26 +146,6 @@ class Bot:
 
         except vk_api.exceptions.ApiError as e:
             log.exception(msg=e.__str__())
-
-    def send_mailing(self, ids: str, msg: str = "") -> NoReturn:
-        """Отправка рассылки
-
-        **Метод устарел!**
-        
-        Arguments:
-            ids: Список идентификаторов пользователей-получателей рассылки
-            msg: Сообщение рассылки
-            
-        Todo:
-            Удалить и заменить на Bot.send_message
-        
-        """
-        warnings.warn(
-            message="Метод 'send_mailing' устарел, " "используйте 'send_message'",
-            category=DeprecationWarning,
-            stacklevel=2,
-        )
-        self.send_message(msg=msg, user_ids=ids)
 
     def get_users_names(self, ids: list) -> List[str]:
         """Получает имена пользователей  из базы данных по идентификаторам из списка

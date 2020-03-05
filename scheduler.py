@@ -91,9 +91,7 @@ class Schedule:
         )
         try:
             if request.status_code != 200:
-                log.error(
-                    "Подключение неудачно."
-                )
+                log.error("Подключение неудачно.")
                 raise requests.exceptions.ConnectionError
         except requests.exceptions.ConnectionError as e:
             log.exception(msg=e)
@@ -165,7 +163,7 @@ class Schedule:
             db = Database(os.environ["DATABASE_URL"])
             subscribers = db.fetch_subcribers("schedule")
             bot.send_message(msg=sch, pid=bot.cid)
-            bot.send_mailing(ids=subscribers, msg=sch)
+            bot.send_message(user_ids=subscribers, msg=sch)
 
 
 def listen():

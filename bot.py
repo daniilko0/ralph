@@ -100,7 +100,6 @@ class Bot:
                 log.info("Успех.")
 
         # Инициализация дополнительных переменных
-        self.event = {}
         self.admins = os.environ["ADMINS_IDS"].split(",")
 
         # Переименование обрабатываемых типов событий

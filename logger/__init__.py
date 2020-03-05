@@ -1,28 +1,52 @@
-import logging.config
-from pprint import pprint
-from typing import NoReturn
+import logging
+from logging import Handler
+from logging import LogRecord
+from logging import Formatter
+import os
+from datetime import datetime, timezone, timedelta
 
-import yaml
-
-
-class Logger:
-    def __init__(self) -> NoReturn:
-        try:
-            with open("logger.yml", "r") as f:
-                self.config = yaml.safe_load(f.read())
-        except FileNotFoundError:
-            with open("logger/logger.yml", "r") as f:
-                self.config = yaml.safe_load(f.read())
-        pprint(self.config)
-        self.log = logging.getLogger("tg")
-        logging.config.dictConfig(config=self.config)
+import requests
 
 
-if __name__ == "__main__":
-    logger = Logger()
-    logger.log.warning("Test.")
+class TelegramHandler(Handler):
+    def emit(self, record: LogRecord) -> None:
+        log_entry = self.format(record)
+        token = os.environ["TG_TOKEN"]
+        chat_ids = os.environ["TG_CHATS"].split(",")
+        print(record.__dict__)
+        notifications = False
+        if record.levelno < 30:
+            notifications = True
+        for chat in chat_ids:
+            requests.get(
+                f"https://api.telegram.org/bot{token}/sendMessage?chat_id="
+                f"{chat}&text"
+                f"={log_entry}&parse_mode=markdown&disable_notification={notifications}"
+            )
 
-    try:
-        a = 3 / 0
-    except ZeroDivisionError:
-        logger.log.exception("Divizion By Zero")
+
+class TelegramFormatter(Formatter):
+    def format(self, record: LogRecord) -> str:
+        message = record.msg
+        levelname = record.levelname
+        timestamp = datetime.utcfromtimestamp(record.created)
+        ts = (
+            timestamp.replace(tzinfo=timezone.utc)
+            .astimezone(tz=timezone(timedelta(hours=3)))
+            .strftime("%d.%m.%Y %H:%M:%S")
+        )
+        log = f"[{levelname}]: {ts}\n{message}"
+        if record.exc_info:
+            log += f"\n{record.exc_info[1].__repr__()}"
+        return log
+
+
+def init_logger():
+    logger = logging.getLogger()
+    logger.setLevel("INFO")
+    handler = TelegramHandler()
+    formatter = TelegramFormatter()
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+    return logger

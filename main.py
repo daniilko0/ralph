@@ -77,10 +77,14 @@ for event in bot.longpoll.listen():
             payload = {"button": ""}
         text = event["message"]["text"].lower()
 
-        # :blockstart: Перезапуск интерфейса
-        if text in ["начать", "старт"]:
+        # :blockstart: Запуск интерфейса
+        if text in ["начать", "старт", "r"]:
+            if not db.is_user_exist(event["message"]["from_id"]):
+                db.create_user(event["message"]["from_id"])
+            if not db.is_session_exist(event["message"]["from_id"]):
+                db.create_session(event["message"]["from_id"])
             bot.send_gui(pid=event["message"]["from_id"])
-        # :blockend: Перезапуск интерфейса
+        # :blockend: Запуск интерфейса
 
         # :blockstart: Возврат на главный экран
         elif payload["button"] == "home":

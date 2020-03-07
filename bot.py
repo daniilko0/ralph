@@ -202,4 +202,4 @@ class Bot(metaclass=SingletonMeta):
         except vk_api.exceptions.ApiError as e:
             log.error(f"Ошибка {e.__str__()}")
         else:
-            log.info(f"Успех.")
+            log.info(f"Статус группы успешно обновлён.")

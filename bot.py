@@ -17,11 +17,10 @@ from typing import NoReturn
 
 import requests
 import vk_api
-from vk_api.bot_longpoll import VkBotEventType
 
 from database import Database
 from keyboard import Keyboards
-from logger import init_logger
+import logger
 from vkbotlongpoll import RalphVkBotLongPoll
 
 
@@ -50,7 +49,7 @@ class Bot:
 
     def __init__(self) -> None:
 
-        log = init_logger()
+        log = logger.init_logger()
 
         log.info("Инициализация...")
 
@@ -114,7 +113,7 @@ class Bot:
             forward: Перечень идентификаторов сообщений для пересылки
         """
 
-        log = init_logger()
+        log = logger.init_logger()
 
         try:
             self.bot_vk.messages.send(
@@ -193,7 +192,7 @@ class Bot:
         """
         Обновляет версию в статусе группы с ботом
         """
-        log = init_logger()
+        log = logger.init_logger()
 
         log.info("Обновление версии в статусе группы...")
         try:

@@ -56,6 +56,7 @@ class Schedule:
     def __init__(self, date: str, gid: str = "324"):
         self.date = date
         self.gid = gid
+        self.log = logger.init_logger()
 
     def is_exist(self) -> bool:
         """
@@ -65,12 +66,11 @@ class Schedule:
         Returns:
             bool: Флаг, указывающий на существование расписания
         """
-        log = logger.init_logger()
         soup = self.get_raw()
         warn = soup.find_all("div", {"class": "msg warning"})
         err = soup.find_all("div", {"class": "msg error"})
         if warn or err:
-            log.info("Расписание отсутствует.")
+            self.log.info("Расписание отсутствует.")
             return False
         return True
 
@@ -82,17 +82,16 @@ class Schedule:
         Returns:
             BeautifulSoup: Объект веб-скрапера, содержащий сырую веб-страницу с расписанием
         """
-        log = logger.init_logger()
         request = requests.get(
             f"http://rating.ivpek.ru/timetable/timetable/show?gid={self.gid}&date"
             f"={self.date}"
         )
         try:
             if request.status_code != 200:
-                log.error("Подключение неудачно.")
+                self.log.error("Подключение неудачно.")
                 raise requests.exceptions.ConnectionError
         except requests.exceptions.ConnectionError as e:
-            log.exception(msg=e)
+            self.log.exception(msg=e)
             self.get_raw()
         else:
             soup = BeautifulSoup(request.text, "lxml")
@@ -105,7 +104,6 @@ class Schedule:
             str: Если расписание найдено
             bool: Если расписание еще не опубликовано
         """
-        log = logger.init_logger()
         soup = self.get_raw()
         for span in soup.find_all("span", {"class": "ldur"}):
             span.decompose()
@@ -146,7 +144,7 @@ class Schedule:
                 msg += f"{item} "
             msg += "\n"
         if not msg:
-            log.info("Расписание отсутствует.")
+            self.log.info("Расписание отсутствует.")
             return False
         date = datetime.strptime(self.date, "%Y-%m-%d").strftime("%d.%m.%Y")
         msg = f"Расписание на {date}:\n{msg}"
@@ -168,17 +166,16 @@ def listen():
     """Слушает сервер на предмет наличия расписания.
     Если находит - отправляет, иначе ждет 15 минут
     """
-    log = logger.init_logger()
     d = Date()
     sch = Schedule(d.tomorrow)
     if sch.is_exist():
         if sch.parse():
             sch.send()
         else:
-            log.info("Расписание отстутствует")
+            sch.log.info("Расписание отстутствует")
             time.sleep(15 * 60)
     else:
-        log.info("Расписание отстутствует")
+        sch.log.info("Расписание отстутствует")
         time.sleep(15 * 60)
 
 

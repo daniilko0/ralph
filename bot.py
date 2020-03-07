@@ -61,36 +61,38 @@ class Bot:
         self.kbs = Keyboards()
 
         self.db = Database(os.environ["DATABASE_URL"])
-
-        log.info("Авторизация ВКонтакте...")
-        try:
-            self.bot_session = vk_api.VkApi(token=self.token, api_version="5.103")
-            self.user_session = vk_api.VkApi(token=self.user_token, api_version="5.103")
-        except vk_api.exceptions.AuthError:
-            log.exception("Неудача. Ошибка авторизации.")
-        else:
-            try:
-                self.bot_vk = self.bot_session.get_api()
-                self.user_vk = self.user_session.get_api()
-                self.longpoll = RalphVkBotLongPoll(
-                    vk=self.bot_session, group_id=self.gid
-                )
-            except requests.exceptions.ConnectionError:
-                log.exception("Неудача. Превышен лимит попыток подключения.")
-            except vk_api.exceptions.ApiError:
-                log.exception("Неудача. Ошибка доступа.")
-            else:
-                log.info("Успех.")
-
-        # Инициализация дополнительных переменных
         self.admins = os.environ["ADMINS_IDS"].split(",")
 
-        # Переименование обрабатываемых типов событий
-        self.NEW_MESSAGE = VkBotEventType.MESSAGE_NEW
+        self.bot_session = None
+        self.user_session = None
+        self.bot_vk = None
+        self.user_vk = None
+        self.longpoll = None
 
         log.info(f"Беседа... {'Тестовая' if self.cid.endswith('1') else 'Основная'}")
 
         log.info("Инициализация завершена.")
+
+    def auth(self):
+
+        log = logger.init_logger()
+        log.info("Авторизация ВКонтакте...")
+        try:
+            self.bot_session = vk_api.VkApi(token=self.token, api_version="5.103")
+            self.user_session = vk_api.VkApi(token=self.user_token, api_version="5.103")
+            self.bot_vk = self.bot_session.get_api()
+            self.user_vk = self.user_session.get_api()
+            self.longpoll = RalphVkBotLongPoll(vk=self.bot_session, group_id=self.gid)
+        except vk_api.exceptions.AuthError:
+            log.exception("Авторизация ВКонтакте неудачна. Ошибка авторизации.")
+        except requests.exceptions.ConnectionError:
+            log.exception(
+                "Авторизация ВКонтакте неудачна. Превышен лимит попыток подключения."
+            )
+        except vk_api.exceptions.ApiError:
+            log.exception("Авторизация ВКонтакте неудачна. Ошибка доступа.")
+        else:
+            log.info("Авторизация ВКонтакте успешна.")
 
     def send_message(
         self,

@@ -13,8 +13,6 @@ from bot import Bot
 from logger import init_logger
 from database import Database
 
-bot = Bot()
-
 
 class Date:
     """
@@ -185,6 +183,7 @@ def listen():
 
 
 if __name__ == "__main__":
+    bot = Bot()
     schedule.every().day.at("09:20").do(listen)
     while True:
         schedule.run_pending()

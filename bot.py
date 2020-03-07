@@ -22,9 +22,10 @@ from database import Database
 from keyboard import Keyboards
 import logger
 from vkbotlongpoll import RalphVkBotLongPoll
+from singleton import SingletonMeta
 
 
-class Bot:
+class Bot(metaclass=SingletonMeta):
     """Класс, описывающий объект бота, включая авторизацию в API, и все методы бота.
     
     Attributes:

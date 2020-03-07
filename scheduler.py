@@ -10,7 +10,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from bot import Bot
-from logger import init_logger
+import logger
 from database import Database
 
 
@@ -65,7 +65,7 @@ class Schedule:
         Returns:
             bool: Флаг, указывающий на существование расписания
         """
-        log = init_logger()
+        log = logger.init_logger()
         soup = self.get_raw()
         warn = soup.find_all("div", {"class": "msg warning"})
         err = soup.find_all("div", {"class": "msg error"})
@@ -82,7 +82,7 @@ class Schedule:
         Returns:
             BeautifulSoup: Объект веб-скрапера, содержащий сырую веб-страницу с расписанием
         """
-        log = init_logger()
+        log = logger.init_logger()
         request = requests.get(
             f"http://rating.ivpek.ru/timetable/timetable/show?gid={self.gid}&date"
             f"={self.date}"
@@ -105,7 +105,7 @@ class Schedule:
             str: Если расписание найдено
             bool: Если расписание еще не опубликовано
         """
-        log = init_logger()
+        log = logger.init_logger()
         soup = self.get_raw()
         for span in soup.find_all("span", {"class": "ldur"}):
             span.decompose()
@@ -168,7 +168,7 @@ def listen():
     """Слушает сервер на предмет наличия расписания.
     Если находит - отправляет, иначе ждет 15 минут
     """
-    log = init_logger()
+    log = logger.init_logger()
     d = Date()
     sch = Schedule(d.tomorrow)
     if sch.is_exist():

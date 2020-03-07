@@ -41,11 +41,8 @@ class Bot(metaclass=SingletonMeta):
         .. code-block:: python
         
             from bot import Bot
-        
             bot = Bot()
-        
-    Todo:
-        * Почистить атрибуты
+            bot.auth()
     """
 
     def __init__(self) -> None:

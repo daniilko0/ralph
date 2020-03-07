@@ -2,20 +2,28 @@ import datetime
 import json
 import os
 import re
+from enum import Enum
 
+from vk_api.bot_longpoll import VkBotEventType
+
+import logger
 from bot import Bot
 from database import Database
 from keyboard import Keyboards
 from scheduler import Date
 from scheduler import Schedule
-from logger import init_logger
 
 db = Database(os.environ["DATABASE_URL"])
 bot = Bot()
 kbs = Keyboards()
-log = init_logger()
+log = logger.init_logger()
 
+bot.auth()
 bot.update_version()
+
+
+class EventTypes(Enum):
+    NEW_MESSAGE = VkBotEventType.MESSAGE_NEW
 
 
 def generate_call_message():
@@ -57,16 +65,12 @@ for event in bot.longpoll.listen():
         "message": event.object.message,
     }
     if (
-        event["type"] == bot.NEW_MESSAGE
+        event["type"] == EventTypes.NEW_MESSAGE
         and event["message"]["text"]
         and event["message"]["out"] == 0
         and event["message"]["from_id"] == event["message"]["peer_id"]
     ):
 
-        if not db.is_user_exist(event["message"]["from_id"]):
-            db.create_user(event["message"]["from_id"])
-        if not db.is_session_exist(event["message"]["from_id"]):
-            db.create_session(event["message"]["from_id"])
         try:
             payload = json.loads(event["message"]["payload"])
         except KeyError:

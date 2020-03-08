@@ -75,6 +75,9 @@ class Bot(metaclass=SingletonMeta):
 
     def auth(self):
 
+        """Авторизация ВКонтакте, подключение к API
+        """
+
         self.log.info("Авторизация ВКонтакте...")
         try:
             self.bot_session = vk_api.VkApi(token=self.token, api_version="5.103")

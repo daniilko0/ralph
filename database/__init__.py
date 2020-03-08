@@ -4,14 +4,13 @@ from typing import Tuple
 from typing import Union
 
 from database.base import Base
-from singleton import SingletonMeta
 
 """
 Модуль, содержащий класс с методами для работы с БД, выполняющих конечную цель
 """
 
 
-class Database(Base, metaclass=SingletonMeta):
+class Database(Base):
     """
         Класс для методов работы с БД, выполняющих конечную цель
     """

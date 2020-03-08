@@ -137,13 +137,8 @@ class Bot(metaclass=SingletonMeta):
         Returns:
             List[str]: Список имён пользователей
         """
-        user_ids = [
-            self.db.query(f"SELECT id FROM users WHERE vk_id={i}")[0][0] for i in ids
-        ]
-        user_names = [
-            self.db.query(f"SELECT first_name FROM users_info WHERE user_id={i}")[0][0]
-            for i in user_ids
-        ]
+        user_ids = [self.db.get_user_id(i) for i in ids]
+        user_names = [self.db.get_user_name(i) for i in user_ids]
         return user_names
 
     def generate_mentions(self, ids: str, names: bool) -> str:

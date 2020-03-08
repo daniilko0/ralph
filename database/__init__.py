@@ -57,6 +57,15 @@ class Database(Base):
         user_id = self.query(f"SELECT id from users WHERE vk_id={vk_id}")[0][0]
         return user_id
 
+    def get_user_name(self, _id: int) -> str:
+        """
+        Получает из базы данных имя по идентификатор студента
+        """
+        name = self.query(f"SELECT first_name FROM users_info WHERE user_id={_id}")[0][
+            0
+        ]
+        return name
+
     def get_mailings_list(self) -> List[Tuple]:
         """
         Получает из базы данных весь список доступных рассылок

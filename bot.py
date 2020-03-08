@@ -47,9 +47,9 @@ class Bot(metaclass=SingletonMeta):
 
     def __init__(self) -> None:
 
-        log = logger.init_logger()
+        self.log = logger.init_logger()
 
-        log.info("Инициализация...")
+        self.log.info("Инициализация...")
 
         self.token = os.environ["VK_TOKEN"]
         self.user_token = os.environ["VK_USER_TOKEN"]
@@ -67,14 +67,15 @@ class Bot(metaclass=SingletonMeta):
         self.user_vk = None
         self.longpoll = None
 
-        log.info(f"Беседа... {'Тестовая' if self.cid.endswith('1') else 'Основная'}")
+        self.log.info(
+            f"Беседа..." f" {'Тестовая' if self.cid.endswith('1') else 'Основная'}"
+        )
 
-        log.info("Инициализация завершена.")
+        self.log.info("Инициализация завершена.")
 
     def auth(self):
 
-        log = logger.init_logger()
-        log.info("Авторизация ВКонтакте...")
+        self.log.info("Авторизация ВКонтакте...")
         try:
             self.bot_session = vk_api.VkApi(token=self.token, api_version="5.103")
             self.user_session = vk_api.VkApi(token=self.user_token, api_version="5.103")
@@ -82,15 +83,15 @@ class Bot(metaclass=SingletonMeta):
             self.user_vk = self.user_session.get_api()
             self.longpoll = RalphVkBotLongPoll(vk=self.bot_session, group_id=self.gid)
         except vk_api.exceptions.AuthError:
-            log.exception("Авторизация ВКонтакте неудачна. Ошибка авторизации.")
+            self.log.exception("Авторизация ВКонтакте неудачна. Ошибка авторизации.")
         except requests.exceptions.ConnectionError:
-            log.exception(
+            self.log.exception(
                 "Авторизация ВКонтакте неудачна. Превышен лимит попыток подключения."
             )
         except vk_api.exceptions.ApiError:
-            log.exception("Авторизация ВКонтакте неудачна. Ошибка доступа.")
+            self.log.exception("Авторизация ВКонтакте неудачна. Ошибка доступа.")
         else:
-            log.info("Авторизация ВКонтакте успешна.")
+            self.log.info("Авторизация ВКонтакте успешна.")
 
     def send_message(
         self,
@@ -113,8 +114,6 @@ class Bot(metaclass=SingletonMeta):
             forward: Перечень идентификаторов сообщений для пересылки
         """
 
-        log = logger.init_logger()
-
         try:
             self.bot_vk.messages.send(
                 peer_id=pid,
@@ -127,7 +126,7 @@ class Bot(metaclass=SingletonMeta):
             )
 
         except vk_api.exceptions.ApiError as e:
-            log.exception(msg=e.__str__())
+            self.log.exception(msg=e.__str__())
 
     def get_users_names(self, ids: list) -> List[str]:
         """Получает имена пользователей  из базы данных по идентификаторам из списка
@@ -192,14 +191,13 @@ class Bot(metaclass=SingletonMeta):
         """
         Обновляет версию в статусе группы с ботом
         """
-        log = logger.init_logger()
 
-        log.info("Обновление версии в статусе группы...")
+        self.log.info("Обновление версии в статусе группы...")
         try:
             with open("VERSION.txt", "r") as f:
                 v = f"Версия: {f.read()}"
             self.user_vk.status.set(text=v, group_id=self.gid)
         except vk_api.exceptions.ApiError as e:
-            log.error(f"Ошибка {e.__str__()}")
+            self.log.error(f"Ошибка {e.__str__()}")
         else:
-            log.info(f"Статус группы успешно обновлён.")
+            self.log.info(f"Статус группы успешно обновлён.")

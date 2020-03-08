@@ -6,7 +6,6 @@ from enum import Enum
 
 from vk_api.bot_longpoll import VkBotEventType
 
-import logger
 from bot import Bot
 from database import Database
 from keyboard import Keyboards
@@ -16,7 +15,6 @@ from scheduler import Schedule
 db = Database(os.environ["DATABASE_URL"])
 bot = Bot()
 kbs = Keyboards()
-log = logger.init_logger()
 
 bot.auth()
 bot.update_version()
@@ -163,7 +161,7 @@ for event in bot.longpoll.listen():
             payload["button"] == "confirm"
             and db.get_session_state(event["message"]["from_id"]) == "call_configuring"
         ):
-            log.info("Отправка призыва...")
+            bot.log.info("Отправка призыва...")
             cid = db.get_conversation(event["message"]["from_id"])
             text = generate_call_message()
             bot.send_message(pid=cid, msg=text)

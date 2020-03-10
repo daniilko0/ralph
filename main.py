@@ -49,10 +49,9 @@ def send_call_confirm():
         bot.send_message(msg=message, pid=event["message"]["from_id"])
     else:
         db.empty_call_storage(event["message"]["from_id"])
-        bot.send_message(
-            msg="Сообщение не может быть пустым. Отмена...",
+        bot.send_gui(
             pid=event["message"]["from_id"],
-            keyboard=kbs.generate_main_menu(bot.is_admin(event["message"]["from_id"])),
+            text="Сообщение не может быть пустым. Отмена...",
         )
 
 

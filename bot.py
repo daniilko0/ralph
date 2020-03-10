@@ -131,19 +131,6 @@ class Bot(metaclass=SingletonMeta):
         except vk_api.exceptions.ApiError as e:
             self.log.exception(msg=e.__str__())
 
-    def get_users_names(self, ids: list) -> List[str]:
-        """Получает имена пользователей  из базы данных по идентификаторам из списка
-        
-        Arguments:
-            ids: Список идентификаторов для формирования списка имён
-        
-        Returns:
-            List[str]: Список имён пользователей
-        """
-        user_ids = [self.db.get_user_id(i) for i in ids]
-        user_names = [self.db.get_user_name(i) for i in user_ids]
-        return user_names
-
     def generate_mentions(self, ids: str, names: bool) -> str:
         """Генерирует строку с упоминаниями из списка идентификаторов
         
@@ -156,7 +143,7 @@ class Bot(metaclass=SingletonMeta):
         """
         ids = ids.replace(" ", "").split(",")[:-1]
         if names:
-            users_names = self.get_users_names(ids)
+            users_names = self.db.get_users_names(ids)
         else:
             users_names = ["!"] * len(ids)
         result = (", " if names else "").join(

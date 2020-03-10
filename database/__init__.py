@@ -302,3 +302,16 @@ class Database(Base):
         """
         s_id = self.get_session_id(user_id)
         self.query(f"UPDATE sessions SET names_using={value} WHERE id={s_id}")
+
+    def get_users_names(self, ids: list) -> List[str]:
+        """
+        Получает список имён по списку идентификаторов ВКонтакте
+        """
+        ids = ", ".join(ids)
+        query = self.query(
+            f"SELECT first_name FROM users INNER JOIN users_info ON users.id = "
+            f"users_info.user_id WHERE vk_id in ({ids}) ORDER BY "
+            f"position(vk_id::text in '{ids}')"
+        )
+        names = [i for (i,) in query]
+        return names

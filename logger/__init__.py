@@ -63,12 +63,13 @@ class TelegramFormatter(Formatter):
 def init_logger():
     logger = logging.getLogger("main")
     logger.setLevel("INFO")
-    tg = TelegramHandler()
     console = logging.StreamHandler()
     formatter = TelegramFormatter()
-    tg.setFormatter(formatter)
-    logger.addHandler(tg)
     console.setFormatter(formatter)
     logger.addHandler(console)
+    if "PRODUCTION" in os.environ:
+        tg = TelegramHandler()
+        tg.setFormatter(formatter)
+        logger.addHandler(tg)
 
     return logger

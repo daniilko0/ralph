@@ -63,7 +63,7 @@ for event in bot.longpoll.listen():
         "message": event.object.message,
     }
     if (
-        event["type"] == EventTypes.NEW_MESSAGE
+        event["type"] == EventTypes.NEW_MESSAGE.value
         and event["message"]["text"]
         and event["message"]["out"] == 0
         and event["message"]["from_id"] == event["message"]["peer_id"]

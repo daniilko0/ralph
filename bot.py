@@ -132,6 +132,12 @@ class Bot(metaclass=SingletonMeta):
             self.log.exception(msg=e.__str__())
 
     def send_mailing(self, slug: str, text: str):
+        """Генерирует строку с упоминаниями из списка идентификаторов
+
+        Arguments:
+            slug: Слаг рассылки
+            text: Сообщение рассылки
+        """
         subscribers = self.db.fetch_subcribers(slug)
         self.send_message(msg=text, user_ids=subscribers)
 

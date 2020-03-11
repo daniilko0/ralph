@@ -105,13 +105,20 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.generate_names_keyboard(payload["letter"]),
             )
         elif payload["button"] == "student":
-            db.append_to_call_ids(
-                event["message"]["from_id"], db.get_vk_id(payload["id"])
-            )
-            bot.send_message(
-                msg=f"{payload['name']} добавлен к списку призыва.",
-                pid=event["message"]["from_id"],
-            )
+            students = db.get_call_ids(event["message"]["from_id"]).split(",")
+            if payload["id"] in students:
+                bot.send_message(
+                    msg=f"{payload['name']} уже был выбран для призыва. Пропуск.",
+                    pid=event["message"]["from_id"],
+                )
+            else:
+                db.append_to_call_ids(
+                    event["message"]["from_id"], db.get_vk_id(payload["id"])
+                )
+                bot.send_message(
+                    msg=f"{payload['name']} добавлен к списку призыва.",
+                    pid=event["message"]["from_id"],
+                )
         elif payload["button"] == "back":
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",

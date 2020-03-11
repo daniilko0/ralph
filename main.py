@@ -105,8 +105,12 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.generate_names_keyboard(payload["letter"]),
             )
         elif payload["button"] == "student":
-            students = db.get_call_ids(event["message"]["from_id"]).split(",")
-            if payload["id"] in students:
+            ids = db.get_call_ids(event["message"]["from_id"])
+            if ids:
+                students = ids.split(",")
+            else:
+                students = [ids]
+            if str(db.get_vk_id(payload["id"])) in students:
                 bot.send_message(
                     msg=f"{payload['name']} уже был выбран для призыва. Пропуск.",
                     pid=event["message"]["from_id"],

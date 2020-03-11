@@ -101,6 +101,8 @@ class Schedule:
         Returns:
             str: Если расписание найдено
             bool: Если расписание еще не опубликовано
+        .. todo::
+            Оптимизация кода метода!
         """
         soup = self.get_raw()
         for span in soup.find_all("span", {"class": "ldur"}):

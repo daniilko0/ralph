@@ -131,6 +131,10 @@ class Bot(metaclass=SingletonMeta):
         except vk_api.exceptions.ApiError as e:
             self.log.exception(msg=e.__str__())
 
+    def send_mailing(self, slug: str, text: str):
+        subscribers = self.db.fetch_subcribers(slug)
+        self.send_message(msg=text, user_ids=subscribers)
+
     def generate_mentions(self, ids: str, names: bool) -> str:
         """Генерирует строку с упоминаниями из списка идентификаторов
         

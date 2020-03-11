@@ -139,10 +139,11 @@
 Настройки
 ~~~~~~~~~
 
-.. todo::
-       Добавить скриншоты настроек
-
 Это подменю с двумя опциями, которые можно изменить для себя (то есть глобальные параметры они не затрагивают)
+
+.. figure:: ../_static/images/ralph/settings/6.2.0/settings.png
+       :align: center
+       :alt: Настройки
 
 Смена беседы
 """"""""""""
@@ -154,10 +155,26 @@
 - Основная
 - Тестовая
 
+.. figure:: ../_static/images/ralph/settings/6.2.0/chconv_test.png
+       :align: center
+       :alt: Смена беседы
+
+.. figure:: ../_static/images/ralph/settings/6.2.0/chconv_main.png
+       :align: center
+       :alt: Смена беседы
+
 Использование имён в призыве
 """"""""""""""""""""""""""""
 
 При нажатии на кнопку "Использование имён в призыве" бот сообщит о текущем состоянии опции и предложит переключиться.
+
+.. figure:: ../_static/images/ralph/settings/6.2.0/names_off.png
+       :align: center
+       :alt: Смена беседы
+
+.. figure:: ../_static/images/ralph/settings/6.2.0/names_on.png
+       :align: center
+       :alt: Смена беседы
 
 **На что это влияет**
 

@@ -396,12 +396,9 @@ for event in bot.longpoll.listen():
             payload["button"] == "confirm"
             and db.get_session_state(event["message"]["from_id"]) == "prompt_mailing"
         ):
-            subscs = db.fetch_subcribers(
-                db.get_mailing_session(event["message"]["from_id"])
-            )
-            bot.send_message(
-                msg=db.get_mailing_message(event["message"]["from_id"]),
-                user_ids=subscs,
+            bot.send_mailing(
+                slug=db.get_mailing_session(event["message"]["from_id"]),
+                text=db.get_mailing_message(event["message"]["from_id"]),
             )
             bot.send_message(
                 msg="Рассылка отправлена.",

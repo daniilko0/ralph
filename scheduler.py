@@ -1,17 +1,15 @@
-import os
 import re
 import time
 from datetime import datetime
 from datetime import timedelta
 from typing import Union
 
-import schedule
 import requests
+import schedule
 from bs4 import BeautifulSoup
 
-from bot import Bot
 import logger
-from database import Database
+from bot import Bot
 
 
 class Date:
@@ -156,10 +154,8 @@ class Schedule:
         """
         sch = self.parse()
         if sch:
-            db = Database(os.environ["DATABASE_URL"])
-            subscribers = db.fetch_subcribers("schedule")
+            bot.send_mailing(slug="schedule", text=sch)
             bot.send_message(msg=sch, pid=bot.cid)
-            bot.send_message(user_ids=subscribers, msg=sch)
 
 
 def listen():

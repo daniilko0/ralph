@@ -133,9 +133,8 @@ class Keyboards:
         )
         return kb.get_keyboard()
 
-    @staticmethod
-    def generate_call_prompt():
-        kb = VkKeyboard()
+    def generate_call_prompt(self):
+        kb = self.generate_alphabet_keyboard()
         kb.add_line()
         kb.add_button(label="Отмена", color="negative", payload={"button": "cancel"})
         kb.add_button(label="Сохранить", color="positive", payload={"button": "save"})
@@ -157,7 +156,7 @@ class Keyboards:
             else:
                 kb.add_line()
 
-        return kb.get_keyboard()
+        return kb
 
     def generate_names_keyboard(self, letter):
         """

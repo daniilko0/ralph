@@ -127,14 +127,14 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.generate_alphabet_keyboard(),
+                keyboard=kbs.generate_call_prompt(),
             )
         elif payload["button"] == "skip":
             db.update_session_state(event["message"]["from_id"], "call_configuring")
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.generate_alphabet_keyboard(),
+                keyboard=kbs.generate_call_prompt(),
             )
         elif (
             db.get_session_state(event["message"]["from_id"]) == "ask_for_call_message"
@@ -145,7 +145,7 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg="Отправка клавиатуры призыва",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.generate_alphabet_keyboard(),
+                keyboard=kbs.generate_call_prompt(),
             )
             db.update_session_state(event["message"]["from_id"], "call_configuring")
         elif payload["button"] == "send_to_all":

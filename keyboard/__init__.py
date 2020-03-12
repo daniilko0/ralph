@@ -147,7 +147,7 @@ class Keyboards:
 
     def generate_alphabet_keyboard(self):
         """
-        Генерирует клавиатуру с алфавитными кнопками для меню Призыва
+        Генерирует клавиатуру с алфавитными кнопками
         """
         kb = VkKeyboard()
         letters = self.db.get_last_names_letters()

@@ -133,6 +133,18 @@ class Keyboards:
         )
         return kb.get_keyboard()
 
+    @staticmethod
+    def generate_call_prompt():
+        kb = VkKeyboard()
+        kb.add_line()
+        kb.add_button(label="Отмена", color="negative", payload={"button": "cancel"})
+        kb.add_button(label="Сохранить", color="positive", payload={"button": "save"})
+        kb.add_line()
+        kb.add_button(
+            label="Отправить всем", color="primary", payload={"button": "send_to_all"}
+        )
+        return kb.get_keyboard()
+
     def generate_alphabet_keyboard(self):
         """
         Генерирует клавиатуру с алфавитными кнопками для меню Призыва
@@ -144,13 +156,7 @@ class Keyboards:
                 kb.add_button(label=v, payload={"button": "letter", "letter": v})
             else:
                 kb.add_line()
-        kb.add_line()
-        kb.add_button(label="Отмена", color="negative", payload={"button": "cancel"})
-        kb.add_button(label="Сохранить", color="positive", payload={"button": "save"})
-        kb.add_line()
-        kb.add_button(
-            label="Отправить всем", color="primary", payload={"button": "send_to_all"}
-        )
+
         return kb.get_keyboard()
 
     def generate_names_keyboard(self, letter):

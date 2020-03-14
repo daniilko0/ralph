@@ -2,7 +2,7 @@ import re
 import time
 from datetime import datetime
 from datetime import timedelta
-from typing import Union
+from typing import List
 
 import requests
 import schedule
@@ -45,80 +45,74 @@ class Date:
 class Schedule:
 
     """Класс, переводящий расписание из сырой веб-страницы в читаемую строку
-    
+
     Attributes:
         date (str): Дата в формате ГГГГ-ММ-ДД, используемая для получения расписания
-        gid (str): Идентификатор группы, для которой нужно получать расписание        
+        gid (str): Идентификатор группы, для которой нужно получать расписание
     """
 
     def __init__(self, date: str, gid: str = "324"):
         self.date = date
         self.gid = gid
         self.log = logger.init_logger()
+        self.raw = None
+
+    def get_raw(self):
+        """Подключается к серверу и получает расписание как объект вебскрапера
+        """
+        request = requests.get(
+            "http://rating.ivpek.ru/timetable/timetable/show",
+            params={"date": self.date, "gid": self.gid},
+        )
+        soup = BeautifulSoup(request.text, "lxml")
+        self.raw = soup
 
     def is_exist(self) -> bool:
         """
         Проверяет наличие расписания, основываясь на присутствии плашек
-        "Расписание отстутствует" и "Расписание составлено, но не опубликовано"
-        
+        "Расписание отстутствует" и "Расписание составлено, но не опубликовано" и
+        содержимом таблицы с расписанием
+
         Returns:
             bool: Флаг, указывающий на существование расписания
         """
-        soup = self.get_raw()
+        soup = self.raw
         warn = soup.find_all("div", {"class": "msg warning"})
         err = soup.find_all("div", {"class": "msg error"})
-        if warn or err:
+        lessons = soup.find_all("div", {"id": "lesson"})
+        if warn or err or not lessons:
             self.log.info("Расписание отсутствует.")
             return False
         return True
 
-    def get_raw(self) -> BeautifulSoup:
-        """
-        Получает с сервера веб-страницу с расписанием и возвращает объект
-        веб-скрапера
-        
-        Returns:
-            BeautifulSoup: Объект веб-скрапера, содержащий сырую веб-страницу с расписанием
-        """
-        request = requests.get(
-            f"http://rating.ivpek.ru/timetable/timetable/show?gid={self.gid}&date"
-            f"={self.date}"
-        )
-        try:
-            if request.status_code != 200:
-                self.log.error("Подключение неудачно.")
-                raise requests.exceptions.ConnectionError
-        except requests.exceptions.ConnectionError as e:
-            self.log.exception(msg=e)
-            self.get_raw()
-        else:
-            soup = BeautifulSoup(request.text, "lxml")
-            return soup
+    def clean(self) -> List[list]:
+        """Чистит объект вебскрапера от мусорных данных и оставляет только то,
+        что относится к расписанию
 
-    def parse(self) -> Union[str, bool]:
-        """Форматирует расписание в читаемую строку
-        
         Returns:
-            str: Если расписание найдено
-            bool: Если расписание еще не опубликовано
-        .. todo::
-            Оптимизация кода метода!
+            List[list]: Список со списками. Каждый вложенный список описывает пару (
+            номер, название предмета, преподавателя, кабинет)
         """
-        soup = self.get_raw()
+        soup = self.raw
         for span in soup.find_all("span", {"class": "ldur"}):
             span.decompose()
         for br in soup.find_all("br"):
             soup.br.insert_before(" ")
             br.decompose()
-        schedule_html = soup.find_all("table", {"class": "tbl"})[1]
+        soup = soup.find_all("table", {"class": "tbl"})[1]
         sch = []
-        rows = schedule_html.find_all("tr")
+        rows = soup.find_all("tr")
         for row in rows:
             cols = row.find_all("td")
             cols = [el.text.strip() for el in cols]
             sch.append([el for el in cols if el])
         sch = [el for el in sch if len(el) > 1]
+        return sch
 
+    def generate(self) -> str:
+        """Собирает расписание в читаемую строку
+        """
+        sch = self.clean()
         msg = ""
         replacements = {
             "Лекция": "(Л)",
@@ -143,9 +137,6 @@ class Schedule:
                     sch[i][j + 1] = ""
                 msg += f"{item} "
             msg += "\n"
-        if not msg:
-            self.log.info("Расписание отсутствует.")
-            return False
         date = datetime.strptime(self.date, "%Y-%m-%d").strftime("%d.%m.%Y")
         msg = f"Расписание на {date}:\n{msg}"
         return msg
@@ -154,7 +145,8 @@ class Schedule:
         """Отправляет расписание в активную беседу
         и в ЛС подписчикам рассылки "Расписание"
         """
-        sch = self.parse()
+        bot = Bot()
+        sch = self.generate()
         if sch:
             bot.send_mailing(slug="schedule", text=sch)
             bot.send_message(msg=sch, pid=bot.cid)
@@ -166,19 +158,15 @@ def listen():
     """
     d = Date()
     sch = Schedule(d.tomorrow)
+    sch.get_raw()
     if sch.is_exist():
-        if sch.parse():
-            sch.send()
-        else:
-            sch.log.info("Расписание отстутствует")
-            time.sleep(15 * 60)
+        sch.log.info("Расписание опубликовано")
+        sch.send()
     else:
-        sch.log.info("Расписание отстутствует")
         time.sleep(15 * 60)
 
 
 if __name__ == "__main__":
-    bot = Bot()
     schedule.every().day.at("09:20").do(listen)
     while True:
         schedule.run_pending()

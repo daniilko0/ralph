@@ -159,11 +159,10 @@ def listen():
     d = Date()
     sch = Schedule(d.tomorrow)
     sch.get_raw()
-    if sch.is_exist():
-        sch.log.info("Расписание опубликовано")
-        sch.send()
-    else:
+    while not sch.is_exist():
         time.sleep(15 * 60)
+    sch.log.info("Расписание опубликовано")
+    sch.send()
 
 
 if __name__ == "__main__":

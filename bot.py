@@ -53,8 +53,8 @@ class Bot(metaclass=SingletonMeta):
 
         self.token = os.environ["VK_TOKEN"]
         self.user_token = os.environ["VK_USER_TOKEN"]
-        self.gid = os.environ["GID_ID"]
-        self.cid = os.environ["CID_ID"]
+        self.gid = os.environ["GROUP_ID"]
+        self.cid = os.environ["CHAT_ID"]
 
         self.kbs = Keyboards()
 

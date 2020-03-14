@@ -38,9 +38,13 @@ class TelegramHandler(Handler):
             notifications = True
         for chat in chat_ids:
             requests.get(
-                f"https://api.telegram.org/bot{token}/sendMessage?chat_id="
-                f"{chat}&text"
-                f"={log_entry}&parse_mode=markdown&disable_notification={notifications}"
+                f"https://api.telegram.org/bot{token}/sendMessage",
+                params={
+                    "chat_id": chat,
+                    "text": log_entry,
+                    "parse_mode": "markdown",
+                    "disable_notification": notifications,
+                },
             )
 
 

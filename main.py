@@ -222,8 +222,9 @@ for event in bot.longpoll.listen():
         elif payload["button"] == "today":
             d = Date()
             s = Schedule(d.today)
-            schedule = s.parse()
-            if schedule:
+            s.get_raw()
+            if s.is_exist():
+                schedule = s.generate()
                 bot.send_message(msg=schedule, pid=event["message"]["from_id"])
             else:
                 bot.send_message(
@@ -232,8 +233,9 @@ for event in bot.longpoll.listen():
         elif payload["button"] == "tomorrow":
             d = Date()
             s = Schedule(d.tomorrow)
-            schedule = s.parse()
-            if schedule:
+            s.get_raw()
+            if s.is_exist():
+                schedule = s.generate()
                 bot.send_message(msg=schedule, pid=event["message"]["from_id"])
             else:
                 bot.send_message(
@@ -242,8 +244,9 @@ for event in bot.longpoll.listen():
         elif payload["button"] == "day_after_tomorrow":
             d = Date()
             s = Schedule(d.day_after_tomorrow)
-            schedule = s.parse()
-            if schedule:
+            s.get_raw()
+            if s.is_exist():
+                schedule = s.generate()
                 bot.send_message(msg=schedule, pid=event["message"]["from_id"])
             else:
                 bot.send_message(
@@ -284,8 +287,8 @@ for event in bot.longpoll.listen():
                     )
                 else:
                     s = Schedule(d)
-                    schedule = s.parse()
-                    if schedule:
+                    if s.is_exist():
+                        schedule = s.generate()
                         bot.send_message(
                             msg=schedule,
                             pid=event["message"]["from_id"],

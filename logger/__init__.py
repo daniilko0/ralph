@@ -48,20 +48,21 @@ class TelegramFormatter(Formatter):
     def format(self, record: LogRecord) -> str:
         message = record.msg
         levelname = record.levelname
+        module = record.module
         timestamp = datetime.utcfromtimestamp(record.created)
         ts = (
             timestamp.replace(tzinfo=timezone.utc)
             .astimezone(tz=timezone(timedelta(hours=3)))
             .strftime("%d.%m.%Y %H:%M:%S")
         )
-        log = f"[{levelname}]: {ts}\n{message}"
+        fmt = f"[{levelname}] ({module}): {ts}\n{message}"
         if record.exc_info:
-            log += f"\n{record.exc_info[1].__repr__()}"
-        return log
+            fmt += f"\n{record.exc_info[1].__repr__()}"
+        return fmt
 
 
 def init_logger():
-    logger = logging.getLogger("main")
+    logger = logging.getLogger(__name__)
     logger.setLevel("INFO")
     console = logging.StreamHandler()
     formatter = TelegramFormatter()

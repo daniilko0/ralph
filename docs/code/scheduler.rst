@@ -1,13 +1,12 @@
 Schedule
 =========
 
-.. module:: scheduler
-.. autoclass:: Schedule
-    :undoc-members:
+.. autoclass:: Date
     :members:
 
-.. autoclass:: Date
-    :undoc-members:
+.. module:: scheduler
+.. autoclass:: Schedule
     :members:
 
 .. autofunction:: listen
+.. autofunction:: send

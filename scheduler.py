@@ -149,9 +149,8 @@ class Schedule:
         bot.auth()
         self.get_raw()
         sch = self.generate()
-        if sch:
-            bot.send_mailing(slug="schedule", text=sch)
-            bot.send_message(msg=sch, pid=bot.cid)
+        bot.send_mailing(slug="schedule", text=sch)
+        bot.send_message(msg=sch, pid=bot.cid)
 
 
 def listen():

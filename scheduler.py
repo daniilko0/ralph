@@ -149,16 +149,19 @@ class Schedule:
         msg = f"Расписание на {date}:\n{msg}"
         return msg
 
-    def send(self):
-        """Отправляет расписание в активную беседу
-        и в ЛС подписчикам рассылки "Расписание"
-        """
-        bot = Bot()
-        bot.auth()
-        self.get_raw()
-        sch = self.generate()
-        bot.send_mailing(slug="schedule", text=sch)
-        bot.send_message(msg=sch, pid=bot.cid)
+
+def send():
+    """Отправляет расписание в активную беседу
+    и в ЛС подписчикам рассылки "Расписание"
+    """
+    bot = Bot()
+    bot.auth()
+    d = Date()
+    s = Schedule(d.tomorrow)
+    s.get_raw()
+    sch = s.generate()
+    bot.send_mailing(slug="schedule", text=sch)
+    bot.send_message(msg=sch, pid=bot.cid)
 
 
 def listen():
@@ -172,7 +175,7 @@ def listen():
         time.sleep(15 * 60)
         sch.get_raw()
     sch.log.info("Расписание опубликовано")
-    sch.send()
+    send()
 
 
 if __name__ == "__main__":

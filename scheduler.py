@@ -161,6 +161,7 @@ def listen():
     sch.get_raw()
     while not sch.is_exist():
         time.sleep(15 * 60)
+        sch.get_raw()
     sch.log.info("Расписание опубликовано")
     sch.send()
 

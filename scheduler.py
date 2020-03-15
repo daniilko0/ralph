@@ -146,8 +146,6 @@ class Schedule:
         и в ЛС подписчикам рассылки "Расписание"
         """
         bot = Bot()
-        bot.auth()
-        self.get_raw()
         sch = self.generate()
         if sch:
             bot.send_mailing(slug="schedule", text=sch)
@@ -169,6 +167,6 @@ def listen():
 
 
 if __name__ == "__main__":
-    schedule.every().day.at("09:20").do(listen)
+    schedule.every().day.at("09:40").do(listen)
     while True:
         schedule.run_pending()

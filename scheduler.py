@@ -146,6 +146,8 @@ class Schedule:
         и в ЛС подписчикам рассылки "Расписание"
         """
         bot = Bot()
+        bot.auth()
+        self.get_raw()
         sch = self.generate()
         if sch:
             bot.send_mailing(slug="schedule", text=sch)

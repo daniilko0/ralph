@@ -169,6 +169,6 @@ def listen():
 
 
 if __name__ == "__main__":
-    schedule.every().day.at("10:55").do(listen)
+    schedule.every().day.at("11:00").do(listen)
     while True:
         schedule.run_pending()

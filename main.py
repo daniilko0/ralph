@@ -287,6 +287,7 @@ for event in bot.longpoll.listen():
                     )
                 else:
                     s = Schedule(d)
+                    s.get_raw()
                     if s.is_exist():
                         schedule = s.generate()
                         bot.send_message(

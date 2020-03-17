@@ -287,6 +287,7 @@ for event in bot.longpoll.listen():
                     )
                 else:
                     s = Schedule(d)
+                    s.get_raw()
                     if s.is_exist():
                         schedule = s.generate()
                         bot.send_message(
@@ -374,10 +375,13 @@ for event in bot.longpoll.listen():
             == "ask_for_mailing_message"
         ):
             bot.send_message(
-                msg="Выполнение команды отменено",
+                msg="Выполнение команды отменено. Возвращаюсь на экран управления "
+                "рассылкой.",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.generate_main_menu(
-                    bot.is_admin(event["message"]["from_id"])
+                keyboard=kbs.generate_mailing_mgmt(
+                    is_admin=bot.is_admin(event["message"]["from_id"]),
+                    slug=db.get_mailing_session(event["message"]["from_id"]),
+                    user_id=event["message"]["from_id"],
                 ),
             )
             db.update_session_state(event["message"]["from_id"], "main")

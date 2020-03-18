@@ -4,12 +4,11 @@ beautifulsoup4==4.8.2
 black==19.10b0
 certifi==2019.11.28
 chardet==3.0.4
-Click==7.1.1
+click==7.1.1
 idna==2.9
 lxml==4.5.0
 pathspec==0.7.0
 psycopg2-binary==2.8.4
-python-telegram-logger==1.4
 PyYAML==5.3
 regex==2020.2.20
 requests==2.23.0

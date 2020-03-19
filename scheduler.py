@@ -155,6 +155,7 @@ def send():
     и в ЛС подписчикам рассылки "Расписание"
     """
     bot = Bot()
+    bot.log.setLevel("ERROR")
     bot.auth()
     d = Date()
     s = Schedule(d.tomorrow)

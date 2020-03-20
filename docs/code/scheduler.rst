@@ -1,10 +1,10 @@
 Schedule
 =========
 
+.. module:: scheduler
 .. autoclass:: Date
     :members:
 
-.. module:: scheduler
 .. autoclass:: Schedule
     :members:
 

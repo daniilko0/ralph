@@ -20,7 +20,7 @@ import vk_api
 
 from database import Database
 from keyboard import Keyboards
-import logger
+from logger import Logger
 from vkbotlongpoll import RalphVkBotLongPoll
 from singleton import SingletonMeta
 
@@ -47,7 +47,7 @@ class Bot(metaclass=SingletonMeta):
 
     def __init__(self) -> None:
 
-        self.log = logger.init_logger()
+        self.log = Logger().init()
 
         self.log.info("Инициализация...")
 

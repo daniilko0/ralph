@@ -8,7 +8,7 @@ import requests
 import schedule
 from bs4 import BeautifulSoup
 
-import logger
+from logger import Logger
 from bot import Bot
 
 
@@ -62,7 +62,7 @@ class Schedule:
     def __init__(self, date: str, gid: str = "324"):
         self.date = date
         self.gid = gid
-        self.log = logger.init_logger()
+        self.log = Logger().init()
         self.raw = None
 
     def get_raw(self):
@@ -155,6 +155,7 @@ def send():
     и в ЛС подписчикам рассылки "Расписание"
     """
     bot = Bot()
+    bot.log.setLevel("ERROR")
     bot.auth()
     d = Date()
     s = Schedule(d.tomorrow)

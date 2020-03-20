@@ -65,16 +65,20 @@ class TelegramFormatter(Formatter):
         return fmt
 
 
-def init_logger():
-    logger = logging.getLogger(__name__)
-    logger.setLevel("INFO")
-    console = logging.StreamHandler()
-    formatter = TelegramFormatter()
-    console.setFormatter(formatter)
-    logger.addHandler(console)
-    if "PRODUCTION" in os.environ:
-        tg = TelegramHandler()
-        tg.setFormatter(formatter)
-        logger.addHandler(tg)
+class Logger:
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+        if self.logger.hasHandlers():
+            self.logger.handlers.clear()
 
-    return logger
+    def init(self):
+        self.logger.setLevel("INFO")
+        console = logging.StreamHandler()
+        formatter = TelegramFormatter()
+        console.setFormatter(formatter)
+        self.logger.addHandler(console)
+        if "PRODUCTION" in os.environ:
+            tg = TelegramHandler()
+            tg.setFormatter(formatter)
+            self.logger.addHandler(tg)
+        return self.logger

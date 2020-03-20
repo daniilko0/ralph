@@ -2,13 +2,13 @@
 # Подробнее здесь: https://github.com/python273/vk_api/issues/144#issuecomment-404023710
 
 from vk_api.bot_longpoll import VkBotLongPoll
-from logger import init_logger
+from logger import Logger
 
 
 class RalphVkBotLongPoll(VkBotLongPoll):
     def __init__(self, vk, group_id, wait=25):
         super().__init__(vk, group_id, wait)
-        self.log = init_logger()
+        self.log = Logger().init()
 
     def listen(self):
         while True:

@@ -84,9 +84,6 @@ for event in bot.longpoll.listen():
                 # Получаем бинарное представление каждого вложения
                 req = requests.get(m_url)
                 print(req.content)
-                # Сохраняем в файл
-                with open("photo.jpg", "wb") as f:
-                    f.write(req.content)
                 # Получаем урл сервера для загрузки
                 server = bot.bot_vk.photos.getMessagesUploadServer()
                 ##############
@@ -94,6 +91,8 @@ for event in bot.longpoll.listen():
                 # Загружаем фото из файла на сервер
                 # (загрузка работает, отправка - нет)
                 ##############
+                #   with open("photo.jpg", "wb") as f:
+                #       f.write(req.content)
                 #   file = open("photo.jpg", "rb")
                 ##############
                 # Вариант 2.

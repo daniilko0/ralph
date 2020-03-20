@@ -3,7 +3,10 @@ import json
 import os
 import re
 from enum import Enum
+from io import BytesIO
+from pprint import pprint
 
+import requests
 from vk_api.bot_longpoll import VkBotEventType
 
 from bot import Bot
@@ -63,10 +66,52 @@ for event in bot.longpoll.listen():
     }
     if (
         event["type"] == EventTypes.NEW_MESSAGE.value
-        and event["message"]["text"]
+        and (event["message"]["text"] or event["message"]["attachments"])
         and event["message"]["out"] == 0
         and event["message"]["from_id"] == event["message"]["peer_id"]
     ):
+        if event["message"]["attachments"]:
+            # Проходимся по всем аттачам
+            for i, v in enumerate(event["message"]["attachments"]):
+                m = -1
+                m_url = ""
+                # Находим фото с наибольшей высотой и берем ее урл
+                for ind, val in enumerate(
+                    event["message"]["attachments"][i]["photo"]["sizes"]
+                ):
+                    if val["height"] > m:
+                        m_url = val["url"]
+                # Получаем бинарное представление каждого вложения
+                req = requests.get(m_url)
+                print(req.content)
+                # Сохраняем в файл
+                with open("photo.jpg", "wb") as f:
+                    f.write(req.content)
+                # Получаем урл сервера для загрузки
+                server = bot.bot_vk.photos.getMessagesUploadServer()
+                ##############
+                # Вариант 1.
+                # Загружаем фото из файла на сервер
+                # (загрузка работает, отправка - нет)
+                ##############
+                #   file = open("photo.jpg", "rb")
+                ##############
+                # Вариант 2.
+                # Загружаем бинарник файла сразу, без скачивания
+                # (загрузка не работает, отправка тоже)
+                ##############
+                #   file = BytesIO(req.content)
+                # upload = requests.post(
+                #     server["upload_url"], files={"photo": file},
+                # ).json()
+                # Сохраняем загруженное фото в альбом
+                # save = bot.bot_vk.photos.saveMessagesPhoto(**upload)
+                # print(save)
+                # photo = f"photo{save[0]['owner_id']}_{save[0]['id']}"
+                # print(photo)
+                # bot.send_message(
+                #     msg="Test", pid=event["message"]["from_id"], attachments=photo,
+                # )
 
         try:
             payload = json.loads(event["message"]["payload"])

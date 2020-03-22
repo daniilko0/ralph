@@ -98,10 +98,10 @@ class Bot(metaclass=SingletonMeta):
 
     def send_message(
         self,
-        msg: str,
+        msg: str = "",
         pid: int = None,
         keyboard: str = "",
-        attachments: str = None,
+        attachment: str = None,
         user_ids: str = None,
         forward: str = "",
     ) -> NoReturn:
@@ -112,7 +112,7 @@ class Bot(metaclass=SingletonMeta):
             msg: Текст отправляемого сообщения
             pid: Идентификатор пользователя/беседы/сообщества получателя сообщения (*не нужен, если указан user_ids*)
             keyboard: JSON-подобная строка со встроенной клавиатурой
-            attachments: Вложения к сообщению (**не работает**)
+            attachment: Вложения к сообщению (**не работает**)
             user_ids: Перечень адресатов для отправки одного сообщения (*не нужен, если указан pid*)
             forward: Перечень идентификаторов сообщений для пересылки
         """
@@ -123,7 +123,7 @@ class Bot(metaclass=SingletonMeta):
                 random_id=random.getrandbits(64),
                 message=msg,
                 keyboard=keyboard,
-                attachments=attachments,
+                attachment=attachment,
                 user_ids=user_ids,
                 forward_messages=forward,
             )
@@ -131,15 +131,16 @@ class Bot(metaclass=SingletonMeta):
         except vk_api.exceptions.ApiError as e:
             self.log.exception(msg=e.__str__())
 
-    def send_mailing(self, slug: str, text: str):
+    def send_mailing(self, slug: str, text: str, attach: str = ""):
         """Генерирует строку с упоминаниями из списка идентификаторов
 
         Arguments:
             slug: Слаг рассылки
             text: Сообщение рассылки
+            attach: Список вложений, прикрепляемых к рассылке
         """
         subscribers = self.db.fetch_subcribers(slug)
-        self.send_message(msg=text, user_ids=subscribers)
+        self.send_message(msg=text, user_ids=subscribers, attachment=attach)
 
     def generate_mentions(self, ids: str, names: bool) -> str:
         """Генерирует строку с упоминаниями из списка идентификаторов

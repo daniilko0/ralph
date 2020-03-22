@@ -28,7 +28,7 @@ class EventTypes(Enum):
 def generate_call_message():
     f = db.get_names_using_status(event["message"]["from_id"])
     students_ids = db.get_call_ids(event["message"]["from_id"])
-    if students_ids:
+    if students_ids is not None:
         mentions = bot.generate_mentions(ids=students_ids, names=f)
     else:
         mentions = ""
@@ -43,7 +43,7 @@ def send_call_confirm():
     atch = db.get_call_attaches(event["message"]["from_id"])
     if atch is None:
         atch = ""
-    if message != "\n":
+    if message != "\n" or atch:
         bot.send_message(
             msg=f"В {'тестовую ' if chat_id == 1 else 'основную '}"
             f"беседу будет отправлено сообщение:",

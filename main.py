@@ -28,7 +28,7 @@ class EventTypes(Enum):
 def generate_call_message():
     f = db.get_names_using_status(event["message"]["from_id"])
     students_ids = db.get_call_ids(event["message"]["from_id"])
-    if students_ids:
+    if students_ids is not None:
         mentions = bot.generate_mentions(ids=students_ids, names=f)
     else:
         mentions = ""

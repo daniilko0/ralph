@@ -43,7 +43,7 @@ def send_call_confirm():
     atch = db.get_call_attaches(event["message"]["from_id"])
     if atch is None:
         atch = ""
-    if message != "\n":
+    if message != "\n" or atch:
         bot.send_message(
             msg=f"В {'тестовую ' if chat_id == 1 else 'основную '}"
             f"беседу будет отправлено сообщение:",

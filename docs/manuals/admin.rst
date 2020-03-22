@@ -23,7 +23,7 @@
 
 Чтобы отправить призыв, нужно выбрать в главном меню одноимённую кнопку и следовать дальнейшим указаниям:
 
-.. figure:: ../_static/images/ralph/call/6.1.5/ask_for_message.png
+.. figure:: ../_static/images/ralph/call/6.4.0/ask_for_message.png
        :align: center
        :alt: Запрос текста призыва
 
@@ -82,7 +82,7 @@
 
 При нажатии этой кнопки вам будет предложено ввести текст рассылки:
 
-.. figure:: ../_static/images/ralph/mailings/6.1.5/ask_for_mailing_message.png
+.. figure:: ../_static/images/ralph/mailings/6.4.0/ask_for_mailing_message.png
        :align: center
        :alt: Запрос сообщения рассылки
 

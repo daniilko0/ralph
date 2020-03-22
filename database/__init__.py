@@ -315,3 +315,29 @@ class Database(Base):
         )
         names = [i for (i,) in query]
         return names
+
+    def get_call_attaches(self, user_id: int):
+        """Получает список вложений для сообщения с призывом
+        """
+        s_id = self.get_session_id(user_id)
+        query = self.query(f"SELECT attach FROM texts WHERE session_id={s_id}")
+        return query[0][0]
+
+    def update_call_attaches(self, user_id: int, attach: str):
+        """Обновляет список вложений для сообщения с призывом
+        """
+        s_id = self.get_session_id(user_id)
+        self.query(f"UPDATE texts SET attach={attach} WHERE session_id={s_id}")
+
+    def get_mailing_attaches(self, user_id: int):
+        """Получает список вложений для сообщения рассылки
+        """
+        s_id = self.get_session_id(user_id)
+        query = self.query(f"SELECT m_attach FROM mailing_mgmt WHERE session_id={s_id}")
+        return query[0][0]
+
+    def update_mailing_attaches(self, user_id: int, attach: str):
+        """Обновляет список вложений для сообщения рассылки
+        """
+        s_id = self.get_session_id(user_id)
+        self.query(f"UPDATE mailing_mgmt SET m_attach={attach} WHERE session_id={s_id}")

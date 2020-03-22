@@ -128,7 +128,7 @@ for event in bot.longpoll.listen():
             if not db.call_session_exist(event["message"]["from_id"]):
                 db.create_call_session(event["message"]["from_id"])
             bot.send_message(
-                msg="Отправьте сообщение к призыву (вложения не поддерживаются)",
+                msg="Отправьте сообщение к призыву (есть поддержка изображений)",
                 pid=event["message"]["from_id"],
                 keyboard=kbs.skip(),
             )
@@ -404,7 +404,7 @@ for event in bot.longpoll.listen():
                 event["message"]["from_id"], "ask_for_mailing_message"
             )
             bot.send_message(
-                msg="Отправьте текст рассылки (вложения не поддерживаются)",
+                msg="Отправьте текст рассылки (есть поддержка изображений)",
                 pid=event["message"]["from_id"],
                 keyboard=kbs.cancel(),
             )

@@ -329,7 +329,7 @@ class Database(Base):
         """Обновляет список вложений для сообщения с призывом
         """
         s_id = self.get_session_id(user_id)
-        self.query(f"UPDATE texts SET attach={attach} WHERE session_id={s_id}")
+        self.query(f"UPDATE texts SET attach='{attach}' WHERE session_id={s_id}")
 
     def get_mailing_attaches(self, user_id: int):
         """Получает список вложений для сообщения рассылки
@@ -342,4 +342,6 @@ class Database(Base):
         """Обновляет список вложений для сообщения рассылки
         """
         s_id = self.get_session_id(user_id)
-        self.query(f"UPDATE mailing_mgmt SET m_attach={attach} WHERE session_id={s_id}")
+        self.query(
+            f"UPDATE mailing_mgmt SET m_attach='{attach}' WHERE session_id={s_id}"
+        )

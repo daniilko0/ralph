@@ -4,6 +4,7 @@ import os
 import re
 from enum import Enum
 
+import requests
 from vk_api.bot_longpoll import VkBotEventType
 
 from bot import Bot
@@ -39,6 +40,9 @@ def generate_call_message():
 def send_call_confirm():
     chat_id = int(str(db.get_conversation(event["message"]["from_id"]))[-1])
     message = generate_call_message()
+    atch = db.get_call_attaches(event["message"]["from_id"])
+    if atch is None:
+        atch = ""
     if message != "\n":
         bot.send_message(
             msg=f"В {'тестовую ' if chat_id == 1 else 'основную '}"
@@ -46,13 +50,44 @@ def send_call_confirm():
             pid=event["message"]["from_id"],
             keyboard=kbs.prompt(event["message"]["from_id"]),
         )
-        bot.send_message(msg=message, pid=event["message"]["from_id"])
+        bot.send_message(msg=message, pid=event["message"]["from_id"], attachment=atch)
     else:
         db.empty_call_storage(event["message"]["from_id"])
         bot.send_gui(
             pid=event["message"]["from_id"],
             text="Сообщение не может быть пустым. Отмена...",
         )
+
+
+def load_attachs():
+    attachments = []
+    for i, v in enumerate(event["message"]["attachments"]):
+        m = -1
+        m_url = ""
+        for ind, val in enumerate(event["message"]["attachments"][i]["photo"]["sizes"]):
+            if val["height"] > m:
+                m_url = val["url"]
+        if ".jpeg" or ".jpg" in m_url:
+            ext = ".jpg"
+        elif ".png" in m_url:
+            ext = ".png"
+        else:
+            ext = ""
+        req = requests.get(m_url)
+        server = bot.bot_vk.photos.getMessagesUploadServer()
+        with open(f"photo{ext}", "wb") as f:
+            f.write(req.content)
+        file = open(f"photo{ext}", "rb")
+        upload = requests.post(server["upload_url"], files={"photo": file},).json()
+        save = bot.bot_vk.photos.saveMessagesPhoto(**upload)
+        photo = f"photo{save[0]['owner_id']}_{save[0]['id']}"
+        attachments.append(photo)
+    atch = ",".join(attachments)
+    state = db.get_session_state(event["message"]["from_id"])
+    if state == "ask_for_mailing_message":
+        db.update_mailing_attaches(event["message"]["from_id"], atch)
+    elif state == "ask_for_call_message":
+        db.update_call_attaches(event["message"]["from_id"], atch)
 
 
 for event in bot.longpoll.listen():
@@ -63,11 +98,10 @@ for event in bot.longpoll.listen():
     }
     if (
         event["type"] == EventTypes.NEW_MESSAGE.value
-        and event["message"]["text"]
+        and (event["message"]["text"] or event["message"]["attachments"])
         and event["message"]["out"] == 0
         and event["message"]["from_id"] == event["message"]["peer_id"]
     ):
-
         try:
             payload = json.loads(event["message"]["payload"])
         except KeyError:
@@ -142,6 +176,8 @@ for event in bot.longpoll.listen():
             db.update_call_message(
                 event["message"]["from_id"], event["message"]["text"]
             )
+            if event["message"]["attachments"]:
+                load_attachs()
             bot.send_message(
                 msg="Отправка клавиатуры призыва",
                 pid=event["message"]["from_id"],
@@ -174,7 +210,10 @@ for event in bot.longpoll.listen():
             bot.log.info("Отправка призыва...")
             cid = db.get_conversation(event["message"]["from_id"])
             text = generate_call_message()
-            bot.send_message(pid=cid, msg=text)
+            attachment = db.get_call_attaches(event["message"]["from_id"])
+            if attachment is None:
+                attachment = ""
+            bot.send_message(pid=cid, msg=text, attachment=attachment)
             db.empty_call_storage(event["message"]["from_id"])
             db.update_session_state(event["message"]["from_id"], "main")
             bot.send_gui(text="Сообщение отправлено.", pid=event["message"]["from_id"])
@@ -392,6 +431,8 @@ for event in bot.longpoll.listen():
             db.update_mailing_message(
                 event["message"]["from_id"], event["message"]["text"]
             )
+            if event["message"]["attachments"]:
+                load_attachs()
             bot.send_message(
                 msg="Всем подписчикам рассылки будет отправлено сообщение с указанным вами текстом",
                 pid=event["message"]["from_id"],
@@ -403,9 +444,13 @@ for event in bot.longpoll.listen():
             payload["button"] == "confirm"
             and db.get_session_state(event["message"]["from_id"]) == "prompt_mailing"
         ):
+            attach = db.get_mailing_attaches(event["message"]["from_id"])
+            if attach is None:
+                attach = ""
             bot.send_mailing(
                 slug=db.get_mailing_session(event["message"]["from_id"]),
                 text=db.get_mailing_message(event["message"]["from_id"]),
+                attach=attach,
             )
             bot.send_message(
                 msg="Рассылка отправлена.",

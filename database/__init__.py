@@ -345,3 +345,9 @@ class Database(Base):
         self.query(
             f"UPDATE mailing_mgmt SET m_attach='{attach}' WHERE session_id={s_id}"
         )
+
+    def get_list_of_finances_categories(self) -> List[Tuple]:
+        """Получает список доступных категорий расходов
+        """
+        query = self.query("SELECT name, slug FROM finances_categories")
+        return query

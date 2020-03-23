@@ -249,3 +249,20 @@ class Keyboards:
                 payload={"button": "chnames_call"},
             )
         return kb.get_keyboard()
+
+    def finances_main(self):
+        kb = VkKeyboard()
+        list_of_cats = self.db.get_list_of_finances_categories()
+        for i, v in enumerate(list_of_cats):
+            label = v[0]
+            kb.add_button(
+                label=label, payload={"button": "fin_category", "slug": v[1]},
+            )
+            if len(kb.lines[-1]) == 2:
+                kb.add_line()
+        if kb.lines[-1]:
+            kb.add_line()
+        kb.add_button(label="Добавить статью", payload={"button": "add_expense_cat"})
+        kb.add_line()
+        kb.add_button(label="Назад", color="primary", payload={"button": "home"})
+        return kb.get_keyboard()

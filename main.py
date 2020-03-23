@@ -539,3 +539,12 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.generate_names_selector(bool(status)),
             )
         # :blockend: Параметры
+
+        # :blockstart: Финансы
+
+        elif payload["button"] == "finances":
+            # TODO: Отправить клавиатуру с доступными категориями расходов
+            bot.send_message(msg="Меню финансов", pid=event["message"]["from_id"],
+                             keyboard=kbs.finances_main())
+
+        # :blockend: Финансы

@@ -551,7 +551,14 @@ for event in bot.longpoll.listen():
             )
 
         elif payload["button"] == "fin_category":
-            pass
+            db.update_active_expenses_category(
+                event["message"]["from_id"], payload["slug"]
+            )
+            bot.send_message(
+                msg=f"Меню управления статьей {payload['name']}.",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.fin_category_menu(),
+            )
 
         elif payload["button"] == "add_expense_cat":
             db.update_session_state(

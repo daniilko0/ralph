@@ -359,3 +359,16 @@ class Database(Base):
         )
 
         return query[0][0]
+
+    def get_active_expenses_category(self, user_id: int):
+        """Получает текущую выбранную пользователем статью расходов
+        """
+        s_id = self.get_session_id(user_id)
+        query = self.query(f"SELECT fin_cat FROM sessions WHERE session_id={s_id}")
+        return query[0][0]
+
+    def update_active_expenses_category(self, user_id: int, cat: str):
+        """Обновляет текущую выбранную пользователем статью расходов
+        """
+        s_id = self.get_session_id(user_id)
+        self.query(f"UPDATE sessions SET fin_cat='{cat}' WHERE session_id={s_id}")

@@ -6,6 +6,7 @@ from enum import Enum
 
 import requests
 from vk_api.bot_longpoll import VkBotEventType
+from googletrans import Translator
 
 from bot import Bot
 from database import Database
@@ -543,7 +544,47 @@ for event in bot.longpoll.listen():
         # :blockstart: Финансы
 
         elif payload["button"] == "finances":
-            bot.send_message(msg="Меню финансов", pid=event["message"]["from_id"],
-                             keyboard=kbs.finances_main())
+            bot.send_message(
+                msg="Меню финансов",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.finances_main(),
+            )
+
+        elif payload["button"] == "fin_category":
+            pass
+
+        elif payload["button"] == "add_expense_cat":
+            db.update_session_state(
+                user_id=event["message"]["from_id"], state="ask_for_expenes_cat_title"
+            )
+            bot.send_message(
+                msg="Отправьте название статьи расхода и сумму сбора, отделенную "
+                "запятой.\n Пример: 23 февраля, 500",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.cancel(),
+            )
+        elif (
+            db.get_session_state(event["message"]["from_id"])
+            == "ask_for_expenes_cat_title"
+            and payload["button"] == "cancel"
+        ):
+            bot.send_message(
+                msg="Операция отменена.",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.finances_main(),
+            )
+        elif (
+            db.get_session_state(event["message"]["from_id"])
+            == "ask_for_expenes_cat_title"
+        ):
+            parsed = event["message"]["text"].split(",")
+            name, summ = parsed
+            slug = Translator().translate(name).text.lower().replace(" ", "-")
+            db.add_expences_category(name, slug, summ)
+            bot.send_message(
+                msg=f'Новая статья "{name}" с суммой сборов {summ} р. успешно создана.',
+                pid=event["message"]["from_id"],
+                keyboard=kbs.finances_main(),
+            )
 
         # :blockend: Финансы

@@ -351,3 +351,11 @@ class Database(Base):
         """
         query = self.query("SELECT name, slug FROM finances_categories")
         return query
+
+    def add_expences_category(self, name: str, slug: str, s: int):
+        query = self.query(
+            f"INSERT INTO finances_categories (name, slug, sum) VALUES ('{name}', "
+            f"'{slug}', {s}) RETURNING id"
+        )
+
+        return query[0][0]

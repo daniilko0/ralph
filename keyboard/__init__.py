@@ -268,7 +268,8 @@ class Keyboards:
         for i, v in enumerate(list_of_cats):
             label = v[0]
             kb.add_button(
-                label=label, payload={"button": "fin_category", "slug": v[1]},
+                label=label,
+                payload={"button": "fin_category", "slug": v[1], "name": v[0]},
             )
             if len(kb.lines[-1]) == 2:
                 kb.add_line()

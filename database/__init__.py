@@ -372,3 +372,8 @@ class Database(Base):
         """
         s_id = self.get_session_id(user_id)
         self.query(f"UPDATE sessions SET fin_cat='{cat}' WHERE id={s_id}")
+
+    def add_expense(self, slug: str, summ: int):
+        self.query(
+            f"INSERT INTO finances_expenses (category, sum) VALUES ({slug}, {summ})"
+        )

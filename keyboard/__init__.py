@@ -134,6 +134,18 @@ class Keyboards:
         )
         return kb.get_keyboard()
 
+    @staticmethod
+    def fin_category_menu():
+        kb = VkKeyboard()
+        kb.add_button(label="📈 Доход", payload={"button": "add_donate"})
+        kb.add_button(label="📉 Расход", payload={"button": "add_expense"})
+        kb.add_line()
+        kb.add_button(label="Должники", payload={"button": "debtors"})
+        kb.add_line()
+        kb.add_button(label="Настройки", payload={"button": "fin_prefs"})
+        kb.add_button(label="Назад", payload={"button": "finances"})
+        return kb.get_keyboard()
+
     def generate_call_prompt(self):
         kb = self.generate_alphabet_keyboard()
         kb.add_line()

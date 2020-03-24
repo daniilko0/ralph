@@ -375,9 +375,9 @@ class Database(Base):
 
     def add_expense(self, slug: str, summ: int):
         self.query(
-            f"INSERT INTO finances_expenses (category, sum) VALUES ({slug}, {summ})"
+            f"INSERT INTO finances_expenses (category, sum) VALUES ('{slug}', {summ})"
         )
 
     def get_expense_category_by_slug(self, slug: str) -> int:
-        query = self.query(f"SELECT name FROM finances_categories WHERE slug={slug}")
+        query = self.query(f"SELECT name FROM finances_categories WHERE slug='{slug}'")
         return query[0][0]

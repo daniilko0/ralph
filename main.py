@@ -551,6 +551,14 @@ for event in bot.longpoll.listen():
             )
 
         elif payload["button"] == "fin_category":
+            if "slug" not in payload:
+                payload.update(
+                    {
+                        "slug": db.get_active_expenses_category(
+                            event["message"]["from_id"]
+                        )
+                    }
+                )
             db.update_active_expenses_category(
                 event["message"]["from_id"], payload["slug"]
             )
@@ -562,7 +570,8 @@ for event in bot.longpoll.listen():
 
         elif payload["button"] == "add_expense_cat":
             db.update_session_state(
-                user_id=event["message"]["from_id"], state="ask_for_expenes_cat_title"
+                user_id=event["message"]["from_id"],
+                state="ask_for_new_expenses_cat_prefs",
             )
             bot.send_message(
                 msg="Отправьте название статьи расхода и сумму сбора, отделенную "
@@ -572,9 +581,10 @@ for event in bot.longpoll.listen():
             )
         elif (
             db.get_session_state(event["message"]["from_id"])
-            == "ask_for_expenes_cat_title"
+            == "ask_for_new_expenses_cat_prefs"
             and payload["button"] == "cancel"
         ):
+            db.update_session_state(event["message"]["from_id"], "main")
             bot.send_message(
                 msg="Операция отменена.",
                 pid=event["message"]["from_id"],
@@ -582,7 +592,7 @@ for event in bot.longpoll.listen():
             )
         elif (
             db.get_session_state(event["message"]["from_id"])
-            == "ask_for_expenes_cat_title"
+            == "ask_for_new_expenses_cat_prefs"
         ):
             parsed = event["message"]["text"].split(",")
             name, summ = parsed
@@ -592,6 +602,103 @@ for event in bot.longpoll.listen():
                 msg=f'Новая статья "{name}" с суммой сборов {summ} р. успешно создана.',
                 pid=event["message"]["from_id"],
                 keyboard=kbs.finances_main(),
+            )
+            db.update_session_state(event["message"]["from_id"], "main")
+
+        elif payload["button"] == "fin_prefs":
+            cat = db.get_expense_category_by_slug(
+                db.get_active_expenses_category(event["message"]["from_id"])
+            )
+            bot.send_message(
+                msg=f"Настройки категории {cat}",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.fin_prefs(),
+            )
+
+        elif payload["button"] == "update_summ":
+            cat = db.get_expense_category_by_slug(
+                db.get_active_expenses_category(event["message"]["from_id"])
+            )
+            db.update_session_state(
+                user_id=event["message"]["from_id"], state="ask_for_expense_cat_summ",
+            )
+            bot.send_message(
+                msg=f"Введите новую сумму для статьи {cat}:",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.cancel(),
+            )
+
+        elif (
+            payload["button"] == ""
+            and db.get_session_state(event["message"]["from_id"])
+            == "ask_for_expense_cat_summ"
+        ):
+            if re.match(r"^\d+$", event["message"]["text"]):
+                db.update_expense_summ(
+                    db.get_active_expenses_category(event["message"]["from_id"]),
+                    event["message"]["text"],
+                )
+                bot.send_message(
+                    msg="Сумма сборов обновлена.",
+                    pid=event["message"]["from_id"],
+                    keyboard=kbs.fin_prefs(),
+                )
+            else:
+                bot.send_message(
+                    msg="Неверный формат сообщения. Необходимо только число.",
+                    pid=event["message"]["from_id"],
+                )
+
+        elif (
+            payload["button"] == "cancel"
+            and db.get_session_state(event["message"]["from_id"])
+            == "ask_for_expense_cat_summ"
+        ):
+            db.update_session_state(event["message"]["from_id"], "main")
+            bot.send_message(
+                msg="Операция отменена.",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.fin_category_menu(),
+            )
+
+        elif payload["button"] == "update_name":
+            cat = db.get_expense_category_by_slug(
+                db.get_active_expenses_category(event["message"]["from_id"])
+            )
+            db.update_session_state(
+                user_id=event["message"]["from_id"], state="ask_for_expense_cat_name",
+            )
+            bot.send_message(
+                msg=f"Введите новое имя для статьи {cat}:",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.cancel(),
+            )
+
+        elif (
+            payload["button"] == ""
+            and db.get_session_state(event["message"]["from_id"])
+            == "ask_for_expense_cat_name"
+        ):
+            db.update_expense_name(
+                db.get_active_expenses_category(event["message"]["from_id"]),
+                event["message"]["text"],
+            )
+            bot.send_message(
+                msg="Назвение сбора обновлено.",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.fin_prefs(),
+            )
+
+        elif (
+            payload["button"] == "cancel"
+            and db.get_session_state(event["message"]["from_id"])
+            == "ask_for_expense_cat_name"
+        ):
+            db.update_session_state(event["message"]["from_id"], "main")
+            bot.send_message(
+                msg="Операция отменена.",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.fin_category_menu(),
             )
 
         # :blockend: Финансы

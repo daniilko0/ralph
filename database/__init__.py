@@ -381,3 +381,12 @@ class Database(Base):
     def get_expense_category_by_slug(self, slug: str) -> int:
         query = self.query(f"SELECT name FROM finances_categories WHERE slug='{slug}'")
         return query[0][0]
+
+    def update_expense_summ(self, slug: str, summ: int):
+        self.query(f"UPDATE finances_categories SET sum={summ} WHERE slug='{slug}'")
+
+    def update_expense_name(self, slug: str, name: str):
+        self.query(f"UPDATE finances_categories SET name='{name}' WHERE slug='{slug}'")
+
+    def delete_expense_catgory(self, slug: str):
+        self.query(f"DELETE FROM finances_categories WHERE slug='{slug}'")

@@ -290,6 +290,7 @@ class Keyboards:
                 kb.add_line()
         if kb.lines[-1]:
             kb.add_line()
+        kb.add_button(label="Баланс", payload={"button": "balance"})
         kb.add_button(label="Добавить статью", payload={"button": "add_expense_cat"})
         kb.add_line()
         kb.add_button(label="Назад", color="primary", payload={"button": "home"})

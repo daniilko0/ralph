@@ -591,16 +591,23 @@ for event in bot.longpoll.listen():
             db.get_session_state(event["message"]["from_id"])
             == "ask_for_new_expenses_cat_prefs"
         ):
-            parsed = event["message"]["text"].split(",")
-            name, summ = parsed
-            slug = Translator().translate(name).text.lower().replace(" ", "-")
-            db.add_expences_category(name, slug, summ)
-            bot.send_message(
-                msg=f'Новая статья "{name}" с суммой сборов {summ} р. успешно создана.',
-                pid=event["message"]["from_id"],
-                keyboard=kbs.finances_main(),
-            )
-            db.update_session_state(event["message"]["from_id"], "main")
+            if re.match(r"^.*,.*\d+$", event["message"]["text"]):
+                parsed = event["message"]["text"].split(",")
+                name, summ = parsed
+                slug = Translator().translate(name).text.lower().replace(" ", "-")
+                db.add_expences_category(name, slug, summ)
+                bot.send_message(
+                    msg=f'Новая статья "{name}" с суммой сборов {summ} р. успешно создана.',
+                    pid=event["message"]["from_id"],
+                    keyboard=kbs.finances_main(),
+                )
+                db.update_session_state(event["message"]["from_id"], "main")
+            else:
+                bot.send_message(
+                    msg=f"Неверный формат сообщения.",
+                    pid=event["message"]["from_id"],
+                    keyboard=kbs.finances_main(),
+                )
 
         elif payload["button"] == "fin_prefs":
             cat = db.get_expense_category_by_slug(

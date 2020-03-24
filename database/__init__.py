@@ -406,3 +406,13 @@ class Database(Base):
     def get_all_expenses(self):
         query = self.query(f"SELECT sum FROM finances_expenses")
         return [i for (i,) in query]
+
+    def get_expense_summ(self, slug: str):
+        query = self.query(f"SELECT sum FROM finances_categories WHERE slug='{slug}'")
+        return query[0][0]
+
+    def create_donate(self, s_id: int, slug: str, summ: int):
+        query = self.query(
+            f"INSERT finances_donates (student_id, category, sum) VALUES ({s_id}, '{slug}', {summ})"
+        )
+        return query[0][0]

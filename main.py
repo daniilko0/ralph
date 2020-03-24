@@ -5,6 +5,7 @@ import re
 from enum import Enum
 
 import requests
+from psycopg2._psycopg import ProgrammingError
 from vk_api.bot_longpoll import VkBotEventType
 from googletrans import Translator
 
@@ -140,7 +141,10 @@ for event in bot.longpoll.listen():
                 pid=event["message"]["from_id"],
                 keyboard=kbs.generate_names_keyboard(payload["letter"]),
             )
-        elif payload["button"] == "student":
+        elif (
+            payload["button"] == "student"
+            and db.get_session_state(event["message"]["from_id"]) != "select_donater"
+        ):
             ids = db.get_call_ids(event["message"]["from_id"])
             if ids:
                 students = ids.split(",")
@@ -159,7 +163,10 @@ for event in bot.longpoll.listen():
                     msg=f"{payload['name']} добавлен к списку призыва.",
                     pid=event["message"]["from_id"],
                 )
-        elif payload["button"] == "back":
+        elif (
+            payload["button"] == "back"
+            and db.get_session_state(event["message"]["from_id"]) != "select_donater"
+        ):
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",
                 pid=event["message"]["from_id"],
@@ -754,4 +761,45 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.fin_prefs(),
             )
 
+        elif payload["button"] == "add_donate":
+            try:
+                db.update_session_state(event["message"]["from_id"], "select_donater")
+            except ProgrammingError:
+                pass
+            bot.send_message(
+                msg="Выберите внесшего деньги:",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_finances_prompt(),
+            )
+
+        elif (
+            payload["button"] == "student"
+            and db.get_session_state(event["message"]["from_id"]) == "select_donater"
+        ):
+            slug = db.get_active_expenses_category(event["message"]["from_id"])
+            d_id = db.create_donate(
+                payload["id"],
+                slug,
+                db.get_expense_summ(slug)
+            )
+
+        elif (
+            payload["button"] == "back"
+            and db.get_session_state(event["message"]["from_id"]) == "select_donater"
+        ):
+            bot.send_message(
+                msg="Отправка клавиатуры с алфавитом.",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_finances_prompt(),
+            )
+
+        elif (
+            payload["button"] == "cancel"
+            and db.get_session_state(event["message"]["from_id"]) == "select_donater"
+        ):
+            bot.send_message(
+                msg="Операция отменена",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.fin_category_menu(),
+            )
         # :blockend: Финансы

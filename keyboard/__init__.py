@@ -157,7 +157,7 @@ class Keyboards:
         )
         kb.add_line()
         kb.add_button(
-            label="Назад", color="primary", payload={"button": "prefs"},
+            label="Назад", color="primary", payload={"button": "fin_category"},
         )
         return kb.get_keyboard()
 

@@ -565,6 +565,14 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.fin_category_menu(),
             )
 
+        elif payload["button"] == "balance":
+            donates = sum(db.get_all_donates())
+            expenses = sum(db.get_all_expenses())
+            delta = donates - expenses
+
+            bot.send_message(
+                msg=f"Остаток: {delta} руб.", pid=event["message"]["from_id"]
+            )
         elif payload["button"] == "add_expense_cat":
             db.update_session_state(
                 user_id=event["message"]["from_id"],

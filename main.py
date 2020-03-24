@@ -697,5 +697,45 @@ for event in bot.longpoll.listen():
                 pid=event["message"]["from_id"],
                 keyboard=kbs.fin_category_menu(),
             )
+        elif payload["button"] == "delete_expense":
+            cat = db.get_expense_category_by_slug(
+                db.get_active_expenses_category(event["message"]["from_id"])
+            )
+            db.update_session_state(
+                user_id=event["message"]["from_id"], state="confirm_delete_expense",
+            )
+            bot.send_message(
+                msg=f"Вы действительно хотите удалить статью {cat}?\nВся связанные записи также будут удалены",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.prompt(),
+            )
+
+        elif (
+            payload["button"] == "confirm"
+            and db.get_session_state(event["message"]["from_id"])
+            == "confirm_delete_expense"
+        ):
+            slug = db.get_active_expenses_category(event["message"]["from_id"])
+            name = db.get_expense_category_by_slug(slug)
+            db.delete_expense_catgory(slug)
+            db.update_active_expenses_category(event["message"]["from_id"], "none")
+            db.update_session_state(event["message"]["from_id"], "main")
+            bot.send_message(
+                msg=f"Категория {name} удалена.",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.finances_main(),
+            )
+
+        elif (
+            payload["button"] == "deny"
+            and db.get_session_state(event["message"]["from_id"])
+            == "confirm_delete_expense"
+        ):
+            db.update_session_state(event["message"]["from_id"], "main")
+            bot.send_message(
+                msg="Операция отменена.",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.fin_prefs(),
+            )
 
         # :blockend: Финансы

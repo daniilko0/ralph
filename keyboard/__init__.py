@@ -172,6 +172,12 @@ class Keyboards:
         )
         return kb.get_keyboard()
 
+    def generate_finances_prompt(self):
+        kb = self.generate_alphabet_keyboard()
+        kb.add_line()
+        kb.add_button(label="Отмена", color="negative", payload={"button": "cancel"})
+        return kb.get_keyboard()
+
     def generate_alphabet_keyboard(self):
         """
         Генерирует клавиатуру с алфавитными кнопками

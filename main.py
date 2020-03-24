@@ -551,13 +551,10 @@ for event in bot.longpoll.listen():
             )
 
         elif payload["button"] == "fin_category":
-            if "slug" not in payload:
+            if "slug" not in payload and "name" not in payload:
+                slug = db.get_active_expenses_category(event["message"]["from_id"])
                 payload.update(
-                    {
-                        "slug": db.get_active_expenses_category(
-                            event["message"]["from_id"]
-                        )
-                    }
+                    {"slug": slug, "name": db.get_expense_category_by_slug(slug),}
                 )
             db.update_active_expenses_category(
                 event["message"]["from_id"], payload["slug"]

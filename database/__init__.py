@@ -394,3 +394,7 @@ class Database(Base):
     def get_all_donates_in_category(self, slug: str):
         query = self.query(f"SELECT sum FROM finaces_donates WHERE slug='{slug}'")
         return [i for (i,) in query]
+
+    def get_all_donates(self):
+        query = self.query(f"SELECT sum FROM finaces_donates")
+        return [i for (i,) in query]

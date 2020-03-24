@@ -146,6 +146,21 @@ class Keyboards:
         kb.add_button(label="Назад", color="primary", payload={"button": "finances"})
         return kb.get_keyboard()
 
+    @staticmethod
+    def fin_prefs():
+        kb = VkKeyboard()
+        kb.add_button(label="Изменить сумму", payload={"button": "update_summ"})
+        kb.add_button(label="Переименовать", payload={"button": "update_name"})
+        kb.add_line()
+        kb.add_button(
+            label="Удалить", color="negative", payload={"button": "delete_expense"}
+        )
+        kb.add_line()
+        kb.add_button(
+            label="Назад", color="primary", payload={"button": "prefs"},
+        )
+        return kb.get_keyboard()
+
     def generate_call_prompt(self):
         kb = self.generate_alphabet_keyboard()
         kb.add_line()

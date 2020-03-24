@@ -681,7 +681,7 @@ for event in bot.longpoll.listen():
                 event["message"]["text"],
             )
             bot.send_message(
-                msg="Назвение сбора обновлено.",
+                msg="Название сбора обновлено.",
                 pid=event["message"]["from_id"],
                 keyboard=kbs.fin_prefs(),
             )
@@ -705,7 +705,8 @@ for event in bot.longpoll.listen():
                 user_id=event["message"]["from_id"], state="confirm_delete_expense",
             )
             bot.send_message(
-                msg=f"Вы действительно хотите удалить статью {cat}?\nВся связанные записи также будут удалены",
+                msg=f"Вы действительно хотите удалить статью {cat}?\nВсе связанные "
+                f"записи также будут удалены.",
                 pid=event["message"]["from_id"],
                 keyboard=kbs.prompt(),
             )

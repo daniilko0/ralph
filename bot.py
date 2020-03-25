@@ -152,7 +152,9 @@ class Bot(metaclass=SingletonMeta):
         Returns:
             str: Сообщение, упоминающее выбранных пользователей
         """
-        ids = ids.replace(" ", "").split(",")[:-1]
+        ids = ids.replace(" ", "").split(",")
+        if not ids[-1]:
+            ids = ids[:-1]
         if names:
             users_names = self.db.get_users_names(ids)
         else:

@@ -268,10 +268,10 @@ class Keyboards:
             label="Подтвердить", color="positive", payload={"button": "confirm"}
         )
         kb.add_button(label="Отмена", color="negative", payload={"button": "deny"})
-        if (
-            user_id is not None
-            and self.db.get_session_state(user_id) == "call_configuring"
-        ):
+        if user_id is not None and self.db.get_session_state(user_id) in [
+            "call_configuring",
+            "debtors_forming",
+        ]:
             kb.add_line()
             kb.add_button(
                 label="Сменить беседу",

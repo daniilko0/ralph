@@ -416,3 +416,9 @@ class Database(Base):
             f"INSERT finances_donates (student_id, category, sum) VALUES ({s_id}, '{slug}', {summ})"
         )
         return query[0][0]
+
+    def get_list_of_donaters_by_slug(self, slug: str):
+        query = self.query(
+            f"SELECT student_id FROM finances_donates WHERE slug='{slug}'"
+        )
+        return [i for (i,) in query]

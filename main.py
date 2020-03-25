@@ -777,11 +777,19 @@ for event in bot.longpoll.listen():
             and db.get_session_state(event["message"]["from_id"]) == "select_donater"
         ):
             slug = db.get_active_expenses_category(event["message"]["from_id"])
-            d_id = db.create_donate(
-                payload["id"],
-                slug,
-                db.get_expense_summ(slug)
-            )
+            d_list = db.get_list_of_donaters_by_slug(slug)
+            if payload["id"] not in d_list:
+                d_id = db.create_donate(payload["id"], slug, db.get_expense_summ(slug))
+                bot.send_message(
+                    msg="Запись успешно создана.",
+                    pid=event["message"]["frpm_id"],
+                    keyboard=kbs.fin_category_menu(),
+                )
+            else:
+                bot.send_message(
+                    msg="Запись уже была создана. Отмена...",
+                    pid=event["message"]["from_id"],
+                )
 
         elif (
             payload["button"] == "back"

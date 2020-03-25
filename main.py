@@ -30,7 +30,6 @@ class EventTypes(Enum):
 def generate_call_message():
     f = db.get_names_using_status(event["message"]["from_id"])
     students_ids = db.get_call_ids(event["message"]["from_id"])
-    print(students_ids)
     if students_ids is not None:
         mentions = bot.generate_mentions(ids=students_ids, names=f)
     else:
@@ -40,9 +39,26 @@ def generate_call_message():
     return message
 
 
+def generate_debtors_message():
+    f = db.get_names_using_status(event["message"]["from_id"])
+    students_ids = db.get_call_ids(event["message"]["from_id"])
+    slg = db.get_active_expenses_category(event["message"]["from_id"])
+    nm = db.get_expense_category_by_slug(slg)
+    sm = db.get_expense_summ(slg)
+    if students_ids is not None:
+        mentions = bot.generate_mentions(ids=students_ids, names=f)
+    else:
+        mentions = ""
+    message = f"{mentions}, вам нужно принести по {sm} руб. на {nm}."
+    return message
+
+
 def send_call_confirm():
     chat_id = int(str(db.get_conversation(event["message"]["from_id"]))[-1])
-    message = generate_call_message()
+    if db.get_session_state(event["message"]["from_id"]) == "debtors_forming":
+        message = generate_debtors_message()
+    else:
+        message = generate_call_message()
     atch = db.get_call_attaches(event["message"]["from_id"])
     if atch is None:
         atch = ""
@@ -212,13 +228,15 @@ for event in bot.longpoll.listen():
             bot.send_gui(
                 text="Выполнение команды отменено.", pid=event["message"]["from_id"]
             )
-        elif (
-            payload["button"] == "confirm"
-            and db.get_session_state(event["message"]["from_id"]) == "call_configuring"
-        ):
+        elif payload["button"] == "confirm" and db.get_session_state(
+            event["message"]["from_id"]
+        ) in ["call_configuring", "debtors_forming"]:
             bot.log.info("Отправка призыва...")
             cid = db.get_conversation(event["message"]["from_id"])
-            text = generate_call_message()
+            if db.get_session_state(event["message"]["from_id"]) == "debtors_forming":
+                text = generate_debtors_message()
+            else:
+                text = generate_call_message()
             attachment = db.get_call_attaches(event["message"]["from_id"])
             if attachment is None:
                 attachment = ""
@@ -226,10 +244,9 @@ for event in bot.longpoll.listen():
             db.empty_call_storage(event["message"]["from_id"])
             db.update_session_state(event["message"]["from_id"], "main")
             bot.send_gui(text="Сообщение отправлено.", pid=event["message"]["from_id"])
-        elif (
-            payload["button"] == "deny"
-            and db.get_session_state(event["message"]["from_id"]) == "call_configuring"
-        ):
+        elif payload["button"] == "deny" and db.get_session_state(
+            event["message"]["from_id"]
+        ) in ["call_configuring", "debtors_forming"]:
             db.update_call_message(event["message"]["from_id"], " ")
             db.update_call_ids(event["message"]["from_id"], " ")
             db.update_session_state(event["message"]["from_id"], "main")
@@ -245,12 +262,8 @@ for event in bot.longpoll.listen():
             elif chat == 2:
                 db.update_conversation(event["message"]["from_id"], 2000000001)
                 chat = 1
-            msg = db.get_call_message(event["message"]["from_id"])
-            bot.send_message(
-                msg=f"Теперь это сообщение будет отправлено в "
-                f"{'тестовую' if chat == 1 else 'основную'} беседу:",
-                pid=event["message"]["from_id"],
-            )
+            send_call_confirm()
+
         elif payload["button"] == "chnames_call":
             if db.get_names_using_status(event["message"]["from_id"]):
                 status = 0
@@ -870,4 +883,19 @@ for event in bot.longpoll.listen():
                 bot.send_message(
                     msg="Неверный формат сообщения.", pid=event["message"]["from_id"]
                 )
+
+        elif payload["button"] == "debtors":
+            bot.send_message(
+                msg="Генерация сообщения может занять некоторое " "время...",
+                pid=event["message"]["from_id"],
+            )
+            db.update_session_state(event["message"]["from_id"], "debtors_forming")
+            slug = db.get_active_expenses_category(event["message"]["from_id"])
+            d_s_ids = db.get_list_of_donaters_by_slug(slug)
+            d_ids = set([str(db.get_vk_id(i)) for i in d_s_ids])
+            s_ids = set(db.get_active_students_ids())
+            debtors = ",".join(s_ids.difference(d_ids))
+            db.update_call_ids(event["message"]["from_id"], debtors)
+            send_call_confirm()
+
         # :blockend: Финансы

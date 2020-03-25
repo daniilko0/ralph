@@ -192,6 +192,11 @@ class Database(Base):
         ids += f"{_id},"
         self.update_call_ids(user_id, ids)
 
+    def update_subscribe_state(self, slug: str, u_id: int, state: int):
+        self.query(
+            f"UPDATE vk_subscriptions SET '{slug}'={state} WHERE " f"user_id={u_id}"
+        )
+
     def empty_call_storage(self, user_id: int) -> NoReturn:
         """
         Очистить хранилище призыва (текст призыва и список идентификатора)

@@ -394,10 +394,7 @@ for event in bot.longpoll.listen():
                 ),
             )
         elif payload["button"] == "subscribe":
-            db.query(
-                f"UPDATE vk_subscriptions SET {payload['slug']}=1 WHERE "
-                f"user_id={payload['user_id']}"
-            )
+            db.update_subscribe_state(payload["slug"], payload["id"], 1)
             bot.send_message(
                 msg="Вы были успешно подписаны на рассылку.",
                 pid=event["message"]["from_id"],
@@ -408,10 +405,7 @@ for event in bot.longpoll.listen():
                 ),
             )
         elif payload["button"] == "unsubscribe":
-            db.query(
-                f"UPDATE vk_subscriptions SET {payload['slug']}=0 WHERE "
-                f"user_id={payload['user_id']}"
-            )
+            db.update_subscribe_state(payload["slug"], payload["id"], 0)
             bot.send_message(
                 msg="Вы были успешно отписаны от рассылки.",
                 pid=event["message"]["from_id"],

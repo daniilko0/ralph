@@ -846,6 +846,7 @@ for event in bot.longpoll.listen():
             and db.get_session_state(event["message"]["from_id"])
             == "ask_for_expense_summ"
         ):
+            db.update_session_state(event["message"]["from_id"], "main")
             bot.send_message(
                 msg="Операция отменена.",
                 pid=event["message"]["from_id"],
@@ -863,6 +864,8 @@ for event in bot.longpoll.listen():
                     pid=event["message"]["from_id"],
                     keyboard=kbs.fin_category_menu(),
                 )
+                db.update_session_state(event["message"]["from_id"], "main")
+
             else:
                 bot.send_message(
                     msg="Неверный формат сообщения.", pid=event["message"]["from_id"]

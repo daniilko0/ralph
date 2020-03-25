@@ -412,13 +412,13 @@ class Database(Base):
         return query[0][0]
 
     def create_donate(self, s_id: int, slug: str, summ: int):
-        query = self.query(
-            f"INSERT finances_donates (student_id, category, sum) VALUES ({s_id}, '{slug}', {summ})"
+        self.query(
+            f"INSERT INTO finances_donates (student_id, category, sum) VALUES ({s_id}, "
+            f"'{slug}', {summ})"
         )
-        return query[0][0]
 
     def get_list_of_donaters_by_slug(self, slug: str):
         query = self.query(
-            f"SELECT student_id FROM finances_donates WHERE slug='{slug}'"
+            f"SELECT student_id FROM finances_donates WHERE category='{slug}'"
         )
         return [i for (i,) in query]

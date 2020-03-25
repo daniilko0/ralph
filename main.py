@@ -782,7 +782,7 @@ for event in bot.longpoll.listen():
                 d_id = db.create_donate(payload["id"], slug, db.get_expense_summ(slug))
                 bot.send_message(
                     msg="Запись успешно создана.",
-                    pid=event["message"]["frpm_id"],
+                    pid=event["message"]["from_id"],
                     keyboard=kbs.fin_category_menu(),
                 )
             else:

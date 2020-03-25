@@ -832,4 +832,39 @@ for event in bot.longpoll.listen():
                 f"Всего собрано: {collected} руб.",
                 pid=event["message"]["from_id"],
             )
+
+        elif payload["button"] == "add_expense":
+            db.update_session_state(event["message"]["from_id"], "ask_for_expense_summ")
+            bot.send_message(
+                msg="Введите сумму расхода (нужно ввести только число):",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.cancel(),
+            )
+
+        elif (
+            payload["button"] == "cancel"
+            and db.get_session_state(event["message"]["from_id"])
+            == "ask_for_expense_summ"
+        ):
+            bot.send_message(
+                msg="Операция отменена.",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.fin_category_menu(),
+            )
+
+        elif (
+            db.get_session_state(event["message"]["from_id"]) == "ask_for_expense_summ"
+        ):
+            if re.match(r"^\d+$", event["message"]["text"]):
+                slug = db.get_active_expenses_category(event["message"]["from_id"])
+                db.add_expense(slug, event["message"]["text"])
+                bot.send_message(
+                    msg="Запись создана.",
+                    pid=event["message"]["from_id"],
+                    keyboard=kbs.fin_category_menu(),
+                )
+            else:
+                bot.send_message(
+                    msg="Неверный формат сообщения.", pid=event["message"]["from_id"]
+                )
         # :blockend: Финансы

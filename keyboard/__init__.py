@@ -189,6 +189,7 @@ class Keyboards:
                 kb.add_button(label=v, payload={"button": "letter", "letter": v})
             else:
                 kb.add_line()
+                kb.add_button(label=v, payload={"button": "letter", "letter": v})
 
         return kb
 

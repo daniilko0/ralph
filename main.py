@@ -5,7 +5,7 @@ import re
 from enum import Enum
 
 import requests
-from psycopg2._psycopg import ProgrammingError
+from psycopg2 import ProgrammingError
 from vk_api.bot_longpoll import VkBotEventType
 from googletrans import Translator
 

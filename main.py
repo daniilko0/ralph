@@ -27,6 +27,16 @@ class EventTypes(Enum):
     NEW_MESSAGE = VkBotEventType.MESSAGE_NEW
 
 
+def send_schedule(date: str):
+    s = Schedule(date)
+    s.get_raw()
+    if s.is_exist():
+        sch = s.generate()
+        bot.send_message(msg=sch, pid=event["message"]["from_id"])
+    else:
+        bot.send_message(msg="Расписание отсутствует.", pid=event["message"]["from_id"])
+
+
 def generate_call_message():
     f = db.get_names_using_status(event["message"]["from_id"])
     students_ids = db.get_call_ids(event["message"]["from_id"])
@@ -282,37 +292,13 @@ for event in bot.longpoll.listen():
             )
         elif payload["button"] == "today":
             d = Date()
-            s = Schedule(d.today)
-            s.get_raw()
-            if s.is_exist():
-                schedule = s.generate()
-                bot.send_message(msg=schedule, pid=event["message"]["from_id"])
-            else:
-                bot.send_message(
-                    msg="Расписание отсутствует.", pid=event["message"]["from_id"]
-                )
+            send_schedule(d.today)
         elif payload["button"] == "tomorrow":
             d = Date()
-            s = Schedule(d.tomorrow)
-            s.get_raw()
-            if s.is_exist():
-                schedule = s.generate()
-                bot.send_message(msg=schedule, pid=event["message"]["from_id"])
-            else:
-                bot.send_message(
-                    msg="Расписание отсутствует.", pid=event["message"]["from_id"]
-                )
+            send_schedule(d.tomorrow)
         elif payload["button"] == "day_after_tomorrow":
             d = Date()
-            s = Schedule(d.day_after_tomorrow)
-            s.get_raw()
-            if s.is_exist():
-                schedule = s.generate()
-                bot.send_message(msg=schedule, pid=event["message"]["from_id"])
-            else:
-                bot.send_message(
-                    msg="Расписание отсутствует.", pid=event["message"]["from_id"]
-                )
+            send_schedule(d.day_after_tomorrow)
         elif payload["button"] == "arbitrary":
             bot.send_message(
                 msg="Напишите дату в формате ДД-ММ-ГГГГ.",

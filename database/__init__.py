@@ -392,7 +392,7 @@ class Database(Base):
         self.query(f"DELETE FROM finances_categories WHERE slug='{slug}'")
 
     def get_all_donates_in_category(self, slug: str):
-        query = self.query(f"SELECT sum FROM finances_donates WHERE slug='{slug}'")
+        query = self.query(f"SELECT sum FROM finances_donates WHERE category='{slug}'")
         return [i for (i,) in query]
 
     def get_all_donates(self):
@@ -400,7 +400,7 @@ class Database(Base):
         return [i for (i,) in query]
 
     def get_all_expenses_in_category(self, slug: str):
-        query = self.query(f"SELECT sum FROM finances_expenses WHERE slug='{slug}'")
+        query = self.query(f"SELECT sum FROM finances_expenses WHERE category='{slug}'")
         return [i for (i,) in query]
 
     def get_all_expenses(self):

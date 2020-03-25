@@ -810,4 +810,26 @@ for event in bot.longpoll.listen():
                 pid=event["message"]["from_id"],
                 keyboard=kbs.fin_category_menu(),
             )
+
+        elif payload["button"] == "fin_stat":
+
+            bot.send_message(msg="Вычисляю...", pid=event["message"]["from_id"])
+
+            slug = db.get_active_expenses_category(event["message"]["from_id"])
+            d_ids = db.get_list_of_donaters_by_slug(slug)
+            s_ids = db.get_active_students_ids()
+            summ = db.get_expense_summ(slug)
+            name = db.get_expense_category_by_slug(slug)
+
+            donated = len(d_ids)
+            not_donated = len(s_ids) - donated
+            collected = sum(db.get_all_donates_in_category(slug))
+
+            bot.send_message(
+                msg=f'Статистика по статье "{name}":\n'
+                f"Всего сдали: {donated} человек;\n"
+                f"Всего не сдали: {not_donated} человек;\n"
+                f"Всего собрано: {collected} руб.",
+                pid=event["message"]["from_id"],
+            )
         # :blockend: Финансы

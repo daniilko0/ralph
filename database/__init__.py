@@ -436,10 +436,10 @@ class Database(Base):
         query = self.query(f"SELECT donate_id FROM sessions WHERE vk_id={u_id}")
         return query[0][0]
 
-    def get_list_of_donaters_by_slug(self, slug: str):
+    def get_list_of_donaters_by_slug(self, slug: str, summ: int):
         """Получает список идентификаторов всех внесших деньги на определенную категорию
         """
         query = self.query(
-            f"SELECT student_id FROM finances_donates WHERE category='{slug}'"
+            f"SELECT student_id FROM finances_donates WHERE category='{slug}' AND sum >= {summ}"
         )
         return [i for (i,) in query]

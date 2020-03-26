@@ -846,9 +846,9 @@ for event in bot.longpoll.listen():
             bot.send_message(msg="Вычисляю...", pid=event["message"]["from_id"])
 
             slug = db.get_active_expenses_category(event["message"]["from_id"])
-            d_ids = db.get_list_of_donaters_by_slug(slug)
-            s_ids = db.get_active_students_ids()
             summ = db.get_expense_summ(slug)
+            d_ids = db.get_list_of_donaters_by_slug(slug, summ)
+            s_ids = db.get_active_students_ids()
             name = db.get_expense_category_by_slug(slug)
 
             donated = len(d_ids)
@@ -908,7 +908,8 @@ for event in bot.longpoll.listen():
             )
             db.update_session_state(event["message"]["from_id"], "debtors_forming")
             slug = db.get_active_expenses_category(event["message"]["from_id"])
-            d_s_ids = db.get_list_of_donaters_by_slug(slug)
+            summ = db.get_expense_summ(slug)
+            d_s_ids = db.get_list_of_donaters_by_slug(slug, summ)
             d_ids = set([str(db.get_vk_id(i)) for i in d_s_ids])
             s_ids = set(db.get_active_students_ids())
             debtors = ",".join(s_ids.difference(d_ids))

@@ -602,7 +602,13 @@ for event in bot.longpoll.listen():
             if re.match(r"^.*,.*\d+$", event["message"]["text"]):
                 parsed = event["message"]["text"].split(",")
                 name, summ = parsed
-                slug = Translator().translate(name).text.lower().replace(" ", "-")
+                slug = (
+                    Translator()
+                    .translate(name)
+                    .text.lower()
+                    .replace(" ", "-")
+                    .replace("'", "")
+                )
                 db.add_expences_category(name, slug, summ)
                 bot.send_message(
                     msg=f'Новая статья "{name}" с суммой сборов {summ} р. успешно создана.',
@@ -771,16 +777,47 @@ for event in bot.longpoll.listen():
         ):
             slug = db.get_active_expenses_category(event["message"]["from_id"])
             d_list = db.get_list_of_donaters_by_slug(slug)
-            if payload["id"] not in d_list:
-                d_id = db.create_donate(payload["id"], slug, db.get_expense_summ(slug))
+            d_id = db.create_donate(payload["id"], slug)
+            db.update_donate_id(event["message"]["from_id"], d_id)
+            db.update_session_state(event["message"]["from_id"], "ask_for_donate_summ")
+            bot.send_message(
+                msg="Введите сумму взноса",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.cancel(),
+            )
+
+        elif (
+            payload["button"] == "cancel"
+            and db.get_session_state(event["message"]["from_id"])
+            == "ask_for_donate_summ"
+        ):
+            d_id = db.get_donate_id(event["message"]["from_id"])
+            db.delete_donate(d_id)
+            bot.send_message(
+                msg="Операция отменена.",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.fin_category_menu(),
+            )
+
+        elif (
+            payload["button"] == ""
+            and db.get_session_state(event["message"]["from_id"])
+            == "ask_for_donate_summ"
+        ):
+            if re.match(r"^\d+$", event["message"]["text"]):
+                d_id = db.get_donate_id(event["message"]["from_id"])
+                print(d_id)
+                db.append_summ_to_donate(d_id, event["message"]["text"])
+                db.update_session_state(event["message"]["from_id"], "main")
                 bot.send_message(
-                    msg="Запись успешно создана.",
+                    "Запись успешно создана.",
                     pid=event["message"]["from_id"],
                     keyboard=kbs.fin_category_menu(),
                 )
+
             else:
                 bot.send_message(
-                    msg="Запись уже была создана. Отмена...",
+                    "Неверный формат сообщения. Необходимо только число.",
                     pid=event["message"]["from_id"],
                 )
 

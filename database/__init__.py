@@ -416,11 +416,25 @@ class Database(Base):
         query = self.query(f"SELECT sum FROM finances_categories WHERE slug='{slug}'")
         return query[0][0]
 
-    def create_donate(self, s_id: int, slug: str, summ: int):
-        self.query(
-            f"INSERT INTO finances_donates (student_id, category, sum) VALUES ({s_id}, "
-            f"'{slug}', {summ})"
+    def create_donate(self, s_id: int, slug: str):
+        query = self.query(
+            f"INSERT INTO finances_donates (student_id, category) VALUES ({s_id}, "
+            f"'{slug}') RETURNING id"
         )
+        return query[0][0]
+
+    def delete_donate(self, d_id: int):
+        self.query(f"DELETE FROM finances_donates WHERE id={d_id}")
+
+    def append_summ_to_donate(self, d_id: int, summ: int):
+        self.query(f"UPDATE finances_donates SET sum={summ} WHERE id={d_id}")
+
+    def update_donate_id(self, u_id: int, d_id: int):
+        self.query(f"UPDATE sessions SET donate_id={d_id} WHERE vk_id={u_id}")
+
+    def get_donate_id(self, u_id: int):
+        query = self.query(f"SELECT donate_id FROM sessions WHERE vk_id={u_id}")
+        return query[0][0]
 
     def get_list_of_donaters_by_slug(self, slug: str):
         query = self.query(

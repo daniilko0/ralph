@@ -96,17 +96,11 @@ def load_attachs():
         for ind, val in enumerate(event["message"]["attachments"][i]["photo"]["sizes"]):
             if val["height"] > m:
                 m_url = val["url"]
-        if ".jpeg" or ".jpg" in m_url:
-            ext = ".jpg"
-        elif ".png" in m_url:
-            ext = ".png"
-        else:
-            ext = ""
         req = requests.get(m_url)
         server = bot.bot_vk.photos.getMessagesUploadServer()
-        with open(f"photo{ext}", "wb") as f:
+        with open(f"photo.jpg", "wb") as f:
             f.write(req.content)
-        file = open(f"photo{ext}", "rb")
+        file = open(f"photo.jpg", "rb")
         upload = requests.post(server["upload_url"], files={"photo": file},).json()
         save = bot.bot_vk.photos.saveMessagesPhoto(**upload)
         photo = f"photo{save[0]['owner_id']}_{save[0]['id']}"

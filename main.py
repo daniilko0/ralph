@@ -5,7 +5,9 @@ import re
 from enum import Enum
 
 import requests
+from psycopg2 import ProgrammingError
 from vk_api.bot_longpoll import VkBotEventType
+from googletrans import Translator
 
 from bot import Bot
 from database import Database
@@ -25,6 +27,16 @@ class EventTypes(Enum):
     NEW_MESSAGE = VkBotEventType.MESSAGE_NEW
 
 
+def send_schedule(date: str):
+    s = Schedule(date)
+    s.get_raw()
+    if s.is_exist():
+        sch = s.generate()
+        bot.send_message(msg=sch, pid=event["message"]["from_id"])
+    else:
+        bot.send_message(msg="Расписание отсутствует.", pid=event["message"]["from_id"])
+
+
 def generate_call_message():
     f = db.get_names_using_status(event["message"]["from_id"])
     students_ids = db.get_call_ids(event["message"]["from_id"])
@@ -37,9 +49,26 @@ def generate_call_message():
     return message
 
 
+def generate_debtors_message():
+    f = db.get_names_using_status(event["message"]["from_id"])
+    students_ids = db.get_call_ids(event["message"]["from_id"])
+    slg = db.get_active_expenses_category(event["message"]["from_id"])
+    nm = db.get_expense_category_by_slug(slg)
+    sm = db.get_expense_summ(slg)
+    if students_ids is not None:
+        mentions = bot.generate_mentions(ids=students_ids, names=f)
+    else:
+        mentions = ""
+    message = f"{mentions}, вам нужно принести по {sm} руб. на {nm}."
+    return message
+
+
 def send_call_confirm():
     chat_id = int(str(db.get_conversation(event["message"]["from_id"]))[-1])
-    message = generate_call_message()
+    if db.get_session_state(event["message"]["from_id"]) == "debtors_forming":
+        message = generate_debtors_message()
+    else:
+        message = generate_call_message()
     atch = db.get_call_attaches(event["message"]["from_id"])
     if atch is None:
         atch = ""
@@ -67,17 +96,11 @@ def load_attachs():
         for ind, val in enumerate(event["message"]["attachments"][i]["photo"]["sizes"]):
             if val["height"] > m:
                 m_url = val["url"]
-        if ".jpeg" or ".jpg" in m_url:
-            ext = ".jpg"
-        elif ".png" in m_url:
-            ext = ".png"
-        else:
-            ext = ""
         req = requests.get(m_url)
         server = bot.bot_vk.photos.getMessagesUploadServer()
-        with open(f"photo{ext}", "wb") as f:
+        with open(f"photo.jpg", "wb") as f:
             f.write(req.content)
-        file = open(f"photo{ext}", "rb")
+        file = open(f"photo.jpg", "rb")
         upload = requests.post(server["upload_url"], files={"photo": file},).json()
         save = bot.bot_vk.photos.saveMessagesPhoto(**upload)
         photo = f"photo{save[0]['owner_id']}_{save[0]['id']}"
@@ -138,7 +161,10 @@ for event in bot.longpoll.listen():
                 pid=event["message"]["from_id"],
                 keyboard=kbs.generate_names_keyboard(payload["letter"]),
             )
-        elif payload["button"] == "student":
+        elif (
+            payload["button"] == "student"
+            and db.get_session_state(event["message"]["from_id"]) != "select_donater"
+        ):
             ids = db.get_call_ids(event["message"]["from_id"])
             if ids:
                 students = ids.split(",")
@@ -157,7 +183,10 @@ for event in bot.longpoll.listen():
                     msg=f"{payload['name']} добавлен к списку призыва.",
                     pid=event["message"]["from_id"],
                 )
-        elif payload["button"] == "back":
+        elif (
+            payload["button"] == "back"
+            and db.get_session_state(event["message"]["from_id"]) != "select_donater"
+        ):
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",
                 pid=event["message"]["from_id"],
@@ -203,13 +232,15 @@ for event in bot.longpoll.listen():
             bot.send_gui(
                 text="Выполнение команды отменено.", pid=event["message"]["from_id"]
             )
-        elif (
-            payload["button"] == "confirm"
-            and db.get_session_state(event["message"]["from_id"]) == "call_configuring"
-        ):
+        elif payload["button"] == "confirm" and db.get_session_state(
+            event["message"]["from_id"]
+        ) in ["call_configuring", "debtors_forming"]:
             bot.log.info("Отправка призыва...")
             cid = db.get_conversation(event["message"]["from_id"])
-            text = generate_call_message()
+            if db.get_session_state(event["message"]["from_id"]) == "debtors_forming":
+                text = generate_debtors_message()
+            else:
+                text = generate_call_message()
             attachment = db.get_call_attaches(event["message"]["from_id"])
             if attachment is None:
                 attachment = ""
@@ -217,10 +248,9 @@ for event in bot.longpoll.listen():
             db.empty_call_storage(event["message"]["from_id"])
             db.update_session_state(event["message"]["from_id"], "main")
             bot.send_gui(text="Сообщение отправлено.", pid=event["message"]["from_id"])
-        elif (
-            payload["button"] == "deny"
-            and db.get_session_state(event["message"]["from_id"]) == "call_configuring"
-        ):
+        elif payload["button"] == "deny" and db.get_session_state(
+            event["message"]["from_id"]
+        ) in ["call_configuring", "debtors_forming"]:
             db.update_call_message(event["message"]["from_id"], " ")
             db.update_call_ids(event["message"]["from_id"], " ")
             db.update_session_state(event["message"]["from_id"], "main")
@@ -236,12 +266,8 @@ for event in bot.longpoll.listen():
             elif chat == 2:
                 db.update_conversation(event["message"]["from_id"], 2000000001)
                 chat = 1
-            msg = db.get_call_message(event["message"]["from_id"])
-            bot.send_message(
-                msg=f"Теперь это сообщение будет отправлено в "
-                f"{'тестовую' if chat == 1 else 'основную'} беседу:",
-                pid=event["message"]["from_id"],
-            )
+            send_call_confirm()
+
         elif payload["button"] == "chnames_call":
             if db.get_names_using_status(event["message"]["from_id"]):
                 status = 0
@@ -260,37 +286,13 @@ for event in bot.longpoll.listen():
             )
         elif payload["button"] == "today":
             d = Date()
-            s = Schedule(d.today)
-            s.get_raw()
-            if s.is_exist():
-                schedule = s.generate()
-                bot.send_message(msg=schedule, pid=event["message"]["from_id"])
-            else:
-                bot.send_message(
-                    msg="Расписание отсутствует.", pid=event["message"]["from_id"]
-                )
+            send_schedule(d.today)
         elif payload["button"] == "tomorrow":
             d = Date()
-            s = Schedule(d.tomorrow)
-            s.get_raw()
-            if s.is_exist():
-                schedule = s.generate()
-                bot.send_message(msg=schedule, pid=event["message"]["from_id"])
-            else:
-                bot.send_message(
-                    msg="Расписание отсутствует.", pid=event["message"]["from_id"]
-                )
+            send_schedule(d.tomorrow)
         elif payload["button"] == "day_after_tomorrow":
             d = Date()
-            s = Schedule(d.day_after_tomorrow)
-            s.get_raw()
-            if s.is_exist():
-                schedule = s.generate()
-                bot.send_message(msg=schedule, pid=event["message"]["from_id"])
-            else:
-                bot.send_message(
-                    msg="Расписание отсутствует.", pid=event["message"]["from_id"]
-                )
+            send_schedule(d.day_after_tomorrow)
         elif payload["button"] == "arbitrary":
             bot.send_message(
                 msg="Напишите дату в формате ДД-ММ-ГГГГ.",
@@ -372,10 +374,7 @@ for event in bot.longpoll.listen():
                 ),
             )
         elif payload["button"] == "subscribe":
-            db.query(
-                f"UPDATE vk_subscriptions SET {payload['slug']}=1 WHERE "
-                f"user_id={payload['user_id']}"
-            )
+            db.update_subscribe_state(payload["slug"], payload["id"], 1)
             bot.send_message(
                 msg="Вы были успешно подписаны на рассылку.",
                 pid=event["message"]["from_id"],
@@ -386,10 +385,7 @@ for event in bot.longpoll.listen():
                 ),
             )
         elif payload["button"] == "unsubscribe":
-            db.query(
-                f"UPDATE vk_subscriptions SET {payload['slug']}=0 WHERE "
-                f"user_id={payload['user_id']}"
-            )
+            db.update_subscribe_state(payload["slug"], payload["id"], 0)
             bot.send_message(
                 msg="Вы были успешно отписаны от рассылки.",
                 pid=event["message"]["from_id"],
@@ -538,3 +534,381 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.generate_names_selector(bool(status)),
             )
         # :blockend: Параметры
+
+        # :blockstart: Финансы
+
+        elif payload["button"] == "finances":
+            bot.send_message(
+                msg="Меню финансов",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.finances_main(),
+            )
+
+        elif payload["button"] == "fin_category":
+            if "slug" not in payload and "name" not in payload:
+                slug = db.get_active_expenses_category(event["message"]["from_id"])
+                payload.update(
+                    {"slug": slug, "name": db.get_expense_category_by_slug(slug),}
+                )
+            db.update_active_expenses_category(
+                event["message"]["from_id"], payload["slug"]
+            )
+            bot.send_message(
+                msg=f"Меню управления статьей {payload['name']}.",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.fin_category_menu(),
+            )
+
+        elif payload["button"] == "balance":
+            donates = sum(db.get_all_donates())
+            expenses = sum(db.get_all_expenses())
+            delta = donates - expenses
+
+            bot.send_message(
+                msg=f"Остаток: {delta} руб.", pid=event["message"]["from_id"]
+            )
+        elif payload["button"] == "add_expense_cat":
+            db.update_session_state(
+                user_id=event["message"]["from_id"],
+                state="ask_for_new_expenses_cat_prefs",
+            )
+            bot.send_message(
+                msg="Отправьте название статьи расхода и сумму сбора, отделенную "
+                "запятой.\n Пример: 23 февраля, 500",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.cancel(),
+            )
+        elif (
+            db.get_session_state(event["message"]["from_id"])
+            == "ask_for_new_expenses_cat_prefs"
+            and payload["button"] == "cancel"
+        ):
+            db.update_session_state(event["message"]["from_id"], "main")
+            bot.send_message(
+                msg="Операция отменена.",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.finances_main(),
+            )
+        elif (
+            db.get_session_state(event["message"]["from_id"])
+            == "ask_for_new_expenses_cat_prefs"
+        ):
+            if re.match(r"^.*,.*\d+$", event["message"]["text"]):
+                parsed = event["message"]["text"].split(",")
+                name, summ = parsed
+                slug = (
+                    Translator()
+                    .translate(name)
+                    .text.lower()
+                    .replace(" ", "-")
+                    .replace("'", "")
+                )
+                db.add_expences_category(name, slug, summ)
+                bot.send_message(
+                    msg=f'Новая статья "{name}" с суммой сборов {summ} р. успешно создана.',
+                    pid=event["message"]["from_id"],
+                    keyboard=kbs.finances_main(),
+                )
+                db.update_session_state(event["message"]["from_id"], "main")
+            else:
+                bot.send_message(
+                    msg=f"Неверный формат сообщения.",
+                    pid=event["message"]["from_id"],
+                    keyboard=kbs.finances_main(),
+                )
+
+        elif payload["button"] == "fin_prefs":
+            cat = db.get_expense_category_by_slug(
+                db.get_active_expenses_category(event["message"]["from_id"])
+            )
+            bot.send_message(
+                msg=f"Настройки категории {cat}",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.fin_prefs(),
+            )
+
+        elif payload["button"] == "update_summ":
+            cat = db.get_expense_category_by_slug(
+                db.get_active_expenses_category(event["message"]["from_id"])
+            )
+            db.update_session_state(
+                user_id=event["message"]["from_id"], state="ask_for_expense_cat_summ",
+            )
+            bot.send_message(
+                msg=f"Введите новую сумму для статьи {cat}:",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.cancel(),
+            )
+
+        elif (
+            payload["button"] == ""
+            and db.get_session_state(event["message"]["from_id"])
+            == "ask_for_expense_cat_summ"
+        ):
+            if re.match(r"^\d+$", event["message"]["text"]):
+                db.update_expense_summ(
+                    db.get_active_expenses_category(event["message"]["from_id"]),
+                    event["message"]["text"],
+                )
+                bot.send_message(
+                    msg="Сумма сборов обновлена.",
+                    pid=event["message"]["from_id"],
+                    keyboard=kbs.fin_prefs(),
+                )
+            else:
+                bot.send_message(
+                    msg="Неверный формат сообщения. Необходимо только число.",
+                    pid=event["message"]["from_id"],
+                )
+
+        elif (
+            payload["button"] == "cancel"
+            and db.get_session_state(event["message"]["from_id"])
+            == "ask_for_expense_cat_summ"
+        ):
+            db.update_session_state(event["message"]["from_id"], "main")
+            bot.send_message(
+                msg="Операция отменена.",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.fin_category_menu(),
+            )
+
+        elif payload["button"] == "update_name":
+            cat = db.get_expense_category_by_slug(
+                db.get_active_expenses_category(event["message"]["from_id"])
+            )
+            db.update_session_state(
+                user_id=event["message"]["from_id"], state="ask_for_expense_cat_name",
+            )
+            bot.send_message(
+                msg=f"Введите новое имя для статьи {cat}:",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.cancel(),
+            )
+
+        elif (
+            payload["button"] == ""
+            and db.get_session_state(event["message"]["from_id"])
+            == "ask_for_expense_cat_name"
+        ):
+            db.update_expense_name(
+                db.get_active_expenses_category(event["message"]["from_id"]),
+                event["message"]["text"],
+            )
+            bot.send_message(
+                msg="Название сбора обновлено.",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.fin_prefs(),
+            )
+
+        elif (
+            payload["button"] == "cancel"
+            and db.get_session_state(event["message"]["from_id"])
+            == "ask_for_expense_cat_name"
+        ):
+            db.update_session_state(event["message"]["from_id"], "main")
+            bot.send_message(
+                msg="Операция отменена.",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.fin_category_menu(),
+            )
+        elif payload["button"] == "delete_expense":
+            cat = db.get_expense_category_by_slug(
+                db.get_active_expenses_category(event["message"]["from_id"])
+            )
+            db.update_session_state(
+                user_id=event["message"]["from_id"], state="confirm_delete_expense",
+            )
+            bot.send_message(
+                msg=f"Вы действительно хотите удалить статью {cat}?\nВсе связанные "
+                f"записи также будут удалены.",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.prompt(),
+            )
+
+        elif (
+            payload["button"] == "confirm"
+            and db.get_session_state(event["message"]["from_id"])
+            == "confirm_delete_expense"
+        ):
+            slug = db.get_active_expenses_category(event["message"]["from_id"])
+            name = db.get_expense_category_by_slug(slug)
+            db.delete_expense_catgory(slug)
+            db.update_active_expenses_category(event["message"]["from_id"], "none")
+            db.update_session_state(event["message"]["from_id"], "main")
+            bot.send_message(
+                msg=f"Категория {name} удалена.",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.finances_main(),
+            )
+
+        elif (
+            payload["button"] == "deny"
+            and db.get_session_state(event["message"]["from_id"])
+            == "confirm_delete_expense"
+        ):
+            db.update_session_state(event["message"]["from_id"], "main")
+            bot.send_message(
+                msg="Операция отменена.",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.fin_prefs(),
+            )
+
+        elif payload["button"] == "add_donate":
+            try:
+                db.update_session_state(event["message"]["from_id"], "select_donater")
+            except ProgrammingError:
+                pass
+            bot.send_message(
+                msg="Выберите внесшего деньги:",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_finances_prompt(),
+            )
+
+        elif (
+            payload["button"] == "student"
+            and db.get_session_state(event["message"]["from_id"]) == "select_donater"
+        ):
+            slug = db.get_active_expenses_category(event["message"]["from_id"])
+            summ = db.get_expense_summ(slug)
+            d_list = db.get_list_of_donaters_by_slug(slug, summ)
+            d_id = db.create_donate(payload["id"], slug)
+            db.update_donate_id(event["message"]["from_id"], d_id)
+            db.update_session_state(event["message"]["from_id"], "ask_for_donate_summ")
+            bot.send_message(
+                msg="Введите сумму взноса",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.cancel(),
+            )
+
+        elif (
+            payload["button"] == "cancel"
+            and db.get_session_state(event["message"]["from_id"])
+            == "ask_for_donate_summ"
+        ):
+            d_id = db.get_donate_id(event["message"]["from_id"])
+            db.delete_donate(d_id)
+            bot.send_message(
+                msg="Операция отменена.",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.fin_category_menu(),
+            )
+
+        elif (
+            payload["button"] == ""
+            and db.get_session_state(event["message"]["from_id"])
+            == "ask_for_donate_summ"
+        ):
+            if re.match(r"^\d+$", event["message"]["text"]):
+                d_id = db.get_donate_id(event["message"]["from_id"])
+                print(d_id)
+                db.append_summ_to_donate(d_id, event["message"]["text"])
+                db.update_session_state(event["message"]["from_id"], "main")
+                bot.send_message(
+                    "Запись успешно создана.",
+                    pid=event["message"]["from_id"],
+                    keyboard=kbs.fin_category_menu(),
+                )
+
+            else:
+                bot.send_message(
+                    "Неверный формат сообщения. Необходимо только число.",
+                    pid=event["message"]["from_id"],
+                )
+
+        elif (
+            payload["button"] == "back"
+            and db.get_session_state(event["message"]["from_id"]) == "select_donater"
+        ):
+            bot.send_message(
+                msg="Отправка клавиатуры с алфавитом.",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_finances_prompt(),
+            )
+
+        elif (
+            payload["button"] == "cancel"
+            and db.get_session_state(event["message"]["from_id"]) == "select_donater"
+        ):
+            bot.send_message(
+                msg="Операция отменена",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.fin_category_menu(),
+            )
+
+        elif payload["button"] == "fin_stat":
+
+            bot.send_message(msg="Вычисляю...", pid=event["message"]["from_id"])
+
+            slug = db.get_active_expenses_category(event["message"]["from_id"])
+            summ = db.get_expense_summ(slug)
+            d_ids = db.get_list_of_donaters_by_slug(slug, summ)
+            s_ids = db.get_active_students_ids()
+            name = db.get_expense_category_by_slug(slug)
+
+            donated = len(d_ids)
+            not_donated = len(s_ids) - donated
+            collected = sum(db.get_all_donates_in_category(slug))
+
+            bot.send_message(
+                msg=f'Статистика по статье "{name}":\n'
+                f"Всего сдали: {donated} человек;\n"
+                f"Всего не сдали: {not_donated} человек;\n"
+                f"Всего собрано: {collected} руб.",
+                pid=event["message"]["from_id"],
+            )
+
+        elif payload["button"] == "add_expense":
+            db.update_session_state(event["message"]["from_id"], "ask_for_expense_summ")
+            bot.send_message(
+                msg="Введите сумму расхода (нужно ввести только число):",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.cancel(),
+            )
+
+        elif (
+            payload["button"] == "cancel"
+            and db.get_session_state(event["message"]["from_id"])
+            == "ask_for_expense_summ"
+        ):
+            db.update_session_state(event["message"]["from_id"], "main")
+            bot.send_message(
+                msg="Операция отменена.",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.fin_category_menu(),
+            )
+
+        elif (
+            db.get_session_state(event["message"]["from_id"]) == "ask_for_expense_summ"
+        ):
+            if re.match(r"^\d+$", event["message"]["text"]):
+                slug = db.get_active_expenses_category(event["message"]["from_id"])
+                db.add_expense(slug, event["message"]["text"])
+                bot.send_message(
+                    msg="Запись создана.",
+                    pid=event["message"]["from_id"],
+                    keyboard=kbs.fin_category_menu(),
+                )
+                db.update_session_state(event["message"]["from_id"], "main")
+
+            else:
+                bot.send_message(
+                    msg="Неверный формат сообщения.", pid=event["message"]["from_id"]
+                )
+
+        elif payload["button"] == "debtors":
+            bot.send_message(
+                msg="Генерация сообщения может занять некоторое " "время...",
+                pid=event["message"]["from_id"],
+            )
+            db.update_session_state(event["message"]["from_id"], "debtors_forming")
+            slug = db.get_active_expenses_category(event["message"]["from_id"])
+            summ = db.get_expense_summ(slug)
+            d_s_ids = db.get_list_of_donaters_by_slug(slug, summ)
+            d_ids = set([str(db.get_vk_id(i)) for i in d_s_ids])
+            s_ids = set(db.get_active_students_ids())
+            debtors = ",".join(s_ids.difference(d_ids))
+            db.update_call_ids(event["message"]["from_id"], debtors)
+            send_call_confirm()
+
+        # :blockend: Финансы

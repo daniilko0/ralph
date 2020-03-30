@@ -770,7 +770,8 @@ for event in bot.longpoll.listen():
             and db.get_session_state(event["message"]["from_id"]) == "select_donater"
         ):
             slug = db.get_active_expenses_category(event["message"]["from_id"])
-            d_list = db.get_list_of_donaters_by_slug(slug)
+            summ = db.get_expense_summ(slug)
+            d_list = db.get_list_of_donaters_by_slug(slug, summ)
             d_id = db.create_donate(payload["id"], slug)
             db.update_donate_id(event["message"]["from_id"], d_id)
             db.update_session_state(event["message"]["from_id"], "ask_for_donate_summ")

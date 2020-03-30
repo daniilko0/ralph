@@ -21,6 +21,7 @@ class Keyboards:
         kb = VkKeyboard()
         if is_admin:
             kb.add_button(label="Призыв", payload={"button": "call"})
+            kb.add_button(label="Финансы", payload={"button": "finances"})
             kb.add_line()
         kb.add_button(label="Расписание", payload={"button": "schedule"})
         kb.add_line()
@@ -133,6 +134,35 @@ class Keyboards:
         )
         return kb.get_keyboard()
 
+    @staticmethod
+    def fin_category_menu():
+        kb = VkKeyboard()
+        kb.add_button(label="📈 Доход", payload={"button": "add_donate"})
+        kb.add_button(label="📉 Расход", payload={"button": "add_expense"})
+        kb.add_line()
+        kb.add_button(label="Статистика", payload={"button": "fin_stat"})
+        kb.add_line()
+        kb.add_button(label="📢 Должники", payload={"button": "debtors"})
+        kb.add_button(label="⚙ Настройки", payload={"button": "fin_prefs"})
+        kb.add_line()
+        kb.add_button(label="👈🏻 Назад", color="primary", payload={"button": "finances"})
+        return kb.get_keyboard()
+
+    @staticmethod
+    def fin_prefs():
+        kb = VkKeyboard()
+        kb.add_button(label="Изменить сумму", payload={"button": "update_summ"})
+        kb.add_button(label="Переименовать", payload={"button": "update_name"})
+        kb.add_line()
+        kb.add_button(
+            label="Удалить", color="negative", payload={"button": "delete_expense"}
+        )
+        kb.add_line()
+        kb.add_button(
+            label="Назад", color="primary", payload={"button": "fin_category"},
+        )
+        return kb.get_keyboard()
+
     def generate_call_prompt(self):
         kb = self.generate_alphabet_keyboard()
         kb.add_line()
@@ -142,6 +172,12 @@ class Keyboards:
         kb.add_button(
             label="Отправить всем", color="primary", payload={"button": "send_to_all"}
         )
+        return kb.get_keyboard()
+
+    def generate_finances_prompt(self):
+        kb = self.generate_alphabet_keyboard()
+        kb.add_line()
+        kb.add_button(label="Отмена", color="negative", payload={"button": "cancel"})
         return kb.get_keyboard()
 
     def generate_alphabet_keyboard(self):
@@ -155,6 +191,7 @@ class Keyboards:
                 kb.add_button(label=v, payload={"button": "letter", "letter": v})
             else:
                 kb.add_line()
+                kb.add_button(label=v, payload={"button": "letter", "letter": v})
 
         return kb
 
@@ -231,10 +268,10 @@ class Keyboards:
             label="Подтвердить", color="positive", payload={"button": "confirm"}
         )
         kb.add_button(label="Отмена", color="negative", payload={"button": "deny"})
-        if (
-            user_id is not None
-            and self.db.get_session_state(user_id) == "call_configuring"
-        ):
+        if user_id is not None and self.db.get_session_state(user_id) in [
+            "call_configuring",
+            "debtors_forming",
+        ]:
             kb.add_line()
             kb.add_button(
                 label="Сменить беседу",
@@ -247,4 +284,23 @@ class Keyboards:
                 color="primary",
                 payload={"button": "chnames_call"},
             )
+        return kb.get_keyboard()
+
+    def finances_main(self):
+        kb = VkKeyboard()
+        list_of_cats = self.db.get_list_of_finances_categories()
+        for i, v in enumerate(list_of_cats):
+            label = v[0]
+            kb.add_button(
+                label=label,
+                payload={"button": "fin_category", "slug": v[1], "name": v[0]},
+            )
+            if len(kb.lines[-1]) == 2:
+                kb.add_line()
+        if kb.lines[-1]:
+            kb.add_line()
+        kb.add_button(label="Баланс", payload={"button": "balance"})
+        kb.add_button(label="Добавить статью", payload={"button": "add_expense_cat"})
+        kb.add_line()
+        kb.add_button(label="Назад", color="primary", payload={"button": "home"})
         return kb.get_keyboard()

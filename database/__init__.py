@@ -176,7 +176,7 @@ class Database(Base):
         """Обновляет статус подписки на рассылку
         """
         self.query(
-            f"UPDATE vk_subscriptions SET '{slug}'={state} WHERE " f"user_id={u_id}"
+            f"UPDATE vk_subscriptions SET {slug}={state} WHERE " f"user_id={u_id}"
         )
 
     def empty_call_storage(self, user_id: int) -> NoReturn:

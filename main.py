@@ -374,7 +374,7 @@ for event in bot.longpoll.listen():
                 ),
             )
         elif payload["button"] == "subscribe":
-            db.update_subscribe_state(payload["slug"], payload["id"], 1)
+            db.update_subscribe_state(payload["slug"], payload["user_id"], 1)
             bot.send_message(
                 msg="Вы были успешно подписаны на рассылку.",
                 pid=event["message"]["from_id"],
@@ -385,7 +385,7 @@ for event in bot.longpoll.listen():
                 ),
             )
         elif payload["button"] == "unsubscribe":
-            db.update_subscribe_state(payload["slug"], payload["id"], 0)
+            db.update_subscribe_state(payload["slug"], payload["user_id"], 0)
             bot.send_message(
                 msg="Вы были успешно отписаны от рассылки.",
                 pid=event["message"]["from_id"],

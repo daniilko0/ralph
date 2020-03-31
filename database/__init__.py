@@ -420,10 +420,24 @@ class Database(Base):
         """
         self.query(f"DELETE FROM finances_donates WHERE id={d_id}")
 
+    def get_summ_of_donate(self, d_id: int):
+        """Получает сумму взноса
+
+        Args:
+            d_id: Идентификатор взноса
+
+        Returns:
+            int: Сумма взноса
+        """
+        query = self.query(f"SELECT sum FROM finances_donates WHERE id={d_id}")
+        return query[0][0]
+
     def append_summ_to_donate(self, d_id: int, summ: int):
         """Добавляет сумму к сбору
         """
-        self.query(f"UPDATE finances_donates SET sum={summ} WHERE id={d_id}")
+        source = self.get_summ_of_donate(d_id)
+        new = summ + source
+        self.query(f"UPDATE finances_donates SET sum={new} WHERE id={d_id}")
 
     def update_donate_id(self, u_id: int, d_id: int):
         """Обновляет иденифиткатор создаваемого взноса в хранилище
@@ -436,10 +450,29 @@ class Database(Base):
         query = self.query(f"SELECT donate_id FROM sessions WHERE vk_id={u_id}")
         return query[0][0]
 
-    def get_list_of_donaters_by_slug(self, slug: str, summ: int):
+    def get_list_of_donaters_by_slug(self, slug: str, summ: int = 0):
         """Получает список идентификаторов всех внесших деньги на определенную категорию
         """
-        query = self.query(
-            f"SELECT student_id FROM finances_donates WHERE category='{slug}' AND sum >= {summ}"
-        )
+        if summ:
+            query = self.query(
+                f"SELECT student_id FROM finances_donates WHERE category='{slug}' AND sum >= {summ}"
+            )
+        else:
+            query = self.query(
+                f"SELECT student_id FROM finances_donates WHERE category='{slug}'"
+            )
         return [i for (i,) in query]
+
+    def get_id_of_donate_record(self, _id, slug) -> int:
+        """Получает идентификатор записи взноса
+        Args:
+            _id: Идентификатор студента, внесшего деньги
+            slug: Слаг категории расхода
+
+        Returns:
+            int: Идентификатор записи
+        """
+        query = self.query(
+            f"SELECT id FROM finances_donates WHERE student_id={_id} AND category='{slug}'"
+        )
+        return query[0][0]

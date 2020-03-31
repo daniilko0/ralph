@@ -771,8 +771,11 @@ for event in bot.longpoll.listen():
         ):
             slug = db.get_active_expenses_category(event["message"]["from_id"])
             summ = db.get_expense_summ(slug)
-            d_list = db.get_list_of_donaters_by_slug(slug, summ)
-            d_id = db.create_donate(payload["id"], slug)
+            d_list = db.get_list_of_donaters_by_slug(slug)
+            if payload["id"] in d_list:
+                d_id = db.get_id_of_donate_record(payload["id"], slug)
+            else:
+                d_id = db.create_donate(payload["id"], slug)
             db.update_donate_id(event["message"]["from_id"], d_id)
             db.update_session_state(event["message"]["from_id"], "ask_for_donate_summ")
             bot.send_message(
@@ -801,8 +804,8 @@ for event in bot.longpoll.listen():
         ):
             if re.match(r"^\d+$", event["message"]["text"]):
                 d_id = db.get_donate_id(event["message"]["from_id"])
-                print(d_id)
-                db.append_summ_to_donate(d_id, event["message"]["text"])
+
+                db.append_summ_to_donate(d_id, int(event["message"]["text"]))
                 db.update_session_state(event["message"]["from_id"], "main")
                 bot.send_message(
                     "Запись успешно создана.",
@@ -898,7 +901,7 @@ for event in bot.longpoll.listen():
 
         elif payload["button"] == "debtors":
             bot.send_message(
-                msg="Генерация сообщения может занять некоторое " "время...",
+                msg="Генерация сообщения может занять некоторое время...",
                 pid=event["message"]["from_id"],
             )
             db.update_session_state(event["message"]["from_id"], "debtors_forming")

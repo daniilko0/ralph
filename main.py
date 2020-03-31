@@ -774,6 +774,7 @@ for event in bot.longpoll.listen():
             d_list = db.get_list_of_donaters_by_slug(slug)
             if payload["id"] in d_list:
                 d_id = db.get_id_of_donate_record(payload["id"], slug)
+                db.set_current_date_as_update(d_id)
             else:
                 d_id = db.create_donate(payload["id"], slug)
             db.update_donate_id(event["message"]["from_id"], d_id)

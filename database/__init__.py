@@ -476,3 +476,13 @@ class Database(Base):
             f"SELECT id FROM finances_donates WHERE student_id={_id} AND category='{slug}'"
         )
         return query[0][0]
+
+    def set_current_date_as_update(self, d_id):
+        """Устанавливает текущую дату в качестве даты изменения записи о взносе
+        Args:
+            d_id: Иденитфикатор записи взноса
+
+        """
+        self.query(
+            f"UPDATE finances_donates SET updated_date = (SELECT CURRENT_DATE) WHERE id={d_id}"
+        )

@@ -514,3 +514,9 @@ class Database(Base):
             "UPDATE finances_donates SET updated_date = (SELECT CURRENT_DATE) WHERE id=%s",
             (d_id,),
         )
+
+    def get_list_of_administrators(self):
+        """Получает список администраторов бота
+        """
+        admins = self.query("select * from administrators")
+        return admins

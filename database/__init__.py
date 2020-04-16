@@ -62,19 +62,20 @@ class Database(Base):
         name = self.query("SELECT first_name FROM users_info WHERE user_id=%s", (_id,))
         return name[0][0]
 
-    def get_mailings_list(self) -> List[Tuple]:
+    def get_mailings_list(self, group) -> List[Tuple]:
         """Получает из базы данных весь список доступных рассылок
         """
         mailings = self.query(
-            "SELECT mailing_id, mailing_name, mailing_slug from mailings"
+            "SELECT mailing_id, mailing_name from mailings where group_num=%s", (group,)
         )
         return mailings
 
-    def get_subscription_status(self, slug: str, user_id: int) -> int:
+    def get_subscription_status(self, m_id: int, user_id: int) -> int:
         """Получает статус подписки пользователя на рассылку
         """
         status = self.query(
-            "SELECT %s FROM vk_subscriptions WHERE user_id=%s", (slug, user_id)
+            "SELECT status FROM subscriptions WHERE user_id=%s and mailing_id = %s",
+            (user_id, m_id),
         )
         return status[0][0]
 
@@ -94,7 +95,6 @@ class Database(Base):
         """Добавляет нового пользователя в таблицы информации и рассылок
         """
         self.query("INSERT INTO users (vk_id) VALUES (%s)", (user_id,))
-        self.query("INSERT INTO vk_subscriptions DEFAULT VALUES")
 
     def create_session(self, user_id: int):
         """Создает новую сессию для пользователя
@@ -176,11 +176,12 @@ class Database(Base):
         ids += f"{_id},"
         self.update_call_ids(user_id, ids)
 
-    def update_subscribe_state(self, slug: str, u_id: int, state: int):
+    def update_subscribe_state(self, m_id: int, u_id: int, state: int):
         """Обновляет статус подписки на рассылку
         """
         self.query(
-            "UPDATE vk_subscriptions SET %s = %s WHERE user_id=%s", (slug, state, u_id)
+            "UPDATE subscriptions SET status = %s WHERE user_id=%s and mailing_id = %s",
+            (state, u_id, m_id),
         )
 
     def empty_call_storage(self, user_id: int):
@@ -263,11 +264,12 @@ class Database(Base):
         )
         return mailing[0][0]
 
-    def fetch_subcribers(self, slug: str) -> str:
+    def fetch_subcribers(self, m_id: int) -> str:
         """Собирает подписчиков рассылки
         """
         user_ids = self.query(
-            "SELECT user_id FROM vk_subscriptions WHERE %s = 1", (slug,)
+            "SELECT user_id FROM subscriptions WHERE status = 1 and mailing_id = %s",
+            (m_id,),
         )
         user_ids = [_id for (_id,) in user_ids]
         ids = []
@@ -289,7 +291,7 @@ class Database(Base):
         """Изменяет статус использования имён
         """
         s_id = self.get_session_id(user_id)
-        self.query("UPDATE sessions SET names_using=%s WHERE id=%s", (value, s_id))
+        self.query("UPDATE sessions SET names_using = %s WHERE id=%s", (value, s_id))
 
     def get_users_names(self, ids: list) -> List[str]:
         """Получает список имён по списку идентификаторов ВКонтакте

@@ -357,10 +357,11 @@ for event in bot.longpoll.listen():
 
         # :blockstart: Рассылки
         elif payload["button"] == "mailings":
+            group = db.get_group_of_user(event["message"]["from_id"])
             bot.send_message(
                 msg="Отправка клавиатуры со списком рассылок.",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.generate_mailings_keyboard(),
+                keyboard=kbs.generate_mailings_keyboard(group),
             )
         elif payload["button"] == "mailing":
             if not db.mailing_session_exist(event["message"]["from_id"]):
@@ -442,6 +443,7 @@ for event in bot.longpoll.listen():
             payload["button"] == "confirm"
             and db.get_session_state(event["message"]["from_id"]) == "prompt_mailing"
         ):
+            group = db.get_group_of_user(event["message"]["from_id"])
             attach = db.get_mailing_attaches(event["message"]["from_id"])
             if attach is None:
                 attach = ""
@@ -453,17 +455,18 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg="Рассылка отправлена.",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.generate_mailings_keyboard(),
+                keyboard=kbs.generate_mailings_keyboard(group),
             )
         elif (
             payload["button"] == "deny"
             and db.get_session_state(event["message"]["from_id"]) == "prompt_mailing"
         ):
+            group = db.get_group_of_user(event["message"]["from_id"])
             db.empty_mailing_storage(event["message"]["from_id"])
             bot.send_message(
                 msg="Отправка рассылки отменена.",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.generate_mailings_keyboard(),
+                keyboard=kbs.generate_mailings_keyboard(group),
             )
         # :blockend: Рассылки
 

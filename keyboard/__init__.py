@@ -215,15 +215,15 @@ class Keyboards:
         )
         return kb.get_keyboard()
 
-    def generate_mailings_keyboard(self):
+    def generate_mailings_keyboard(self, group: int):
         """
         Генерация клавиатуры со списком доступных рассылок
         """
-        mailings = self.db.get_mailings_list()
+        mailings = self.db.get_mailings_list(group)
         kb = VkKeyboard()
         for i, v in enumerate(mailings):
             kb.add_button(
-                label=v[1], payload={"button": "mailing", "name": v[1], "slug": v[2]},
+                label=v[1], payload={"button": "mailing", "name": v[1], "id": v[0]},
             )
             if len(kb.lines[-1]) == 2:
                 kb.add_line()

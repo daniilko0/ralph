@@ -603,7 +603,8 @@ for event in bot.longpoll.listen():
                     .replace(" ", "-")
                     .replace("'", "")
                 )
-                db.add_expences_category(name, slug, summ)
+                group = db.get_group_of_user(event["message"]["from_id"])
+                db.add_expences_category(name, slug, summ, group)
                 bot.send_message(
                     msg=f'Новая статья "{name}" с суммой сборов {summ} р. успешно создана.',
                     pid=event["message"]["from_id"],

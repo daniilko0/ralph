@@ -520,3 +520,11 @@ class Database(Base):
         """
         admins = self.query("select * from administrators")
         return admins
+
+    def get_group_of_user(self, vk_id: int):
+        """Получает номер группы студента по идентификатору ВК"""
+        user_id = self.get_user_id(vk_id)
+        group = self.query(
+            "select group_num from users_info where user_id=%s", (user_id,)
+        )
+        return group[0][0]

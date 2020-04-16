@@ -188,10 +188,11 @@ for event in bot.longpoll.listen():
             payload["button"] == "back"
             and db.get_session_state(event["message"]["from_id"]) != "select_donater"
         ):
+            group = db.get_group_of_user(event["message"]["from_id"])
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.generate_call_prompt(),
+                keyboard=kbs.generate_call_prompt(group),
             )
         elif payload["button"] == "skip":
             db.update_session_state(event["message"]["from_id"], "call_configuring")
@@ -209,10 +210,11 @@ for event in bot.longpoll.listen():
             )
             if event["message"]["attachments"]:
                 load_attachs()
+            group = db.get_group_of_user(event["message"]["from_id"])
             bot.send_message(
                 msg="Отправка клавиатуры призыва",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.generate_call_prompt(),
+                keyboard=kbs.generate_call_prompt(group),
             )
             db.update_session_state(event["message"]["from_id"], "call_configuring")
         elif payload["button"] == "send_to_all":
@@ -831,10 +833,11 @@ for event in bot.longpoll.listen():
             payload["button"] == "back"
             and db.get_session_state(event["message"]["from_id"]) == "select_donater"
         ):
+            group = db.get_group_of_user(event["message"]["from_id"])
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.generate_finances_prompt(),
+                keyboard=kbs.generate_finances_prompt(group),
             )
 
         elif (

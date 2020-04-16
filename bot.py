@@ -172,7 +172,11 @@ class Bot(metaclass=SingletonMeta):
         Returns:
             bool: Флаг, указывающий на принадлежность текущего пользователя к касте Администраторов
         """
-        return str(_id) in self.admins
+        admins = self.db.get_list_of_administrators()
+        for admin in admins:
+            if _id == admin[0]:
+                return True
+        return False
 
     def send_gui(self, pid: int, text: str = "Привет!") -> NoReturn:
         """Отправляет клавиатуру главного меню

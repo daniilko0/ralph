@@ -286,9 +286,9 @@ class Keyboards:
             )
         return kb.get_keyboard()
 
-    def finances_main(self):
+    def finances_main(self, group: int):
         kb = VkKeyboard()
-        list_of_cats = self.db.get_list_of_finances_categories()
+        list_of_cats = self.db.get_list_of_finances_categories(group)
         for i, v in enumerate(list_of_cats):
             label = v[0]
             kb.add_button(

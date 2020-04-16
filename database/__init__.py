@@ -343,10 +343,12 @@ class Database(Base):
             "UPDATE mailing_mgmt SET m_attach = %s WHERE session_id=%s", (attach, s_id)
         )
 
-    def get_list_of_finances_categories(self) -> List[Tuple]:
+    def get_list_of_finances_categories(self, group: int) -> List[Tuple]:
         """Получает список доступных категорий расходов
         """
-        query = self.query("SELECT name, slug FROM finances_categories")
+        query = self.query(
+            "SELECT name, slug FROM finances_categories where " "group_num=%s", (group,)
+        )
         return query
 
     def add_expences_category(self, name: str, slug: str, s: int, group: int):

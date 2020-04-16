@@ -549,10 +549,11 @@ for event in bot.longpoll.listen():
         # :blockstart: Финансы
 
         elif payload["button"] == "finances":
+            group = db.get_group_of_user(event["message"]["from_id"])
             bot.send_message(
                 msg="Меню финансов",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.finances_main(),
+                keyboard=kbs.finances_main(group),
             )
 
         elif payload["button"] == "fin_category":
@@ -594,11 +595,12 @@ for event in bot.longpoll.listen():
             == "ask_for_new_expenses_cat_prefs"
             and payload["button"] == "cancel"
         ):
+            group = db.get_group_of_user(event["message"]["from_id"])
             db.update_session_state(event["message"]["from_id"], "main")
             bot.send_message(
                 msg="Операция отменена.",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.finances_main(),
+                keyboard=kbs.finances_main(group),
             )
         elif (
             db.get_session_state(event["message"]["from_id"])
@@ -619,14 +621,15 @@ for event in bot.longpoll.listen():
                 bot.send_message(
                     msg=f'Новая статья "{name}" с суммой сборов {summ} р. успешно создана.',
                     pid=event["message"]["from_id"],
-                    keyboard=kbs.finances_main(),
+                    keyboard=kbs.finances_main(group),
                 )
                 db.update_session_state(event["message"]["from_id"], "main")
             else:
+                group = db.get_group_of_user(event["message"]["from_id"])
                 bot.send_message(
                     msg=f"Неверный формат сообщения.",
                     pid=event["message"]["from_id"],
-                    keyboard=kbs.finances_main(),
+                    keyboard=kbs.finances_main(group),
                 )
 
         elif payload["button"] == "fin_prefs":
@@ -748,10 +751,11 @@ for event in bot.longpoll.listen():
             db.delete_expense_catgory(slug)
             db.update_active_expenses_category(event["message"]["from_id"], "none")
             db.update_session_state(event["message"]["from_id"], "main")
+            group = db.get_group_of_user(event["message"]["from_id"])
             bot.send_message(
                 msg=f"Категория {name} удалена.",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.finances_main(),
+                keyboard=kbs.finances_main(group),
             )
 
         elif (

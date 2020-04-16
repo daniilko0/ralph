@@ -28,7 +28,9 @@ class EventTypes(Enum):
 
 
 def send_schedule(date: str):
-    s = Schedule(date)
+    group = db.get_group_of_user(event["message"]["from_id"])
+    gid = db.get_schedule_descriptor(group)
+    s = Schedule(date, gid)
     s.get_raw()
     if s.is_exist():
         sch = s.generate()
@@ -331,7 +333,8 @@ for event in bot.longpoll.listen():
                         pid=event["message"]["from_id"],
                     )
                 else:
-                    s = Schedule(d)
+                    group = db.get_group_of_user(event["message"]["from_id"])
+                    s = Schedule(d, group)
                     s.get_raw()
                     if s.is_exist():
                         schedule = s.generate()

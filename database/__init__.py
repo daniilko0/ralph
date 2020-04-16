@@ -529,3 +529,9 @@ class Database(Base):
             "select group_num from users_info where user_id=%s", (user_id,)
         )
         return group[0][0]
+
+    def get_schedule_descriptor(self, g_id: int):
+        desc = self.query(
+            "select schedule_descriptor from schedule where group_num = %s", (g_id,)
+        )
+        return desc[0][0]

@@ -372,7 +372,7 @@ for event in bot.longpoll.listen():
                 pid=event["message"]["from_id"],
                 keyboard=kbs.generate_mailing_mgmt(
                     is_admin=bot.is_admin(event["message"]["from_id"]),
-                    slug=payload["slug"],
+                    m_id=payload["id"],
                     user_id=event["message"]["from_id"],
                 ),
             )
@@ -383,7 +383,7 @@ for event in bot.longpoll.listen():
                 pid=event["message"]["from_id"],
                 keyboard=kbs.generate_mailing_mgmt(
                     is_admin=bot.is_admin(event["message"]["from_id"]),
-                    slug=payload["slug"],
+                    m_id=payload["id"],
                     user_id=event["message"]["from_id"],
                 ),
             )
@@ -394,7 +394,7 @@ for event in bot.longpoll.listen():
                 pid=event["message"]["from_id"],
                 keyboard=kbs.generate_mailing_mgmt(
                     is_admin=bot.is_admin(event["message"]["from_id"]),
-                    slug=payload["slug"],
+                    m_id=payload["id"],
                     user_id=event["message"]["from_id"],
                 ),
             )
@@ -418,7 +418,7 @@ for event in bot.longpoll.listen():
                 pid=event["message"]["from_id"],
                 keyboard=kbs.generate_mailing_mgmt(
                     is_admin=bot.is_admin(event["message"]["from_id"]),
-                    slug=db.get_mailing_session(event["message"]["from_id"]),
+                    m_id=db.get_mailing_session(event["message"]["from_id"]),
                     user_id=event["message"]["from_id"],
                 ),
             )

@@ -256,7 +256,7 @@ class Database(Base):
             "UPDATE mailing_mgmt SET mailing = %s WHERE session_id=%s", (m_slug, s_id)
         )
 
-    def get_mailing_session(self, user_id: int) -> str:
+    def get_mailing_session(self, user_id: int) -> int:
         """Получает выбранную рассылку
         """
         s_id = self.get_session_id(user_id)

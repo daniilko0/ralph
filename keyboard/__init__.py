@@ -234,9 +234,9 @@ class Keyboards:
         )
         return kb.get_keyboard()
 
-    def generate_mailing_mgmt(self, user_id: int, is_admin: bool, slug: str):
+    def generate_mailing_mgmt(self, user_id: int, is_admin: bool, m_id: int):
         uid = self.db.get_user_id(vk_id=user_id)
-        status = self.db.get_subscription_status(slug=slug, user_id=uid)
+        status = self.db.get_subscription_status(m_id=m_id, user_id=uid)
 
         kb = VkKeyboard()
         if is_admin:

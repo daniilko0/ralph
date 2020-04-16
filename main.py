@@ -453,9 +453,10 @@ for event in bot.longpoll.listen():
             if attach is None:
                 attach = ""
             bot.send_mailing(
-                slug=db.get_mailing_session(event["message"]["from_id"]),
+                m_id=db.get_mailing_session(event["message"]["from_id"]),
                 text=db.get_mailing_message(event["message"]["from_id"]),
                 attach=attach,
+                group=group,
             )
             bot.send_message(
                 msg="Рассылка отправлена.",

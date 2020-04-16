@@ -265,7 +265,7 @@ class Database(Base):
         )
         return mailing[0][0]
 
-    def fetch_subcribers(self, m_id: int) -> str:
+    def fetch_subcribers(self, m_id: int, group: int) -> str:
         """Собирает подписчиков рассылки
         """
         user_ids = self.query(
@@ -275,7 +275,13 @@ class Database(Base):
         user_ids = [_id for (_id,) in user_ids]
         ids = []
         for i, _id in enumerate(user_ids):
-            ids.append(self.query("SELECT vk_id FROM users WHERE id=%s", (_id,))[0][0])
+            ids.append(
+                self.query(
+                    "SELECT vk_id FROM users left outer join users_info on id = "
+                    "user_id WHERE id=%s and group_num = %s",
+                    (_id, group),
+                )[0][0]
+            )
         ids = ",".join(map(str, ids))
         return ids
 
@@ -523,7 +529,8 @@ class Database(Base):
         return admins
 
     def get_group_of_user(self, vk_id: int):
-        """Получает номер группы студента по идентификатору ВК"""
+        """Получает номер группы студента по идентификатору ВК
+        """
         user_id = self.get_user_id(vk_id)
         group = self.query(
             "select group_num from users_info where user_id=%s", (user_id,)
@@ -531,7 +538,24 @@ class Database(Base):
         return group[0][0]
 
     def get_schedule_descriptor(self, g_id: int):
+        """Получает дескриптор расписания
+
+        Args:
+            g_id: Номер группы
+
+        Returns:
+            str: Дескриптор расписания
+        """
         desc = self.query(
             "select schedule_descriptor from schedule where group_num = %s", (g_id,)
         )
         return desc[0][0]
+
+    def get_list_of_groups(self):
+        """Получает список групп с описанием
+
+        Returns:
+            List[tuple]: Список созданных групп
+        """
+        groups = self.query("select * from groups")
+        return groups

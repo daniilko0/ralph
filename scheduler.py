@@ -1,4 +1,5 @@
 import re
+import os
 import time
 from datetime import datetime
 from datetime import timedelta
@@ -10,6 +11,7 @@ from bs4 import BeautifulSoup
 
 from logger import Logger
 from bot import Bot
+from database import Database
 
 
 class Date:
@@ -156,6 +158,7 @@ def send():
     """Отправляет расписание в активную беседу
     и в ЛС подписчикам рассылки "Расписание"
     """
+    db = Database(os.environ["DATABASE_URL"])
     bot = Bot()
     bot.log.setLevel("ERROR")
     bot.auth()
@@ -163,7 +166,9 @@ def send():
     s = Schedule(d.tomorrow)
     s.get_raw()
     sch = s.generate()
-    bot.send_mailing(slug="schedule", text=sch)
+    groups = db.get_list_of_groups()
+    for group, desc in groups:
+        bot.send_mailing(m_id=2, text=sch, group=group)
     bot.send_message(msg=sch, pid=bot.cid)
 
 

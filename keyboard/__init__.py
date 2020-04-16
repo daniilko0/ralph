@@ -163,8 +163,8 @@ class Keyboards:
         )
         return kb.get_keyboard()
 
-    def generate_call_prompt(self):
-        kb = self.generate_alphabet_keyboard()
+    def generate_call_prompt(self, group: int):
+        kb = self.generate_alphabet_keyboard(group)
         kb.add_line()
         kb.add_button(label="Отмена", color="negative", payload={"button": "cancel"})
         kb.add_button(label="Сохранить", color="positive", payload={"button": "save"})
@@ -174,18 +174,18 @@ class Keyboards:
         )
         return kb.get_keyboard()
 
-    def generate_finances_prompt(self):
-        kb = self.generate_alphabet_keyboard()
+    def generate_finances_prompt(self, group):
+        kb = self.generate_alphabet_keyboard(group)
         kb.add_line()
         kb.add_button(label="Отмена", color="negative", payload={"button": "cancel"})
         return kb.get_keyboard()
 
-    def generate_alphabet_keyboard(self):
+    def generate_alphabet_keyboard(self, group: int):
         """
         Генерирует клавиатуру с алфавитными кнопками
         """
         kb = VkKeyboard()
-        letters = self.db.get_last_names_letters()
+        letters = self.db.get_last_names_letters(group)
         for i, v in enumerate(letters):
             if len(kb.lines[-1]) < 4:
                 kb.add_button(label=v, payload={"button": "letter", "letter": v})
@@ -195,11 +195,11 @@ class Keyboards:
 
         return kb
 
-    def generate_names_keyboard(self, letter):
+    def generate_names_keyboard(self, letter: str, group: int):
         """
         Генерирует клавиатуру с фамилиями, начинающимися на букву (аргумент)
         """
-        names = self.db.get_list_of_names(letter=letter)
+        names = self.db.get_list_of_names(letter=letter, group=group)
         kb = VkKeyboard()
         for i, v in enumerate(names):
             label = f"{v[2]} {v[1][0]}."

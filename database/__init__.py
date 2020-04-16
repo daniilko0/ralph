@@ -24,23 +24,24 @@ class Database(Base):
         vk_ids = [str(self.get_vk_id(_id)) for (_id,) in ids]
         return vk_ids
 
-    def get_last_names_letters(self) -> List[str]:
+    def get_last_names_letters(self, group: int) -> List[str]:
         """Получает из базы данных все уникальные первые буквы фамилий
         """
         letters = self.query(
-            "SELECT DISTINCT substring(second_name from  '^.') FROM users_info "
-            "ORDER BY substring(second_name from  '^.')"
+            "SELECT DISTINCT substring(second_name from  '^.') FROM users_info where "
+            "group_num = %s ORDER BY substring(second_name from  '^.')",
+            (group,),
         )
         return [letter for (letter,) in letters]
 
-    def get_list_of_names(self, letter: str) -> List[Tuple]:
+    def get_list_of_names(self, letter: str, group: int) -> List[Tuple]:
         """Получает из базы данных все фамилии, начинающиеся на букву
         """
         names = self.query(
             "SELECT user_id, first_name, second_name FROM users_info "
-            "WHERE substring(second_name from '^.') =%s "
-            "AND academic_status > 0 ORDER BY user_id",
-            (letter,),
+            "WHERE substring(second_name from '^.') = %s "
+            "AND academic_status > 0 AND group_num = %s ORDER BY user_id",
+            (letter, group),
         )
         return names
 

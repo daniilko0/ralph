@@ -156,10 +156,11 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.skip(),
             )
         elif payload["button"] == "letter":
+            group = db.get_group_of_user(event["message"]["from_id"])
             bot.send_message(
                 msg=f"Отправка клавиатуры с фамилиями на букву \"{payload['letter']}\"",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.generate_names_keyboard(payload["letter"]),
+                keyboard=kbs.generate_names_keyboard(payload["letter"], group),
             )
         elif (
             payload["button"] == "student"
@@ -194,10 +195,11 @@ for event in bot.longpoll.listen():
             )
         elif payload["button"] == "skip":
             db.update_session_state(event["message"]["from_id"], "call_configuring")
+            group = db.get_group_of_user(event["message"]["from_id"])
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.generate_call_prompt(),
+                keyboard=kbs.generate_call_prompt(group),
             )
         elif (
             db.get_session_state(event["message"]["from_id"]) == "ask_for_call_message"
@@ -760,10 +762,11 @@ for event in bot.longpoll.listen():
                 db.update_session_state(event["message"]["from_id"], "select_donater")
             except ProgrammingError:
                 pass
+            group = db.get_group_of_user(event["message"]["from_id"])
             bot.send_message(
                 msg="Выберите внесшего деньги:",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.generate_finances_prompt(),
+                keyboard=kbs.generate_finances_prompt(group),
             )
 
         elif (

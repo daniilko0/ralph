@@ -3,6 +3,8 @@ from typing import NoReturn
 from typing import Tuple
 from typing import Union
 
+from psycopg2.extensions import AsIs
+
 from database.base import Base
 
 """
@@ -18,7 +20,7 @@ class Database(Base):
         """Получает список активных студентов (с любым статусом, кроме "отчислен")
         """
         ids = self.query(
-            f"SELECT user_id FROM users_info WHERE academic_status > 0 ORDER BY user_id"
+            "SELECT user_id FROM users_info WHERE academic_status > 0 ORDER BY user_id"
         )
         vk_ids = [str(self.get_vk_id(_id)) for (_id,) in ids]
         return vk_ids
@@ -36,31 +38,30 @@ class Database(Base):
         """Получает из базы данных все фамилии, начинающиеся на букву
         """
         names = self.query(
-            f"SELECT user_id, first_name, second_name FROM users_info "
-            f"WHERE substring(second_name from '^.') = '{letter}' "
-            f"AND academic_status > 0 ORDER BY user_id"
+            "SELECT user_id, first_name, second_name FROM users_info "
+            "WHERE substring(second_name from '^.') =%s "
+            "AND academic_status > 0 ORDER BY user_id",
+            (letter,),
         )
         return names
 
     def get_vk_id(self, _id: Union[str, int]) -> int:
         """Получает из базы данных идентификатор ВКонтакте по идентификатору студента
         """
-        vk_id = self.query(f"SELECT vk_id from users WHERE id={_id}")[0][0]
-        return vk_id
+        vk_id = self.query("SELECT vk_id from users WHERE id=%s", (_id,))
+        return vk_id[0][0]
 
     def get_user_id(self, vk_id: int) -> int:
         """Получает из базы данных идентификатор студента по идентификатору ВКонтакте
         """
-        user_id = self.query(f"SELECT id from users WHERE vk_id={vk_id}")[0][0]
-        return user_id
+        user_id = self.query("SELECT id from users WHERE vk_id=%s", (vk_id,))
+        return user_id[0][0]
 
     def get_user_name(self, _id: int) -> str:
         """Получает из базы данных имя по идентификатор студента
         """
-        name = self.query(f"SELECT first_name FROM users_info WHERE user_id={_id}")[0][
-            0
-        ]
-        return name
+        name = self.query("SELECT first_name FROM users_info WHERE user_id=%s", (_id,))
+        return name[0][0]
 
     def get_mailings_list(self) -> List[Tuple]:
         """Получает из базы данных весь список доступных рассылок
@@ -74,96 +75,100 @@ class Database(Base):
         """Получает статус подписки пользователя на рассылку
         """
         status = self.query(
-            f"SELECT {slug} FROM vk_subscriptions WHERE user_id={user_id}"
-        )[0][0]
-        return status
+            "SELECT %s FROM vk_subscriptions WHERE user_id=%s", (slug, user_id)
+        )
+        return status[0][0]
 
     def is_user_exist(self, user_id: int) -> bool:
         """Возвращает информацию о том, существует ли пользователь в базе данных
         """
-        user = self.query(f"SELECT id FROM users WHERE vk_id={user_id}")
+        user = self.query("SELECT id FROM users WHERE vk_id=%s", (user_id,))
         return bool(user)
 
     def is_session_exist(self, user_id: int) -> bool:
         """Проверяет существование сессии текущего пользователя
         """
-        user = self.query(f"SELECT id FROM sessions WHERE vk_id={user_id}")
+        user = self.query("SELECT id FROM sessions WHERE vk_id=%s", (user_id,))
         return bool(user)
 
-    def create_user(self, user_id: int) -> NoReturn:
+    def create_user(self, user_id: int):
         """Добавляет нового пользователя в таблицы информации и рассылок
         """
-        self.query(f"INSERT INTO users (vk_id) VALUES ({user_id})")
-        self.query(f"INSERT INTO vk_subscriptions DEFAULT VALUES")
+        self.query("INSERT INTO users (vk_id) VALUES (%s)", (user_id,))
+        self.query("INSERT INTO vk_subscriptions DEFAULT VALUES")
 
-    def create_session(self, user_id: int) -> NoReturn:
+    def create_session(self, user_id: int):
         """Создает новую сессию для пользователя
         """
-        _id = self.query(f"SELECT id FROM users WHERE vk_id={user_id}")[0][0]
+        _id = self.query("SELECT id FROM users WHERE vk_id=%s", (user_id,))[0][0]
         self.query(
-            f"INSERT INTO sessions (id, vk_id, state) VALUES ({_id}, {user_id}, 'main')"
+            "INSERT INTO sessions (id, vk_id, state) VALUES (%s, %s, 'main')",
+            (_id, user_id),
         )
 
     def get_session_state(self, user_id: int) -> str:
         """Получает текущий статус бота из сессии
         """
-        st = self.query(f"SELECT state FROM sessions WHERE vk_id={user_id}")
+        st = self.query("SELECT state FROM sessions WHERE vk_id=%s", (user_id,))
         return st[0][0]
 
     def get_session_id(self, user_id: int) -> int:
         """Получает идентификатор сессии
         """
-        s_id = self.query(f"SELECT id FROM sessions WHERE vk_id={user_id}")[0][0]
-        return s_id
+        s_id = self.query("SELECT id FROM sessions WHERE vk_id=%s", (user_id,))
+        return s_id[0][0]
 
-    def update_session_state(self, user_id: int, state: str) -> NoReturn:
+    def update_session_state(self, user_id: int, state: str):
         """Изменяет текущий статус бота из сессии
         """
-        self.query(f"UPDATE sessions SET state='{state}' WHERE vk_id={user_id}")
+        self.query("UPDATE sessions SET state = %s WHERE vk_id=%s", (state, user_id))
 
     def call_session_exist(self, user_id: int) -> bool:
         """Проверяет существование сессии призыва
         """
         s_id = self.get_session_id(user_id)
-        call_exist = self.query(f"SELECT session_id FROM calls WHERE session_id={s_id}")
+        call_exist = self.query(
+            "SELECT session_id FROM calls WHERE session_id=%s", (s_id,)
+        )
         texts_exist = self.query(
-            f"SELECT session_id FROM texts WHERE session_id" f"={s_id}"
+            "SELECT session_id FROM texts WHERE session_id=%s", (s_id,)
         )
         return bool(call_exist and texts_exist)
 
-    def create_call_session(self, user_id: int) -> NoReturn:
+    def create_call_session(self, user_id: int):
         """Создает новую сессию призыва
         """
         s_id = self.get_session_id(user_id)
-        self.query(f"INSERT INTO calls (session_id) VALUES ({s_id})")
-        self.query(f"INSERT INTO texts (session_id) VALUES ({s_id})")
+        self.query("INSERT INTO calls (session_id) VALUES (%s)", (s_id,))
+        self.query("INSERT INTO texts (session_id) VALUES (%s)", (s_id,))
 
     def get_call_message(self, user_id: int) -> str:
         """Получает текст призыва
         """
         s_id = self.get_session_id(user_id)
-        return self.query(f"SELECT text FROM texts WHERE session_id={s_id}")[0][0]
+        call_text = self.query("SELECT text FROM texts WHERE session_id=%s", (s_id,))
+        return call_text[0][0]
 
-    def update_call_message(self, user_id: int, message: str) -> NoReturn:
+    def update_call_message(self, user_id: int, message: str):
         """Обновляет текст призыва
         """
         s_id = self.get_session_id(user_id)
-        self.query(f"UPDATE texts SET text='{message}' WHERE session_id={s_id}")
+        self.query("UPDATE texts SET text = %s WHERE session_id=%s", (message, s_id))
 
     def get_call_ids(self, user_id: int) -> str:
         """Получить список идентификаторов для призыва
         """
         s_id = self.get_session_id(user_id)
-        ids = self.query(f"SELECT ids FROM calls WHERE session_id={s_id}")[0][0]
-        return ids
+        ids = self.query("SELECT ids FROM calls WHERE session_id=%s", (s_id,))
+        return ids[0][0]
 
-    def update_call_ids(self, user_id: int, ids: str) -> NoReturn:
+    def update_call_ids(self, user_id: int, ids: str):
         """Перезаписать список идентификаторов для призыва
         """
         s_id = self.get_session_id(user_id)
-        self.query(f"UPDATE calls SET ids='{ids}' WHERE session_id={s_id}")
+        self.query("UPDATE calls SET ids = %s WHERE session_id=%s", (ids, s_id))
 
-    def append_to_call_ids(self, user_id: int, _id: int) -> NoReturn:
+    def append_to_call_ids(self, user_id: int, _id: int):
         """Добавить идентификатор к списку для призыва
         """
         ids = self.get_call_ids(user_id)
@@ -176,91 +181,99 @@ class Database(Base):
         """Обновляет статус подписки на рассылку
         """
         self.query(
-            f"UPDATE vk_subscriptions SET {slug}={state} WHERE " f"user_id={u_id}"
+            "UPDATE vk_subscriptions SET %s = %s WHERE user_id=%s", (slug, state, u_id)
         )
 
-    def empty_call_storage(self, user_id: int) -> NoReturn:
+    def empty_call_storage(self, user_id: int):
         """Очистить хранилище призыва (текст призыва и список идентификатора)
         """
         s_id = self.get_session_id(user_id)
-        self.query(f"UPDATE calls SET ids=NULL WHERE session_id={s_id}")
-        self.query(f"UPDATE texts SET text=NULL WHERE session_id={s_id}")
-        self.query(f"UPDATE texts SET attach=NULL WHERE session_id={s_id}")
+        self.query("UPDATE calls SET ids=NULL WHERE session_id=%s", (s_id,))
+        self.query("UPDATE texts SET text=NULL WHERE session_id=%s", (s_id,))
+        self.query("UPDATE texts SET attach=NULL WHERE session_id=%s", (s_id,))
 
-    def empty_mailing_storage(self, user_id: int) -> NoReturn:
+    def empty_mailing_storage(self, user_id: int):
         """Очистить хранилище рассылок (выбранную рассылку и текст рассылки)
         """
         s_id = self.get_session_id(user_id)
-        self.query(f"UPDATE mailing_mgmt SET mailing=NULL WHERE session_id={s_id}")
-        self.query(f"UPDATE mailing_mgmt SET m_text=NULL WHERE session_id={s_id}")
-        self.query(f"UPDATE mailing_mgmt SET m_attach=NULL WHERE session_id={s_id}")
+        self.query("UPDATE mailing_mgmt SET mailing=NULL WHERE session_id=%s", (s_id,))
+        self.query("UPDATE mailing_mgmt SET m_text=NULL WHERE session_id=%s", (s_id,))
+        self.query("UPDATE mailing_mgmt SET m_attach=NULL WHERE session_id=%s", (s_id,))
 
     def get_mailing_message(self, user_id: int) -> str:
         """Получить текст рассылки
         """
         s_id = self.get_session_id(user_id)
-        return self.query(f"SELECT m_text FROM mailing_mgmt WHERE session_id={s_id}")[
-            0
-        ][0]
+        m_message = self.query(
+            "SELECT m_text FROM mailing_mgmt WHERE session_id=%s", (s_id,)
+        )
+        return m_message[0][0]
 
-    def update_mailing_message(self, user_id: int, message: str) -> NoReturn:
+    def update_mailing_message(self, user_id: int, message: str):
         """Перезаписывает текст рассылки
         """
         s_id = self.get_session_id(user_id)
         self.query(
-            f"UPDATE mailing_mgmt SET m_text='{message}' WHERE session_id={s_id}"
+            "UPDATE mailing_mgmt SET m_text = %s WHERE session_id=%s", (message, s_id)
         )
 
     def get_conversation(self, user_id: int) -> int:
         """Получает активную беседу
         """
         s_id = self.get_session_id(user_id)
-        return self.query(f"SELECT conversation FROM sessions WHERE id={s_id}")[0][0]
+        conversation = self.query(
+            "SELECT conversation FROM sessions WHERE id=%s", (s_id,)
+        )
+        return conversation[0][0]
 
-    def update_conversation(self, user_id: int, conv_id: int) -> NoReturn:
+    def update_conversation(self, user_id: int, conv_id: int):
         """Изменяет активную беседу
         """
         s_id = self.get_session_id(user_id)
-        self.query(f"UPDATE sessions SET conversation={conv_id} WHERE id" f"={s_id}")
+        self.query("UPDATE sessions SET conversation = %s WHERE id=%s", (conv_id, s_id))
 
     def mailing_session_exist(self, user_id: int) -> bool:
         """Проверяет наличие сессии рассылки
         """
         s_id = self.get_session_id(user_id)
-        return self.query(
-            f"SELECT session_id FROM mailing_mgmt WHERE session_id={s_id}"
+        session = self.query(
+            "SELECT session_id FROM mailing_mgmt WHERE session_id=%s", (s_id,)
         )
+        return bool(session)
 
-    def create_mailing_session(self, user_id: int) -> NoReturn:
+    def create_mailing_session(self, user_id: int):
         """Создает сессию рассылки
         """
         s_id = self.get_session_id(user_id)
-        self.query(f"INSERT INTO mailing_mgmt (session_id) VALUES ({s_id})")
+        self.query("INSERT INTO mailing_mgmt (session_id) VALUES (%s)", (s_id,))
 
-    def update_mailing_session(self, user_id: int, m_slug: str) -> NoReturn:
+    def update_mailing_session(self, user_id: int, m_slug: str):
         """Изменяет выбранную рассылку
         """
         s_id = self.get_session_id(user_id)
         self.query(
-            f"UPDATE mailing_mgmt SET mailing='{m_slug}' WHERE session_id={s_id}"
+            "UPDATE mailing_mgmt SET mailing = %s WHERE session_id=%s", (m_slug, s_id)
         )
 
     def get_mailing_session(self, user_id: int) -> str:
         """Получает выбранную рассылку
         """
         s_id = self.get_session_id(user_id)
-        return self.query(f"SELECT mailing FROM mailing_mgmt WHERE session_id={s_id}")[
-            0
-        ][0]
+        mailing = self.query(
+            "SELECT mailing FROM mailing_mgmt WHERE session_id=%s", (s_id,)
+        )
+        return mailing[0][0]
 
     def fetch_subcribers(self, slug: str) -> str:
         """Собирает подписчиков рассылки
         """
-        user_ids = self.query(f"SELECT user_id FROM vk_subscriptions WHERE {slug}=1")
+        user_ids = self.query(
+            "SELECT user_id FROM vk_subscriptions WHERE %s = 1", (slug,)
+        )
         user_ids = [_id for (_id,) in user_ids]
         ids = []
         for i, _id in enumerate(user_ids):
-            ids.append(self.query(f"SELECT vk_id FROM users WHERE id={_id}")[0][0])
+            ids.append(self.query("SELECT vk_id FROM users WHERE id=%s", (_id,))[0][0])
         ids = ",".join(map(str, ids))
         return ids
 
@@ -268,25 +281,26 @@ class Database(Base):
         """Получает статус использования имён
         """
         s_id = self.get_session_id(user_id)
-        names_using = self.query(f"SELECT names_using FROM sessions WHERE id={s_id}")[
-            0
-        ][0]
-        return bool(names_using)
+        names_using = self.query(
+            "SELECT names_using FROM sessions WHERE id=%s", (s_id,)
+        )
+        return bool(names_using[0][0])
 
     def update_names_using_status(self, user_id: int, value: int):
         """Изменяет статус использования имён
         """
         s_id = self.get_session_id(user_id)
-        self.query(f"UPDATE sessions SET names_using={value} WHERE id={s_id}")
+        self.query("UPDATE sessions SET names_using=%s WHERE id=%s", (value, s_id))
 
     def get_users_names(self, ids: list) -> List[str]:
         """Получает список имён по списку идентификаторов ВКонтакте
         """
         ids = ", ".join(ids)
         query = self.query(
-            f"SELECT first_name FROM users INNER JOIN users_info ON users.id = "
-            f"users_info.user_id WHERE vk_id in ({ids}) ORDER BY "
-            f"position(vk_id::text in '{ids}')"
+            "SELECT first_name FROM users INNER JOIN users_info ON "
+            "users.id = users_info.user_id WHERE vk_id in (%s) ORDER "
+            "BY position(vk_id::text in %s)",
+            (AsIs(ids), ids),
         )
         names = [i for (i,) in query]
         return names
@@ -295,20 +309,22 @@ class Database(Base):
         """Получает список вложений для сообщения с призывом
         """
         s_id = self.get_session_id(user_id)
-        query = self.query(f"SELECT attach FROM texts WHERE session_id={s_id}")
+        query = self.query("SELECT attach FROM texts WHERE session_id=%s", (s_id,))
         return query[0][0]
 
     def update_call_attaches(self, user_id: int, attach: str):
         """Обновляет список вложений для сообщения с призывом
         """
         s_id = self.get_session_id(user_id)
-        self.query(f"UPDATE texts SET attach='{attach}' WHERE session_id={s_id}")
+        self.query("UPDATE texts SET attach = %s WHERE session_id=%s", (attach, s_id))
 
     def get_mailing_attaches(self, user_id: int):
         """Получает список вложений для сообщения рассылки
         """
         s_id = self.get_session_id(user_id)
-        query = self.query(f"SELECT m_attach FROM mailing_mgmt WHERE session_id={s_id}")
+        query = self.query(
+            "SELECT m_attach FROM mailing_mgmt WHERE session_id=%s", (s_id,)
+        )
         return query[0][0]
 
     def update_mailing_attaches(self, user_id: int, attach: str):
@@ -316,7 +332,7 @@ class Database(Base):
         """
         s_id = self.get_session_id(user_id)
         self.query(
-            f"UPDATE mailing_mgmt SET m_attach='{attach}' WHERE session_id={s_id}"
+            "UPDATE mailing_mgmt SET m_attach = %s WHERE session_id=%s", (attach, s_id)
         )
 
     def get_list_of_finances_categories(self) -> List[Tuple]:
@@ -325,12 +341,13 @@ class Database(Base):
         query = self.query("SELECT name, slug FROM finances_categories")
         return query
 
-    def add_expences_category(self, name: str, slug: str, s: int):
+    def add_expences_category(self, name: str, slug: str, s: int, group: int):
         """Созадет новую категорию расходов
         """
         query = self.query(
-            f"INSERT INTO finances_categories (name, slug, sum) VALUES ('{name}', "
-            f"'{slug}', {s}) RETURNING id"
+            "INSERT INTO finances_categories (name, slug, sum, group_num) VALUES (%s, %s, "
+            "%s, %s) RETURNING id",
+            (name, slug, s, group),
         )
 
         return query[0][0]
@@ -339,86 +356,98 @@ class Database(Base):
         """Получает текущую выбранную пользователем статью расходов
         """
         s_id = self.get_session_id(user_id)
-        query = self.query(f"SELECT fin_cat FROM sessions WHERE id={s_id}")
+        query = self.query("SELECT fin_cat FROM sessions WHERE id=%s", (s_id,))
         return query[0][0]
 
     def update_active_expenses_category(self, user_id: int, cat: str):
         """Обновляет текущую выбранную пользователем статью расходов
         """
         s_id = self.get_session_id(user_id)
-        self.query(f"UPDATE sessions SET fin_cat='{cat}' WHERE id={s_id}")
+        self.query("UPDATE sessions SET fin_cat = %s WHERE id = %s", (cat, s_id))
 
     def add_expense(self, slug: str, summ: int):
         """Создает новый расход
         """
         self.query(
-            f"INSERT INTO finances_expenses (category, sum) VALUES ('{slug}', {summ})"
+            "INSERT INTO finances_expenses (category, sum) VALUES (%s, %s)",
+            (slug, summ),
         )
 
     def get_expense_category_by_slug(self, slug: str) -> int:
         """Получет название категории расхода по слагу
         """
-        query = self.query(f"SELECT name FROM finances_categories WHERE slug='{slug}'")
+        query = self.query(
+            "SELECT name FROM finances_categories WHERE slug=%s", (slug,)
+        )
         return query[0][0]
 
     def update_expense_summ(self, slug: str, summ: int):
         """Обновляет сумму сборов категории расхода
         """
-        self.query(f"UPDATE finances_categories SET sum={summ} WHERE slug='{slug}'")
+        self.query(
+            "UPDATE finances_categories SET sum = %s WHERE slug=%s", (summ, slug)
+        )
 
     def update_expense_name(self, slug: str, name: str):
         """Обновляет имя категории расхода
         """
-        self.query(f"UPDATE finances_categories SET name='{name}' WHERE slug='{slug}'")
+        self.query(
+            "UPDATE finances_categories SET name = %s WHERE slug=%s", (name, slug)
+        )
 
     def delete_expense_catgory(self, slug: str):
         """Удаляет категорию расхода
         """
-        self.query(f"DELETE FROM finances_categories WHERE slug='{slug}'")
+        self.query("DELETE FROM finances_categories WHERE slug=%s", (slug,))
 
     def get_all_donates_in_category(self, slug: str):
         """Получает сумму всех сборов по категории
         """
-        query = self.query(f"SELECT sum FROM finances_donates WHERE category='{slug}'")
+        query = self.query(
+            "SELECT sum FROM finances_donates WHERE category=%s", (slug,)
+        )
         return [i for (i,) in query]
 
     def get_all_donates(self):
         """Получает сумму всех сборов
         """
-        query = self.query(f"SELECT sum FROM finances_donates")
+        query = self.query("SELECT sum FROM finances_donates")
         return [i for (i,) in query]
 
     def get_all_expenses_in_category(self, slug: str):
         """Получает все расходы в категории
         """
-        query = self.query(f"SELECT sum FROM finances_expenses WHERE category='{slug}'")
+        query = self.query(
+            "SELECT sum FROM finances_expenses WHERE category=%s", (slug,)
+        )
         return [i for (i,) in query]
 
     def get_all_expenses(self):
         """Получает все расходы
         """
-        query = self.query(f"SELECT sum FROM finances_expenses")
+        query = self.query("SELECT sum FROM finances_expenses")
         return [i for (i,) in query]
 
     def get_expense_summ(self, slug: str):
         """Получает сумму сбора категории
         """
-        query = self.query(f"SELECT sum FROM finances_categories WHERE slug='{slug}'")
+        query = self.query("SELECT sum FROM finances_categories WHERE slug=%s", (slug,))
         return query[0][0]
 
     def create_donate(self, s_id: int, slug: str):
         """Создает новый взнос
         """
         query = self.query(
-            f"INSERT INTO finances_donates (student_id, category) VALUES ({s_id}, "
-            f"'{slug}') RETURNING id"
+            "INSERT INTO finances_donates (student_id, category) VALUES (%s, %s) "
+            "RETURNING id",
+            (s_id, slug),
         )
         return query[0][0]
 
     def delete_donate(self, d_id: int):
         """Удаляет взнос
         """
-        self.query(f"DELETE FROM finances_donates WHERE id={d_id}")
+        self.query("DELETE FROM finances_donates WHERE id=%s", (d_id,))
 
     def get_summ_of_donate(self, d_id: int):
         """Получает сумму взноса
@@ -429,7 +458,7 @@ class Database(Base):
         Returns:
             int: Сумма взноса
         """
-        query = self.query(f"SELECT sum FROM finances_donates WHERE id={d_id}")
+        query = self.query("SELECT sum FROM finances_donates WHERE id=%s", (d_id,))
         return query[0][0]
 
     def append_summ_to_donate(self, d_id: int, summ: int):
@@ -437,30 +466,26 @@ class Database(Base):
         """
         source = self.get_summ_of_donate(d_id)
         new = summ + source
-        self.query(f"UPDATE finances_donates SET sum={new} WHERE id={d_id}")
+        self.query("UPDATE finances_donates SET sum = %s WHERE id=%s", (new, d_id))
 
     def update_donate_id(self, u_id: int, d_id: int):
         """Обновляет иденифиткатор создаваемого взноса в хранилище
         """
-        self.query(f"UPDATE sessions SET donate_id={d_id} WHERE vk_id={u_id}")
+        self.query("UPDATE sessions SET donate_id = %s WHERE vk_id=%s", (d_id, u_id))
 
     def get_donate_id(self, u_id: int):
         """Получет иденифиткатор создаваемого взноса в хранилище
         """
-        query = self.query(f"SELECT donate_id FROM sessions WHERE vk_id={u_id}")
+        query = self.query("SELECT donate_id FROM sessions WHERE vk_id=%s", (u_id,))
         return query[0][0]
 
     def get_list_of_donaters_by_slug(self, slug: str, summ: int = 0):
         """Получает список идентификаторов всех внесших деньги на определенную категорию
         """
-        if summ:
-            query = self.query(
-                f"SELECT student_id FROM finances_donates WHERE category='{slug}' AND sum >= {summ}"
-            )
-        else:
-            query = self.query(
-                f"SELECT student_id FROM finances_donates WHERE category='{slug}'"
-            )
+        query = self.query(
+            "SELECT student_id FROM finances_donates WHERE category=%s AND sum >= %s",
+            (slug, summ),
+        )
         return [i for (i,) in query]
 
     def get_id_of_donate_record(self, _id, slug) -> int:
@@ -473,7 +498,8 @@ class Database(Base):
             int: Идентификатор записи
         """
         query = self.query(
-            f"SELECT id FROM finances_donates WHERE student_id={_id} AND category='{slug}'"
+            "SELECT id FROM finances_donates WHERE student_id=%s AND category=%s",
+            (_id, slug),
         )
         return query[0][0]
 
@@ -484,5 +510,6 @@ class Database(Base):
 
         """
         self.query(
-            f"UPDATE finances_donates SET updated_date = (SELECT CURRENT_DATE) WHERE id={d_id}"
+            "UPDATE finances_donates SET updated_date = (SELECT CURRENT_DATE) WHERE id=%s",
+            (d_id,),
         )

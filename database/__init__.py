@@ -1,5 +1,4 @@
 from typing import List
-from typing import NoReturn
 from typing import Tuple
 from typing import Union
 

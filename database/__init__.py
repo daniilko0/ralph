@@ -15,11 +15,12 @@ class Database(Base):
     """Класс для методов работы с БД, выполняющих конечную цель
     """
 
-    def get_active_students_ids(self) -> list:
+    def get_active_students_ids(self, group: int) -> list:
         """Получает список активных студентов (с любым статусом, кроме "отчислен")
         """
         ids = self.query(
-            "SELECT user_id FROM users_info WHERE academic_status > 0 ORDER BY user_id"
+            "SELECT user_id FROM users_info WHERE academic_status > 0 AND group_num = %s ORDER BY user_id",
+            (group,),
         )
         vk_ids = [str(self.get_vk_id(_id)) for (_id,) in ids]
         return vk_ids
@@ -347,17 +348,16 @@ class Database(Base):
         """Получает список доступных категорий расходов
         """
         query = self.query(
-            "SELECT name, slug FROM finances_categories where " "group_num=%s", (group,)
+            "SELECT id, name FROM finances_categories where group_num=%s", (group,)
         )
         return query
 
-    def add_expences_category(self, name: str, slug: str, s: int, group: int):
+    def add_expences_category(self, name: str, s: int, group: int):
         """Созадет новую категорию расходов
         """
         query = self.query(
-            "INSERT INTO finances_categories (name, slug, sum, group_num) VALUES (%s, %s, "
-            "%s, %s) RETURNING id",
-            (name, slug, s, group),
+            "INSERT INTO finances_categories (name, sum, group_num) VALUES (%s, %s, %s) RETURNING id",
+            (name, s, group),
         )
 
         return query[0][0]
@@ -375,46 +375,44 @@ class Database(Base):
         s_id = self.get_session_id(user_id)
         self.query("UPDATE sessions SET fin_cat = %s WHERE id = %s", (cat, s_id))
 
-    def add_expense(self, slug: str, summ: int):
+    def add_expense(self, e_id: int, summ: int):
         """Создает новый расход
         """
         self.query(
             "INSERT INTO finances_expenses (category, sum) VALUES (%s, %s)",
-            (slug, summ),
+            (e_id, summ),
         )
 
-    def get_expense_category_by_slug(self, slug: str) -> int:
-        """Получет название категории расхода по слагу
+    def get_expense_category_by_slug(self, cat_id: int) -> int:
+        """Получет название категории расхода по ИД категории
         """
         query = self.query(
-            "SELECT name FROM finances_categories WHERE slug=%s", (slug,)
+            "SELECT name FROM finances_categories WHERE id=%s", (cat_id,)
         )
         return query[0][0]
 
-    def update_expense_summ(self, slug: str, summ: int):
+    def update_expense_summ(self, e_id: int, summ: int):
         """Обновляет сумму сборов категории расхода
         """
         self.query(
-            "UPDATE finances_categories SET sum = %s WHERE slug=%s", (summ, slug)
+            "UPDATE finances_categories SET sum = %s WHERE id = %s", (summ, e_id)
         )
 
-    def update_expense_name(self, slug: str, name: str):
+    def update_expense_name(self, e_id: int, name: str):
         """Обновляет имя категории расхода
         """
-        self.query(
-            "UPDATE finances_categories SET name = %s WHERE slug=%s", (name, slug)
-        )
+        self.query("UPDATE finances_categories SET name = %s WHERE id=%s", (name, e_id))
 
-    def delete_expense_catgory(self, slug: str):
+    def delete_expense_catgory(self, e_id: int):
         """Удаляет категорию расхода
         """
-        self.query("DELETE FROM finances_categories WHERE slug=%s", (slug,))
+        self.query("DELETE FROM finances_categories WHERE id=%s", (e_id,))
 
-    def get_all_donates_in_category(self, slug: str):
+    def get_all_donates_in_category(self, cat_id: int):
         """Получает сумму всех сборов по категории
         """
         query = self.query(
-            "SELECT sum FROM finances_donates WHERE category=%s", (slug,)
+            "SELECT sum FROM finances_donates WHERE category=%s", (cat_id,)
         )
         return [i for (i,) in query]
 
@@ -438,10 +436,10 @@ class Database(Base):
         query = self.query("SELECT sum FROM finances_expenses")
         return [i for (i,) in query]
 
-    def get_expense_summ(self, slug: str):
+    def get_expense_summ(self, e_id: int):
         """Получает сумму сбора категории
         """
-        query = self.query("SELECT sum FROM finances_categories WHERE slug=%s", (slug,))
+        query = self.query("SELECT sum FROM finances_categories WHERE id=%s", (e_id,))
         return query[0][0]
 
     def create_donate(self, s_id: int, slug: str):

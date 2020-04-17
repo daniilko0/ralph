@@ -290,10 +290,10 @@ class Keyboards:
         kb = VkKeyboard()
         list_of_cats = self.db.get_list_of_finances_categories(group)
         for i, v in enumerate(list_of_cats):
-            label = v[0]
+            label = v[1]
             kb.add_button(
                 label=label,
-                payload={"button": "fin_category", "slug": v[1], "name": v[0]},
+                payload={"button": "fin_category", "id": v[0], "name": v[1]},
             )
             if len(kb.lines[-1]) == 2:
                 kb.add_line()

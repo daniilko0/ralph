@@ -220,7 +220,8 @@ for event in bot.longpoll.listen():
             )
             db.update_session_state(event["message"]["from_id"], "call_configuring")
         elif payload["button"] == "send_to_all":
-            ids = ",".join(db.get_active_students_ids())
+            group = db.get_group_of_user(event["message"]["from_id"])
+            ids = ",".join(db.get_active_students_ids(group))
             db.update_call_ids(event["message"]["from_id"], ids)
             bot.send_message(
                 msg="Все студенты отмечены как получатели уведомления",
@@ -557,13 +558,13 @@ for event in bot.longpoll.listen():
             )
 
         elif payload["button"] == "fin_category":
-            if "slug" not in payload and "name" not in payload:
-                slug = db.get_active_expenses_category(event["message"]["from_id"])
+            if "id" not in payload and "name" not in payload:
+                e_id = db.get_active_expenses_category(event["message"]["from_id"])
                 payload.update(
-                    {"slug": slug, "name": db.get_expense_category_by_slug(slug),}
+                    {"id": e_id, "name": db.get_expense_category_by_slug(e_id),}
                 )
             db.update_active_expenses_category(
-                event["message"]["from_id"], payload["slug"]
+                event["message"]["from_id"], payload["id"]
             )
             bot.send_message(
                 msg=f"Меню управления статьей {payload['name']}.",
@@ -609,15 +610,8 @@ for event in bot.longpoll.listen():
             if re.match(r"^.*,.*\d+$", event["message"]["text"]):
                 parsed = event["message"]["text"].split(",")
                 name, summ = parsed
-                slug = (
-                    Translator()
-                    .translate(name)
-                    .text.lower()
-                    .replace(" ", "-")
-                    .replace("'", "")
-                )
                 group = db.get_group_of_user(event["message"]["from_id"])
-                db.add_expences_category(name, slug, summ, group)
+                db.add_expences_category(name, summ, group)
                 bot.send_message(
                     msg=f'Новая статья "{name}" с суммой сборов {summ} р. успешно создана.',
                     pid=event["message"]["from_id"],
@@ -862,10 +856,11 @@ for event in bot.longpoll.listen():
 
             bot.send_message(msg="Вычисляю...", pid=event["message"]["from_id"])
 
+            group = db.get_group_of_user(event["message"]["from_id"])
             slug = db.get_active_expenses_category(event["message"]["from_id"])
             summ = db.get_expense_summ(slug)
             d_ids = db.get_list_of_donaters_by_slug(slug, summ)
-            s_ids = db.get_active_students_ids()
+            s_ids = db.get_active_students_ids(group)
             name = db.get_expense_category_by_slug(slug)
 
             donated = len(d_ids)
@@ -928,7 +923,8 @@ for event in bot.longpoll.listen():
             summ = db.get_expense_summ(slug)
             d_s_ids = db.get_list_of_donaters_by_slug(slug, summ)
             d_ids = set([str(db.get_vk_id(i)) for i in d_s_ids])
-            s_ids = set(db.get_active_students_ids())
+            group = db.get_group_of_user(event["message"]["from_id"])
+            s_ids = set(db.get_active_students_ids(group))
             debtors = ",".join(s_ids.difference(d_ids))
             db.update_call_ids(event["message"]["from_id"], debtors)
             send_call_confirm()

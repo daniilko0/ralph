@@ -422,11 +422,11 @@ class Database(Base):
         query = self.query("SELECT sum FROM finances_donates")
         return [i for (i,) in query]
 
-    def get_all_expenses_in_category(self, slug: str):
+    def get_all_expenses_in_category(self, e_id: int):
         """Получает все расходы в категории
         """
         query = self.query(
-            "SELECT sum FROM finances_expenses WHERE category=%s", (slug,)
+            "SELECT sum FROM finances_expenses WHERE category=%s", (e_id,)
         )
         return [i for (i,) in query]
 

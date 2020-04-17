@@ -740,9 +740,9 @@ for event in bot.longpoll.listen():
             and db.get_session_state(event["message"]["from_id"])
             == "confirm_delete_expense"
         ):
-            slug = db.get_active_expenses_category(event["message"]["from_id"])
-            name = db.get_expense_category_by_slug(slug)
-            db.delete_expense_catgory(slug)
+            exp_id = db.get_active_expenses_category(event["message"]["from_id"])
+            name = db.get_expense_category_by_slug(exp_id)
+            db.delete_expense_catgory(exp_id)
             db.update_active_expenses_category(event["message"]["from_id"], "none")
             db.update_session_state(event["message"]["from_id"], "main")
             group = db.get_group_of_user(event["message"]["from_id"])
@@ -780,14 +780,14 @@ for event in bot.longpoll.listen():
             payload["button"] == "student"
             and db.get_session_state(event["message"]["from_id"]) == "select_donater"
         ):
-            slug = db.get_active_expenses_category(event["message"]["from_id"])
-            summ = db.get_expense_summ(slug)
-            d_list = db.get_list_of_donaters_by_slug(slug)
+            exp_id = db.get_active_expenses_category(event["message"]["from_id"])
+            summ = db.get_expense_summ(exp_id)
+            d_list = db.get_list_of_donaters_by_slug(exp_id)
             if payload["id"] in d_list:
-                d_id = db.get_id_of_donate_record(payload["id"], slug)
+                d_id = db.get_id_of_donate_record(payload["id"], exp_id)
                 db.set_current_date_as_update(d_id)
             else:
-                d_id = db.create_donate(payload["id"], slug)
+                d_id = db.create_donate(payload["id"], exp_id)
             db.update_donate_id(event["message"]["from_id"], d_id)
             db.update_session_state(event["message"]["from_id"], "ask_for_donate_summ")
             bot.send_message(
@@ -857,15 +857,15 @@ for event in bot.longpoll.listen():
             bot.send_message(msg="Вычисляю...", pid=event["message"]["from_id"])
 
             group = db.get_group_of_user(event["message"]["from_id"])
-            slug = db.get_active_expenses_category(event["message"]["from_id"])
-            summ = db.get_expense_summ(slug)
-            d_ids = db.get_list_of_donaters_by_slug(slug, summ)
+            exp_id = db.get_active_expenses_category(event["message"]["from_id"])
+            summ = db.get_expense_summ(exp_id)
+            d_ids = db.get_list_of_donaters_by_slug(exp_id, summ)
             s_ids = db.get_active_students_ids(group)
-            name = db.get_expense_category_by_slug(slug)
+            name = db.get_expense_category_by_slug(exp_id)
 
             donated = len(d_ids)
             not_donated = len(s_ids) - donated
-            collected = sum(db.get_all_donates_in_category(slug))
+            collected = sum(db.get_all_donates_in_category(exp_id))
 
             bot.send_message(
                 msg=f'Статистика по статье "{name}":\n'
@@ -899,8 +899,8 @@ for event in bot.longpoll.listen():
             db.get_session_state(event["message"]["from_id"]) == "ask_for_expense_summ"
         ):
             if re.match(r"^\d+$", event["message"]["text"]):
-                slug = db.get_active_expenses_category(event["message"]["from_id"])
-                db.add_expense(slug, event["message"]["text"])
+                exp_id = db.get_active_expenses_category(event["message"]["from_id"])
+                db.add_expense(exp_id, event["message"]["text"])
                 bot.send_message(
                     msg="Запись создана.",
                     pid=event["message"]["from_id"],
@@ -919,9 +919,9 @@ for event in bot.longpoll.listen():
                 pid=event["message"]["from_id"],
             )
             db.update_session_state(event["message"]["from_id"], "debtors_forming")
-            slug = db.get_active_expenses_category(event["message"]["from_id"])
-            summ = db.get_expense_summ(slug)
-            d_s_ids = db.get_list_of_donaters_by_slug(slug, summ)
+            exp_id = db.get_active_expenses_category(event["message"]["from_id"])
+            summ = db.get_expense_summ(exp_id)
+            d_s_ids = db.get_list_of_donaters_by_slug(exp_id, summ)
             d_ids = set([str(db.get_vk_id(i)) for i in d_s_ids])
             group = db.get_group_of_user(event["message"]["from_id"])
             s_ids = set(db.get_active_students_ids(group))

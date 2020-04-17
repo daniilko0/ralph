@@ -858,6 +858,7 @@ for event in bot.longpoll.listen():
 
             group = db.get_group_of_user(event["message"]["from_id"])
             exp_id = db.get_active_expenses_category(event["message"]["from_id"])
+            wasted = sum(db.get_all_expenses_in_category(exp_id))
             summ = db.get_expense_summ(exp_id)
             d_ids = db.get_list_of_donaters_by_slug(exp_id, summ)
             s_ids = db.get_active_students_ids(group)
@@ -871,7 +872,8 @@ for event in bot.longpoll.listen():
                 msg=f'Статистика по статье "{name}":\n'
                 f"Всего сдали: {donated} человек;\n"
                 f"Всего не сдали: {not_donated} человек;\n"
-                f"Всего собрано: {collected} руб.",
+                f"Всего собрано: {collected} руб.\n"
+                f"Всего потрачено: {wasted} руб.",
                 pid=event["message"]["from_id"],
             )
 

@@ -15,7 +15,7 @@ Jinja2==2.11.2
 lxml==4.5.0
 MarkupSafe==1.1.1
 packaging==20.3
-pathspec==0.7.0
+pathspec==0.8.0
 psycopg2-binary==2.8.5
 Pygments==2.6.1
 pyparsing==2.4.7

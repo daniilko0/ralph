@@ -40,22 +40,18 @@ class Keyboards:
         Возвращает клавиатуру с выбором даты получения расписания
         """
         kb = VkKeyboard()
-        kb.add_button(label="На сегодня", color="default", payload={"button": "today"})
+        kb.add_button(label="На сегодня", payload={"button": "today"})
+        kb.add_button(label="На завтра", payload={"button": "tomorrow"})
+        kb.add_line()
         kb.add_button(
-            label="На завтра", color="default", payload={"button": "tomorrow"}
+            label="На послезавтра", payload={"button": "day_after_tomorrow"},
+        )
+        kb.add_button(
+            label="Выбрать дату", payload={"button": "arbitrary"},
         )
         kb.add_line()
         kb.add_button(
-            label="На послезавтра",
-            color="default",
-            payload={"button": "day_after_tomorrow"},
-        )
-        kb.add_button(
-            label="Выбрать дату", color="default", payload={"button": "arbitrary"},
-        )
-        kb.add_line()
-        kb.add_button(
-            label="Назад", color="primary", payload={"button": "home"},
+            label="Назад", payload={"button": "home"},
         )
         return kb.get_keyboard()
 
@@ -82,7 +78,7 @@ class Keyboards:
         Возвращает клавиатуру с кнопкой "Отмена"
         """
         kb = VkKeyboard()
-        kb.add_button(label="Отмена", color="negative", payload={"button": "cancel"})
+        kb.add_button(label="Отмена", payload={"button": "cancel"})
         return kb.get_keyboard()
 
     @staticmethod
@@ -96,7 +92,7 @@ class Keyboards:
         kb.add_button(label="Использование имён в призыве", payload={"button": "names"})
         kb.add_line()
         kb.add_button(
-            label="Назад", color="primary", payload={"button": "home"},
+            label="Назад", payload={"button": "home"},
         )
         return kb.get_keyboard()
 
@@ -118,7 +114,7 @@ class Keyboards:
             )
         kb.add_line()
         kb.add_button(
-            label="Назад", color="primary", payload={"button": "prefs"},
+            label="Назад", payload={"button": "prefs"},
         )
         return kb.get_keyboard()
 
@@ -131,7 +127,7 @@ class Keyboards:
             kb.add_button(label="Включить", payload={"button": "on_using_names"})
         kb.add_line()
         kb.add_button(
-            label="Назад", color="primary", payload={"button": "prefs"},
+            label="Назад", payload={"button": "prefs"},
         )
         return kb.get_keyboard()
 
@@ -146,7 +142,7 @@ class Keyboards:
         kb.add_button(label="📢 Должники", payload={"button": "debtors"})
         kb.add_button(label="⚙ Настройки", payload={"button": "fin_prefs"})
         kb.add_line()
-        kb.add_button(label="👈🏻 Назад", color="primary", payload={"button": "finances"})
+        kb.add_button(label="👈🏻 Назад", payload={"button": "finances"})
         return kb.get_keyboard()
 
     @staticmethod
@@ -155,30 +151,26 @@ class Keyboards:
         kb.add_button(label="Изменить сумму", payload={"button": "update_summ"})
         kb.add_button(label="Переименовать", payload={"button": "update_name"})
         kb.add_line()
-        kb.add_button(
-            label="Удалить", color="negative", payload={"button": "delete_expense"}
-        )
+        kb.add_button(label="Удалить", payload={"button": "delete_expense"})
         kb.add_line()
         kb.add_button(
-            label="Назад", color="primary", payload={"button": "fin_category"},
+            label="Назад", payload={"button": "fin_category"},
         )
         return kb.get_keyboard()
 
     def generate_call_prompt(self, group: int):
         kb = self.generate_alphabet_keyboard(group)
         kb.add_line()
-        kb.add_button(label="Отмена", color="negative", payload={"button": "cancel"})
-        kb.add_button(label="Сохранить", color="positive", payload={"button": "save"})
+        kb.add_button(label="Отмена", payload={"button": "cancel"})
+        kb.add_button(label="Сохранить", payload={"button": "save"})
         kb.add_line()
-        kb.add_button(
-            label="Отправить всем", color="primary", payload={"button": "send_to_all"}
-        )
+        kb.add_button(label="Отправить всем", payload={"button": "send_to_all"})
         return kb.get_keyboard()
 
     def generate_finances_prompt(self, group):
         kb = self.generate_alphabet_keyboard(group)
         kb.add_line()
-        kb.add_button(label="Отмена", color="negative", payload={"button": "cancel"})
+        kb.add_button(label="Отмена", payload={"button": "cancel"})
         return kb.get_keyboard()
 
     def generate_alphabet_keyboard(self, group: int):
@@ -212,7 +204,7 @@ class Keyboards:
         if kb.lines[-1]:
             kb.add_line()
         kb.add_button(
-            label="Назад", color="primary", payload={"button": "back"},
+            label="Назад", payload={"button": "back"},
         )
         return kb.get_keyboard()
 
@@ -231,7 +223,7 @@ class Keyboards:
         if kb.lines[-1]:
             kb.add_line()
         kb.add_button(
-            label="Назад", color="primary", payload={"button": "home"},
+            label="Назад", payload={"button": "home"},
         )
         return kb.get_keyboard()
 
@@ -243,7 +235,6 @@ class Keyboards:
         if is_admin:
             kb.add_button(
                 label="Отправить рассылку",
-                color="default",
                 payload={"button": "send_mailing", "mailing": m_id},
             )
         kb.add_button(
@@ -256,7 +247,7 @@ class Keyboards:
         )
         kb.add_line()
         kb.add_button(
-            label="Назад", color="primary", payload={"button": "mailings"},
+            label="Назад", payload={"button": "mailings"},
         )
         return kb.get_keyboard()
 
@@ -265,24 +256,19 @@ class Keyboards:
         Возвращает клавиатуру с подтверждением действия
         """
         kb = VkKeyboard()
-        kb.add_button(
-            label="Подтвердить", color="positive", payload={"button": "confirm"}
-        )
-        kb.add_button(label="Отмена", color="negative", payload={"button": "deny"})
+        kb.add_button(label="Подтвердить", payload={"button": "confirm"})
+        kb.add_button(label="Отмена", payload={"button": "deny"})
         if user_id is not None and self.db.get_session_state(user_id) in [
             "call_configuring",
             "debtors_forming",
         ]:
             kb.add_line()
             kb.add_button(
-                label="Сменить беседу",
-                color="primary",
-                payload={"button": "chconv_call"},
+                label="Сменить беседу", payload={"button": "chconv_call"},
             )
             kb.add_line()
             kb.add_button(
                 label="Переключить использование имён",
-                color="primary",
                 payload={"button": "chnames_call"},
             )
         return kb.get_keyboard()
@@ -303,5 +289,5 @@ class Keyboards:
         kb.add_button(label="Баланс", payload={"button": "balance"})
         kb.add_button(label="Добавить статью", payload={"button": "add_expense_cat"})
         kb.add_line()
-        kb.add_button(label="Назад", color="primary", payload={"button": "home"})
+        kb.add_button(label="Назад", payload={"button": "home"})
         return kb.get_keyboard()

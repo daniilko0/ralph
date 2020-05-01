@@ -31,6 +31,7 @@ class Keyboards:
         if is_admin:
             kb.add_line()
             kb.add_button(label="Настройки", payload={"button": "prefs"})
+            kb.add_button(label="Веб", payload={"button": "web"})
         return kb.get_keyboard()
 
     @staticmethod

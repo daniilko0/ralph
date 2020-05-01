@@ -371,7 +371,7 @@ for event in bot.longpoll.listen():
         elif payload["button"] == "mailing":
             if not db.mailing_session_exist(event["message"]["from_id"]):
                 db.create_mailing_session(event["message"]["from_id"])
-            db.update_mailing_session(event["message"]["from_id"], payload["slug"])
+            db.update_mailing_session(event["message"]["from_id"], payload["id"])
             bot.send_message(
                 msg=f"Меню управления рассылкой \"{payload['name']}\":",
                 pid=event["message"]["from_id"],
@@ -382,7 +382,8 @@ for event in bot.longpoll.listen():
                 ),
             )
         elif payload["button"] == "subscribe":
-            db.update_subscribe_state(payload["slug"], payload["user_id"], 1)
+            u_id = db.get_user_id(payload["user_id"])
+            db.update_subscribe_state(payload["slug"], u_id, 1)
             bot.send_message(
                 msg="Вы были успешно подписаны на рассылку.",
                 pid=event["message"]["from_id"],
@@ -393,7 +394,8 @@ for event in bot.longpoll.listen():
                 ),
             )
         elif payload["button"] == "unsubscribe":
-            db.update_subscribe_state(payload["slug"], payload["user_id"], 0)
+            u_id = db.get_user_id(payload["user_id"])
+            db.update_subscribe_state(payload["slug"], u_id, 0)
             bot.send_message(
                 msg="Вы были успешно отписаны от рассылки.",
                 pid=event["message"]["from_id"],
@@ -402,6 +404,13 @@ for event in bot.longpoll.listen():
                     m_id=payload["id"],
                     user_id=event["message"]["from_id"],
                 ),
+            )
+        elif payload["button"] == "inline_unsubscribe":
+            u_id = db.get_user_id(payload["user_id"])
+            db.update_subscribe_state(payload["slug"], u_id, 0)
+            bot.send_message(
+                msg="Вы были успешно отписаны от рассылки.",
+                pid=event["message"]["from_id"],
             )
         elif payload["button"] == "send_mailing":
             db.update_session_state(
@@ -458,6 +467,8 @@ for event in bot.longpoll.listen():
                 attach=attach,
                 group=group,
             )
+            db.update_mailing_message(event["message"]["from_id"], "")
+            db.update_mailing_attaches(event["message"]["from_id"], "")
             bot.send_message(
                 msg="Рассылка отправлена.",
                 pid=event["message"]["from_id"],

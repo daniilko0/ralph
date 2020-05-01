@@ -158,6 +158,15 @@ class Keyboards:
         )
         return kb.get_keyboard()
 
+    @staticmethod
+    def inline_unsubscribe(m_id, sub_id):
+        kb = VkKeyboard(inline=True)
+        kb.add_button(
+            label="Отписаться от таких сообщений",
+            payload={"button": "inline_unsubscribe", "slug": m_id, "user_id": sub_id},
+        )
+        return kb.get_keyboard()
+
     def generate_call_prompt(self, group: int):
         kb = self.generate_alphabet_keyboard(group)
         kb.add_line()

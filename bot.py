@@ -140,8 +140,14 @@ class Bot(metaclass=SingletonMeta):
             text: Сообщение рассылки
             attach: Список вложений, прикрепляемых к рассылке
         """
-        subscribers = self.db.fetch_subcribers(m_id, group)
-        self.send_message(msg=text, user_ids=subscribers, attachment=attach)
+        subscribers = self.db.fetch_subcribers(m_id, group).split(",")
+        for sub in subscribers:
+            self.send_message(
+                msg=text,
+                pid=int(sub),
+                attachment=attach,
+                keyboard=self.kbs.inline_unsubscribe(m_id, int(sub)),
+            )
 
     def generate_mentions(self, ids: str, names: bool) -> str:
         """Генерирует строку с упоминаниями из списка идентификаторов

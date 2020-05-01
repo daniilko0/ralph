@@ -559,3 +559,16 @@ class Database(Base):
         """
         groups = self.query("select * from groups")
         return groups
+
+    def get_administrating_groups(self, admin_id: int):
+        """Получает список групп доступных пользователю для администрирования
+
+        Arguments:
+            admin_id: Идентификатор пользователя
+        Returns:
+            List[int]: Список номеров групп
+        """
+        groups = self.query(
+            "select group_num from administrators where vk_id=%s", (admin_id,)
+        )
+        return [i for (i,) in groups]

@@ -931,3 +931,35 @@ for event in bot.longpoll.listen():
             send_call_confirm()
 
         # :blockend: Финансы
+
+        # :blockstart: Веб-интерфейс
+
+        elif payload["button"] == "web":
+            bot.send_message(
+                msg="Выберите группу для получения ссылки авторизации",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_administrating_groups(
+                    event["message"]["from_id"]
+                ),
+            )
+
+        elif payload["button"] == "get_auth_link":
+            domain = "https://ralph-cms.herokuapp.com"
+            url = domain + f"/api/auth/{payload['group']}"
+            request = requests.get(url)
+            if request.status_code == 200:
+                arg = request.json()["result"]["link"]
+                bot.send_message(
+                    msg="Ваша одноразовая ссылка для авторизации под именем "
+                    f"администратора группы {payload['group']}:\n"
+                    f"{domain + arg}\nОна действительна в течении 5 минут.\nТак как "
+                    f"панель управления находится на бесплатном хостинге, "
+                    f"при открытии ссылки с компьютера могут возникнуть "
+                    f"проблемы\nПохоже, (без костылей) это никак не решается.",
+                    pid=event["message"]["from_id"],
+                    keyboard=kbs.generate_main_menu(
+                        bot.is_admin(event["message"]["from_id"])
+                    ),
+                )
+
+        # :blockend: Веб-интерфейс

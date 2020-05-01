@@ -291,3 +291,18 @@ class Keyboards:
         kb.add_line()
         kb.add_button(label="Назад", payload={"button": "home"})
         return kb.get_keyboard()
+
+    def generate_administrating_groups(self, admin_id):
+        kb = VkKeyboard()
+        groups = self.db.get_administrating_groups(admin_id)
+        for i, v in enumerate(groups):
+            label = v
+            kb.add_button(
+                label=label, payload={"button": "get_auth_link", "group": v},
+            )
+            if len(kb.lines[-1]) == 2:
+                kb.add_line()
+        if kb.lines[-1]:
+            kb.add_line()
+        kb.add_button(label="Назад", payload={"button": "home"})
+        return kb.get_keyboard()

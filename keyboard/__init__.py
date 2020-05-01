@@ -243,13 +243,13 @@ class Keyboards:
             kb.add_button(
                 label="Отправить рассылку",
                 color="default",
-                payload={"button": "send_mailing", "mailing": slug},
+                payload={"button": "send_mailing", "mailing": m_id},
             )
         kb.add_button(
             label=f"{'Отписаться' if status else 'Подписаться'}",
             payload={
                 "button": f"{'unsubscribe' if status else 'subscribe'}",
-                "slug": slug,
+                "slug": m_id,
                 "user_id": uid,
             },
         )

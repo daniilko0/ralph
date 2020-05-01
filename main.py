@@ -7,7 +7,6 @@ from enum import Enum
 import requests
 from psycopg2 import ProgrammingError
 from vk_api.bot_longpoll import VkBotEventType
-from googletrans import Translator
 
 from bot import Bot
 from database import Database

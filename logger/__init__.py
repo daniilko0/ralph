@@ -59,7 +59,7 @@ class TelegramFormatter(Formatter):
             .astimezone(tz=timezone(timedelta(hours=3)))
             .strftime("%d.%m.%Y %H:%M:%S")
         )
-        fmt = f"[{levelname}] ({module}): {ts}\n{message}"
+        fmt = f"[{levelname}] ({module}): {ts} {message}"
         if record.exc_info:
             fmt += f"\n{record.exc_info[1].__repr__()}"
         return fmt

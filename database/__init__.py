@@ -233,6 +233,7 @@ class Database(Base):
         """
         s_id = self.get_session_id(user_id)
         self.query("UPDATE sessions SET conversation = %s WHERE id=%s", (conv_id, s_id))
+        return conv_id
 
     def mailing_session_exist(self, user_id: int) -> bool:
         """Проверяет наличие сессии рассылки

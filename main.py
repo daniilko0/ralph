@@ -494,39 +494,6 @@ for event in bot.longpoll.listen():
                 pid=event["message"]["from_id"],
                 keyboard=kbs.generate_prefs_keyboard(),
             )
-
-        elif payload["button"] == "chconv":
-            chat = db.get_conversation(event["message"]["from_id"])
-            if chat == 2000000001:
-                bot.send_message(
-                    msg="Тестовая беседа сейчас активна",
-                    pid=event["message"]["from_id"],
-                    keyboard=kbs.generate_conv_selector(chat),
-                )
-            elif chat == 2000000002:
-                bot.send_message(
-                    msg="Основная беседа сейчас активна",
-                    pid=event["message"]["from_id"],
-                    keyboard=kbs.generate_conv_selector(chat),
-                )
-
-        elif payload["button"] == "select_main_conv":
-            chat = 2000000002
-            db.update_conversation(event["message"]["from_id"], chat)
-            bot.send_message(
-                msg="Основная беседа активна.",
-                pid=event["message"]["from_id"],
-                keyboard=kbs.generate_conv_selector(chat),
-            )
-        elif payload["button"] == "select_test_conv":
-            chat = 2000000001
-            db.update_conversation(event["message"]["from_id"], chat)
-            bot.send_message(
-                msg="Тестовая беседа активна.",
-                pid=event["message"]["from_id"],
-                keyboard=kbs.generate_conv_selector(chat),
-            )
-
         elif payload["button"] == "names":
             status = db.get_names_using_status(event["message"]["from_id"])
             msg = (
@@ -554,6 +521,37 @@ for event in bot.longpoll.listen():
                 msg="Использование имён в призыве включено.",
                 pid=event["message"]["from_id"],
                 keyboard=kbs.generate_names_selector(bool(status)),
+            )
+
+        elif payload["button"] == "chats":
+            bot.send_message(
+                msg="Настройки чатов",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_chat_prefs(),
+            )
+
+        elif payload["button"] == "local_chat":
+            chat = db.get_conversation(event["message"]["from_id"])
+            bot.send_message(
+                msg="Локальная настройка чатов",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_local_chat_prefs(chat),
+            )
+
+        elif payload["button"] == "activate_test_chat":
+            chat = db.update_conversation(event["message"]["from_id"], 0)
+            bot.send_message(
+                msg="Тестовая беседа активирована",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_local_chat_prefs(chat),
+            )
+
+        elif payload["button"] == "activate_main_chat":
+            chat = db.update_conversation(event["message"]["from_id"], 1)
+            bot.send_message(
+                msg="Основная беседа активирована",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_local_chat_prefs(chat),
             )
         # :blockend: Параметры
 

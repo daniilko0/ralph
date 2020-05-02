@@ -87,13 +87,46 @@ class Keyboards:
         Возвращает клавиатуру с настройками бота
         """
         kb = VkKeyboard()
-        kb.add_button(label="Сменить беседу", payload={"button": "chconv"})
+        kb.add_button(label="Чаты", payload={"button": "chats"})
         kb.add_line()
         kb.add_button(label="Использование имён в призыве", payload={"button": "names"})
         kb.add_line()
         kb.add_button(
             label="Назад", payload={"button": "home"},
         )
+        return kb.get_keyboard()
+
+    @staticmethod
+    def generate_chat_prefs():
+        kb = VkKeyboard()
+        kb.add_button(
+            label="Глобальные настройки чатов", payload={"button": "global_chat"}
+        )
+        kb.add_line()
+        kb.add_button(
+            label="Локальные настройки чатов", payload={"button": "local_chat"}
+        )
+        kb.add_line()
+        kb.add_button(
+            label="Назад", payload={"button": "prefs"},
+        )
+        return kb.get_keyboard()
+
+    @staticmethod
+    def generate_local_chat_prefs(chat):
+        kb = VkKeyboard()
+        if chat:
+            kb.add_button(
+                label="Переключиться на тестовую беседу",
+                payload={"button": "activate_test_chat"},
+            )
+        else:
+            kb.add_button(
+                label="Переключиться на основную беседу",
+                payload={"button": "activate_main_chat"},
+            )
+        kb.add_line()
+        kb.add_button(label="Назад", payload={"button": "chats"})
         return kb.get_keyboard()
 
     @staticmethod

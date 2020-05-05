@@ -637,3 +637,15 @@ class Database(Base):
             (group, 0),
         )
         return bool(chat)
+
+    def registrate_chat(self, chat_id: int, chat_type: int, group: int):
+        """Регистрирует чат
+        Args:
+            chat_id: Идентификатор регистрируемого чата
+            chat_type: Тип чата (0/1)
+            group: Номер группы
+        """
+        self.query(
+            "insert into chats (chat_id, chat_type, group_num) values (%s, %s, %s)",
+            (chat_id, chat_type, group),
+        )

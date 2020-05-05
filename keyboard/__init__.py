@@ -3,6 +3,7 @@ import os
 from vk_api.keyboard import VkKeyboard
 
 from database import Database
+from bot import Bot
 
 
 class Keyboards:
@@ -12,6 +13,8 @@ class Keyboards:
 
     def __init__(self):
         self.db = Database(os.environ["DATABASE_URL"])
+        self.bot = Bot()
+        self.bot.auth()
 
     @staticmethod
     def generate_main_menu(is_admin: bool):
@@ -129,26 +132,62 @@ class Keyboards:
         kb.add_button(label="Назад", payload={"button": "chats"})
         return kb.get_keyboard()
 
-    @staticmethod
-    def generate_conv_selector(chat: int):
-        """
-        Возвращает клавиатуру-селектор бесед
-        """
+    def generate_global_chat_prefs(self, group: int):
         kb = VkKeyboard()
-        if chat == 2000000001:
-            kb.add_button(
-                label="Переключиться на основную беседу",
-                payload={"button": "select_main_conv"},
+        chats = self.db.get_chats_of_group(group)
+        for i, v in enumerate(chats):
+            if v[1]:
+                kb.add_button(
+                    label="Основная беседа",
+                    payload={"button": "main_chat", "group": group, "chat_id": v[0]},
+                )
+            else:
+                kb.add_button(
+                    label="Тестовая беседа",
+                    payload={"button": "test_chat", "group": group, "chat_id": v[0]},
+                )
+            if len(kb.lines[-1]) == 2:
+                kb.add_line()
+        if kb.lines[-1]:
+            kb.add_line()
+        if len(chats) < 2 and self.db.get_cached_chats():
+            kb.add_button(label="Зарегистрировать чат", payload={"button": "reg_chat"})
+        kb.add_button(label="Назад", payload={"button": "chats"})
+        return kb.get_keyboard()
+
+    def reg_chat(self):
+        kb = VkKeyboard()
+        chats = self.db.get_cached_chats()
+        for i, v in enumerate(chats):
+            chat = self.bot.bot_vk.messages.getConversationsById(
+                peer_ids=v, group_id=self.bot.gid
             )
-        elif chat == 2000000002:
+            if chat["items"]:
+                kb.add_button(
+                    label=chat["items"][0]["chat_settings"]["title"],
+                    payload={"button": "add_chat", "chat_id": v},
+                )
+            else:
+                kb.add_button(label="???", payload={"button": "add_chat", "chat_id": v})
+            if len(kb.lines[-1]) == 2:
+                kb.add_line()
+        if kb.lines[-1]:
+            kb.add_line()
+        kb.add_button(label="Назад", payload={"button": "global_chat"})
+        return kb.get_keyboard()
+
+    def generate_available_chat_types(self, chat_id: int, group: int):
+        kb = VkKeyboard()
+        if not self.db.is_main_chat_added(group):
             kb.add_button(
-                label="Переключиться на тестовую беседу",
-                payload={"button": "select_test_conv"},
+                label="Основной", payload={"button": "reg_as_main", "chat_id": chat_id}
+            )
+        if not self.db.is_test_chat_added(group):
+            kb.add_button(
+                label="Тестовый", payload={"button": "reg_as_test", "chat_id": chat_id}
             )
         kb.add_line()
-        kb.add_button(
-            label="Назад", payload={"button": "prefs"},
-        )
+        kb.add_button(label="Назад", payload={"button": "reg_chat"})
         return kb.get_keyboard()
 
     @staticmethod

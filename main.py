@@ -580,6 +580,52 @@ for event in bot.longpoll.listen():
                 pid=event["message"]["from_id"],
                 keyboard=kbs.generate_local_chat_prefs(chat),
             )
+
+        elif payload["button"] == "global_chat":
+            group = db.get_group_of_user(event["message"]["from_id"])
+
+            bot.send_message(
+                msg="Глобальная настройка чатов",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_global_chat_prefs(group),
+            )
+
+        elif payload["button"] == "reg_chat":
+            bot.send_message(
+                msg="Выберите чат для регистрации\n(Если вы видите кнопки в названии "
+                "которых вопросительные знаки, значит в этом чате бот не является администратором,"
+                "что недопустимо для нормальной работы бота. Проверьте права доступа и вернитесь)",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.reg_chat(),
+            )
+
+        elif payload["button"] == "add_chat":
+            group = db.get_group_of_user(event["message"]["from_id"])
+            bot.send_message(
+                msg="Выберите тип регистрируемого чата",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_available_chat_types(payload["chat_id"], group),
+            )
+
+        elif payload["button"] == "reg_as_main":
+            group = db.get_group_of_user(event["message"]["from_id"])
+            db.remove_cached_chat(payload["chat_id"])
+            db.registrate_chat(payload["chat_id"], 1, group)
+            bot.send_message(
+                msg="Чат зарегистрирован как основной",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_global_chat_prefs(group),
+            )
+
+        elif payload["button"] == "reg_as_test":
+            group = db.get_group_of_user(event["message"]["from_id"])
+            db.remove_cached_chat(payload["chat_id"])
+            db.registrate_chat(payload["chat_id"], 0, group)
+            bot.send_message(
+                msg="Чат зарегистрирован как тестовый",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_global_chat_prefs(group),
+            )
         # :blockend: Параметры
 
         # :blockstart: Финансы

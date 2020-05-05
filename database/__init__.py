@@ -573,3 +573,40 @@ class Database(Base):
             "select group_num from administrators where vk_id=%s", (admin_id,)
         )
         return [i for (i,) in groups]
+
+    def get_registered_chats(self):
+        """Получает список зарегистрированных чатов"""
+        chats = self.query("select chat_id from chats")
+        return [chat for (chat,) in chats]
+
+    def get_chats_of_group(self, group: int):
+        """Получает список чатов, привязанных к группе
+
+        Arguments:
+            group: Номер группы
+        Returns:
+            List[Tuple[int, int]]: Список чатов
+        """
+        chats = self.query(
+            "select chat_id, chat_type from chats where group_num=%s", (group,)
+        )
+        return chats
+
+    def get_cached_chats(self):
+        """Получает список сохраненных чатов"""
+        chats = self.query("select chat_id from chat_cache")
+        return [chat for (chat,) in chats]
+
+    def add_cached_chat(self, chat_id: int):
+        """Сохраняет чат в кеш
+        Arguments:
+            chat_id: Идентификатор чата для сохранения
+        """
+        self.query("insert into chat_cache (chat_id) values (%s)", (chat_id,))
+
+    def remove_cached_chat(self, chat_id: int):
+        """Удаляет чат из кеша
+        Arguments:
+            chat_id: Идентификатор чата для удаления
+        """
+        self.query("delete from chat_cache where chat_id=%s", (chat_id,))

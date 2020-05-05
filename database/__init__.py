@@ -565,7 +565,7 @@ class Database(Base):
     def get_administrating_groups(self, admin_id: int):
         """Получает список групп доступных пользователю для администрирования
 
-        Arguments:
+        Args:
             admin_id: Идентификатор пользователя
         Returns:
             List[int]: Список номеров групп
@@ -583,7 +583,7 @@ class Database(Base):
     def get_chats_of_group(self, group: int):
         """Получает список чатов, привязанных к группе
 
-        Arguments:
+        Args:
             group: Номер группы
         Returns:
             List[Tuple[int, int]]: Список чатов
@@ -600,14 +600,40 @@ class Database(Base):
 
     def add_cached_chat(self, chat_id: int):
         """Сохраняет чат в кеш
-        Arguments:
+        Args:
             chat_id: Идентификатор чата для сохранения
         """
         self.query("insert into chat_cache (chat_id) values (%s)", (chat_id,))
 
     def remove_cached_chat(self, chat_id: int):
         """Удаляет чат из кеша
-        Arguments:
+        Args:
             chat_id: Идентификатор чата для удаления
         """
         self.query("delete from chat_cache where chat_id=%s", (chat_id,))
+
+    def is_main_chat_added(self, group: int):
+        """Проверяет наличие добавленного основного чата в группу
+        Args:
+            group: Номер группы
+        Returns:
+            bool: Наличие основного чата
+        """
+        chat = self.query(
+            "select chat_id from chats where group_num=%s and " "chat_type=%s",
+            (group, 1),
+        )
+        return bool(chat)
+
+    def is_test_chat_added(self, group: int):
+        """Проверяет наличие добавленного тестового чата в группу
+        Args:
+            group: Номер группы
+        Returns:
+            bool: Наличие основного чата
+        """
+        chat = self.query(
+            "select chat_id from chats where group_num=%s and " "chat_type=%s",
+            (group, 0),
+        )
+        return bool(chat)

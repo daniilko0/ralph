@@ -152,6 +152,7 @@ class Keyboards:
             kb.add_line()
         if len(chats) < 2 and self.db.get_cached_chats():
             kb.add_button(label="Зарегистрировать чат", payload={"button": "reg_chat"})
+        kb.add_line()
         kb.add_button(label="Назад", payload={"button": "chats"})
         return kb.get_keyboard()
 

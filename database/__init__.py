@@ -19,7 +19,8 @@ class Database(Base):
         """Получает список активных студентов (с любым статусом, кроме "отчислен")
         """
         ids = self.query(
-            "SELECT user_id FROM users_info WHERE academic_status > 0 AND group_num = %s ORDER BY user_id",
+            "SELECT user_id FROM users_info WHERE status_id > 0 AND group_num = %s ORDER BY "
+            "user_id",
             (group,),
         )
         vk_ids = [str(self.get_vk_id(_id)) for (_id,) in ids]
@@ -41,7 +42,7 @@ class Database(Base):
         names = self.query(
             "SELECT user_id, first_name, second_name FROM users_info "
             "WHERE substring(second_name from '^.') = %s "
-            "AND academic_status > 0 AND group_num = %s ORDER BY user_id",
+            "AND status_id > 0 AND group_num = %s ORDER BY user_id",
             (letter, group),
         )
         return names

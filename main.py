@@ -114,12 +114,39 @@ def load_attachs():
         db.update_call_attaches(event["message"]["from_id"], atch)
 
 
+def invite_bot():
+    """Срабатывает, если текущее событие - приглашение бота в беседу
+    """
+    if event["message"]["action"][
+        "type"
+    ] == "chat_invite_user" and event.object.message["action"]["member_id"] == -int(
+        bot.gid
+    ):
+        if (
+            event.objects.message["peer_id"] not in db.get_cached_chats()
+            and event.objects.message["peer_id"] not in db.get_registered_chats()
+        ):
+            db.add_cached_chat(event.objects.message["peer_id"])
+        bot.send_message(
+            msg="Привет! Для полноценной работы меня нужно сделать администратором",
+            pid=event.object.message["peer_id"],
+        )
+
+
 for event in bot.longpoll.listen():
     event = {
         "type": event.type,
         "client_info": event.object.client_info,
         "message": event.object.message,
+        "from": event.object.message["from_id"],
+        "text": event.object.message["text"],
+        "chat": event.object.message["from_id"] == event.object.message["peer_id"],
     }
+    try:
+        invite_bot()
+    except KeyError:
+        pass
+
     if (
         event["type"] == EventTypes.NEW_MESSAGE.value
         and (event["message"]["text"] or event["message"]["attachments"])

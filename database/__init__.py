@@ -649,3 +649,32 @@ class Database(Base):
             "insert into chats (chat_id, chat_type, group_num) values (%s, %s, %s)",
             (chat_id, chat_type, group),
         )
+
+    def is_chat_active(self, group: int, chat_type: int):
+        """
+        Возвращает статус чата (активен/не активен)
+        Args:
+            group: Номер группы
+            chat_type: Тип чата (тестовый/основной)
+
+        Returns:
+            bool: Статус чата
+        """
+        chat_status = self.query(
+            "select is_active from chats where group_num=%s and chat_type=%s",
+            (group, chat_type),
+            fetchone=True,
+        )
+        return bool(chat_status[0])
+
+    def update_chat_activity(self, group: int, chat_type: int, new_state: int):
+        """
+        Изменяет статус активности чата
+        Args:
+            group: Номер группы
+            chat_type: Тип чата (тестовый/основной)
+        """
+        self.query(
+            "update chats set is_active = %s where group_num=%s and " "chat_type=%s",
+            (new_state, group, chat_type),
+        )

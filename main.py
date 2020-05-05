@@ -117,20 +117,23 @@ def load_attachs():
 def invite_bot():
     """Срабатывает, если текущее событие - приглашение бота в беседу
     """
-    if event["message"]["action"][
-        "type"
-    ] == "chat_invite_user" and event.object.message["action"]["member_id"] == -int(
-        bot.gid
-    ):
-        if (
-            event.objects.message["peer_id"] not in db.get_cached_chats()
-            and event.objects.message["peer_id"] not in db.get_registered_chats()
+    try:
+        if event["message"]["action"][
+            "type"
+        ] == "chat_invite_user" and event.object.message["action"]["member_id"] == -int(
+            bot.gid
         ):
-            db.add_cached_chat(event.objects.message["peer_id"])
-        bot.send_message(
-            msg="Привет! Для полноценной работы меня нужно сделать администратором",
-            pid=event.object.message["peer_id"],
-        )
+            if (
+                event.objects.message["peer_id"] not in db.get_cached_chats()
+                and event.objects.message["peer_id"] not in db.get_registered_chats()
+            ):
+                db.add_cached_chat(event.objects.message["peer_id"])
+            bot.send_message(
+                msg="Привет! Для полноценной работы меня нужно сделать администратором",
+                pid=event.object.message["peer_id"],
+            )
+    except (KeyError, TypeError):
+        pass
 
 
 for event in bot.longpoll.listen():
@@ -138,14 +141,9 @@ for event in bot.longpoll.listen():
         "type": event.type,
         "client_info": event.object.client_info,
         "message": event.object.message,
-        "from": event.object.message["from_id"],
-        "text": event.object.message["text"],
-        "chat": event.object.message["from_id"] == event.object.message["peer_id"],
     }
-    try:
-        invite_bot()
-    except KeyError:
-        pass
+
+    invite_bot()
 
     if (
         event["type"] == EventTypes.NEW_MESSAGE.value
@@ -590,13 +588,37 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.generate_global_chat_prefs(group),
             )
 
+        elif payload["button"] == "configure_chat":
+            chat = bot.bot_vk.messages.getConversationsById(
+                peer_ids=payload["chat_id"], group_id=bot.gid
+            )
+            status = ""
+            if not chat["items"]:
+                status = (
+                    "Бот не администратор в этом чате. Это может мешать "
+                    "корректной работе"
+                )
+            if payload["chat_type"]:
+                chat_type = "основного"
+            else:
+                chat_type = "тестового"
+            bot.send_message(
+                msg=f"Настройки {chat_type} чата\n{status}",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.configure_chat(payload["group"], payload["chat_type"]),
+            )
+
         elif payload["button"] == "reg_chat":
+            chats = db.get_cached_chats()
+            chats_info = bot.bot_vk.messages.getConversationsById(
+                peer_ids="".join(chats), group_id=bot.gid
+            )
             bot.send_message(
                 msg="Выберите чат для регистрации\n(Если вы видите кнопки в названии "
                 "которых вопросительные знаки, значит в этом чате бот не является администратором,"
                 "что недопустимо для нормальной работы бота. Проверьте права доступа и вернитесь)",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.reg_chat(),
+                keyboard=kbs.reg_chat(chats, chats_info),
             )
 
         elif payload["button"] == "add_chat":
@@ -626,6 +648,22 @@ for event in bot.longpoll.listen():
                 pid=event["message"]["from_id"],
                 keyboard=kbs.generate_global_chat_prefs(group),
             )
+
+        elif payload["button"] == "activate_chat":
+            if payload["chat_type"]:
+                db.update_chat_activity(payload["group"], 1, 1)
+                db.update_chat_activity(payload["group"], 0, 0)
+                chat_type = "Основной"
+            else:
+                db.update_chat_activity(payload["group"], 1, 0)
+                db.update_chat_activity(payload["group"], 0, 1)
+                chat_type = "Тестовый"
+            bot.send_message(
+                msg=f"{chat_type} чат выбран для отправки рассылок",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.configure_chat(payload["group"], payload["chat_type"]),
+            )
+
         # :blockend: Параметры
 
         # :blockstart: Финансы

@@ -3,7 +3,6 @@ import os
 from vk_api.keyboard import VkKeyboard
 
 from database import Database
-from bot import Bot
 
 
 class Keyboards:
@@ -13,8 +12,6 @@ class Keyboards:
 
     def __init__(self):
         self.db = Database(os.environ["DATABASE_URL"])
-        self.bot = Bot()
-        self.bot.auth()
 
     @staticmethod
     def generate_main_menu(is_admin: bool):
@@ -136,42 +133,63 @@ class Keyboards:
         kb = VkKeyboard()
         chats = self.db.get_chats_of_group(group)
         for i, v in enumerate(chats):
+            if len(kb.lines[-1]) == 2:
+                kb.add_line()
             if v[1]:
                 kb.add_button(
                     label="Основная беседа",
-                    payload={"button": "main_chat", "group": group, "chat_id": v[0]},
+                    payload={
+                        "button": "configure_chat",
+                        "group": group,
+                        "chat_type": 1,
+                        "chat_id": v[0],
+                    },
                 )
             else:
                 kb.add_button(
                     label="Тестовая беседа",
-                    payload={"button": "test_chat", "group": group, "chat_id": v[0]},
+                    payload={
+                        "button": "configure_chat",
+                        "group": group,
+                        "chat_type": 0,
+                        "chat_id": v[0],
+                    },
                 )
-            if len(kb.lines[-1]) == 2:
-                kb.add_line()
-        if kb.lines[-1]:
-            kb.add_line()
         if len(chats) < 2 and self.db.get_cached_chats():
             kb.add_button(label="Зарегистрировать чат", payload={"button": "reg_chat"})
         kb.add_line()
         kb.add_button(label="Назад", payload={"button": "chats"})
         return kb.get_keyboard()
 
-    def reg_chat(self):
+    @staticmethod
+    def reg_chat(chats, chats_info):
         kb = VkKeyboard()
-        chats = self.db.get_cached_chats()
         for i, v in enumerate(chats):
-            chat = self.bot.bot_vk.messages.getConversationsById(
-                peer_ids=v, group_id=self.bot.gid
-            )
-            if chat["items"]:
+            if chats_info["items"]:
                 kb.add_button(
-                    label=chat["items"][0]["chat_settings"]["title"],
+                    label=chats_info["items"][0]["chat_settings"]["title"],
                     payload={"button": "add_chat", "chat_id": v},
                 )
             else:
                 kb.add_button(label="???", payload={"button": "add_chat", "chat_id": v})
             if len(kb.lines[-1]) == 2:
                 kb.add_line()
+        if kb.lines[-1]:
+            kb.add_line()
+        kb.add_button(label="Назад", payload={"button": "global_chat"})
+        return kb.get_keyboard()
+
+    def configure_chat(self, group: int, chat_type: int):
+        kb = VkKeyboard()
+        if not self.db.is_chat_active(group, chat_type):
+            kb.add_button(
+                label="Активировать",
+                payload={
+                    "button": "activate_chat",
+                    "group": group,
+                    "chat_type": chat_type,
+                },
+            )
         if kb.lines[-1]:
             kb.add_line()
         kb.add_button(label="Назад", payload={"button": "global_chat"})

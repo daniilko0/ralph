@@ -158,7 +158,6 @@ def send():
     """Отправляет расписание в активную беседу
     и в ЛС подписчикам рассылки "Расписание"
     """
-    db = Database(os.environ["DATABASE_URL"])
     bot = Bot()
     bot.log.setLevel("ERROR")
     bot.auth()
@@ -166,10 +165,9 @@ def send():
     s = Schedule(d.tomorrow)
     s.get_raw()
     sch = s.generate()
-    groups = db.get_list_of_groups()
-    for group, desc in groups:
-        bot.send_mailing(m_id=2, text=sch, group=group)
-    bot.send_message(msg=sch, pid=bot.cid)
+    chat = bot.db.get_active_chat_id(group=109)
+    bot.send_mailing(m_id=2, text=sch, group=109)
+    bot.send_message(msg=sch, pid=chat)
 
 
 def listen():

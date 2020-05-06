@@ -690,3 +690,19 @@ class Database(Base):
         self.query(
             "delete from chats where group_num=%s and chat_type=%s", (group, chat_type)
         )
+
+    def get_active_chat_id(self, group: int):
+        """
+        Получает идентификатор акивного чата группы
+        Args:
+            group: Номер группы
+
+        Returns:
+            int: Идентфикатор чата
+        """
+        chat = self.query(
+            "select chat_id from chats where chat_type=1 and " "group_num=%s",
+            (group,),
+            fetchone=True,
+        )
+        return chat[0]

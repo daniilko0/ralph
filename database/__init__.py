@@ -673,8 +673,20 @@ class Database(Base):
         Args:
             group: Номер группы
             chat_type: Тип чата (тестовый/основной)
+            new_state: Новое состояние чата
         """
         self.query(
             "update chats set is_active = %s where group_num=%s and " "chat_type=%s",
             (new_state, group, chat_type),
+        )
+
+    def unpin_chat(self, group: int, chat_type: int):
+        """
+        Открепляет чат
+        Args:
+            group: Номер группы
+            chat_type: Тип чата
+        """
+        self.query(
+            "delete from chats where group_num=%s and chat_type=%s", (group, chat_type)
         )

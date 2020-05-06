@@ -165,13 +165,13 @@ class Keyboards:
     def reg_chat(chats, chats_info):
         kb = VkKeyboard()
         for i, v in enumerate(chats):
-            if chats_info["items"]:
-                kb.add_button(
-                    label=chats_info["items"][0]["chat_settings"]["title"],
-                    payload={"button": "add_chat", "chat_id": v},
-                )
-            else:
-                kb.add_button(label="???", payload={"button": "add_chat", "chat_id": v})
+            try:
+                label = chats_info["items"][i]["chat_settings"]["title"]
+            except IndexError:
+                label = "???"
+            kb.add_button(
+                label=label, payload={"button": "add_chat", "chat_id": v},
+            )
             if len(kb.lines[-1]) == 2:
                 kb.add_line()
         if kb.lines[-1]:
@@ -179,17 +179,27 @@ class Keyboards:
         kb.add_button(label="Назад", payload={"button": "global_chat"})
         return kb.get_keyboard()
 
-    def configure_chat(self, group: int, chat_type: int):
+    def configure_chat(self, group: int, chat_type: int, chat_id: int):
         kb = VkKeyboard()
         if not self.db.is_chat_active(group, chat_type):
             kb.add_button(
-                label="Активировать",
+                label="Активировать чат",
                 payload={
                     "button": "activate_chat",
                     "group": group,
                     "chat_type": chat_type,
+                    "chat_id": chat_id,
                 },
             )
+        kb.add_button(
+            label="Открепить чат",
+            payload={
+                "button": "unpin_chat",
+                "group": group,
+                "chat_type": chat_type,
+                "chat_id": chat_id,
+            },
+        )
         if kb.lines[-1]:
             kb.add_line()
         kb.add_button(label="Назад", payload={"button": "global_chat"})

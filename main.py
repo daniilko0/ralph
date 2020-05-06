@@ -3,6 +3,7 @@ import json
 import os
 import re
 from enum import Enum
+from typing import Tuple
 
 import requests
 from psycopg2 import ProgrammingError
@@ -605,13 +606,15 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg=f"Настройки {chat_type} чата\n{status}",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.configure_chat(payload["group"], payload["chat_type"]),
+                keyboard=kbs.configure_chat(
+                    payload["group"], payload["chat_type"], payload["chat_id"]
+                ),
             )
 
         elif payload["button"] == "reg_chat":
-            chats = db.get_cached_chats()
-            chats_info = bot.bot_vk.messages.getConversationsById(
-                peer_ids="".join(chats), group_id=bot.gid
+            chats: Tuple[int] = db.get_cached_chats()
+            chats_info: str = bot.bot_vk.messages.getConversationsById(
+                peer_ids=",".join(map(str, chats)), group_id=bot.gid
             )
             bot.send_message(
                 msg="Выберите чат для регистрации\n(Если вы видите кнопки в названии "
@@ -661,7 +664,18 @@ for event in bot.longpoll.listen():
             bot.send_message(
                 msg=f"{chat_type} чат выбран для отправки рассылок",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.configure_chat(payload["group"], payload["chat_type"]),
+                keyboard=kbs.configure_chat(
+                    payload["group"], payload["chat_type"], payload["chat_id"]
+                ),
+            )
+
+        elif payload["button"] == "unpin_chat":
+            db.unpin_chat(payload["group"], payload["chat_type"])
+            db.add_cached_chat(payload["chat_id"])
+            bot.send_message(
+                msg="Чат откреплен",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_global_chat_prefs(payload["group"]),
             )
 
         # :blockend: Параметры

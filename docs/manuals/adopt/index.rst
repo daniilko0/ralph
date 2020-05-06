@@ -6,8 +6,8 @@
    :titlesonly:
    :includehidden:
 
-   group
    institution
+   group
 
 Список подключенных учебных заведений
 -------------------------------------

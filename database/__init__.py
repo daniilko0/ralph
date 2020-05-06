@@ -706,3 +706,20 @@ class Database(Base):
             fetchone=True,
         )
         return chat[0]
+
+    def get_chat_id(self, group: int, chat_type: int):
+        """
+        Получает идентификатор чата
+        Args:
+            group: Номер группы
+            chat_type: Тип чата (тестовый/основной)
+
+        Returns:
+            int: Идентификатор чата
+        """
+        chat = self.query(
+            "select chat_id from chats where chat_type=%s and group_num=%s",
+            (chat_type, group),
+            fetchone=True,
+        )
+        return chat[0]

@@ -66,7 +66,7 @@ def generate_debtors_message():
 
 
 def send_call_confirm():
-    chat_id = int(str(db.get_conversation(event["message"]["from_id"]))[-1])
+    chat_id = db.get_conversation(event["message"]["from_id"])
     if db.get_session_state(event["message"]["from_id"]) == "debtors_forming":
         message = generate_debtors_message()
     else:
@@ -76,7 +76,7 @@ def send_call_confirm():
         atch = ""
     if message != "\n" or atch:
         bot.send_message(
-            msg=f"В {'тестовую ' if chat_id == 1 else 'основную '}"
+            msg=f"В {'основную ' if chat_id else 'тестовую '}"
             f"беседу будет отправлено сообщение:",
             pid=event["message"]["from_id"],
             keyboard=kbs.prompt(event["message"]["from_id"]),
@@ -268,7 +268,9 @@ for event in bot.longpoll.listen():
             event["message"]["from_id"]
         ) in ["call_configuring", "debtors_forming"]:
             bot.log.info("Отправка призыва...")
-            cid = db.get_conversation(event["message"]["from_id"])
+            chat_type = db.get_conversation(event["message"]["from_id"])
+            group = db.get_group_of_user(event["message"]["from_id"])
+            cid = db.get_chat_id(group, chat_type)
             if db.get_session_state(event["message"]["from_id"]) == "debtors_forming":
                 text = generate_debtors_message()
             else:
@@ -291,12 +293,11 @@ for event in bot.longpoll.listen():
             )
         elif payload["button"] == "chconv_call":
             conv = db.get_conversation(event["message"]["from_id"])
-            chat = int(str(conv)[-1])
-            if chat == 1:
-                db.update_conversation(event["message"]["from_id"], 2000000002)
+            if conv == 0:
+                db.update_conversation(event["message"]["from_id"], 1)
                 chat = 2
-            elif chat == 2:
-                db.update_conversation(event["message"]["from_id"], 2000000001)
+            elif conv == 1:
+                db.update_conversation(event["message"]["from_id"], 0)
                 chat = 1
             send_call_confirm()
 

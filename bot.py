@@ -54,22 +54,16 @@ class Bot(metaclass=SingletonMeta):
         self.token = os.environ["VK_TOKEN"]
         self.user_token = os.environ["VK_USER_TOKEN"]
         self.gid = os.environ["GROUP_ID"]
-        self.cid = os.environ["CHAT_ID"]
 
         self.kbs = Keyboards()
 
         self.db = Database(os.environ["DATABASE_URL"])
-        self.admins = os.environ["ADMINS_IDS"].split(",")
 
         self.bot_session = None
         self.user_session = None
         self.bot_vk = None
         self.user_vk = None
         self.longpoll = None
-
-        self.log.info(
-            f"Беседа..." f" {'Тестовая' if self.cid.endswith('1') else 'Основная'}"
-        )
 
         self.log.info("Инициализация завершена.")
 

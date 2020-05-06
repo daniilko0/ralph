@@ -28,27 +28,7 @@ from datetime import datetime, timezone, timedelta
 import requests
 
 
-class TelegramHandler(Handler):
-    def emit(self, record: LogRecord) -> None:
-        log_entry = self.format(record)
-        token = os.environ["TG_TOKEN"]
-        chat_ids = os.environ["TG_CHATS"].split(",")
-        notifications = False
-        if record.levelno < 30:
-            notifications = True
-        for chat in chat_ids:
-            requests.get(
-                f"https://api.telegram.org/bot{token}/sendMessage",
-                params={
-                    "chat_id": chat,
-                    "text": log_entry,
-                    "parse_mode": "markdown",
-                    "disable_notification": notifications,
-                },
-            )
-
-
-class TelegramFormatter(Formatter):
+class BaseFormatter(Formatter):
     def format(self, record: LogRecord) -> str:
         message = record.msg
         levelname = record.levelname
@@ -74,11 +54,7 @@ class Logger:
     def init(self):
         self.logger.setLevel("INFO")
         console = logging.StreamHandler()
-        formatter = TelegramFormatter()
+        formatter = BaseFormatter()
         console.setFormatter(formatter)
         self.logger.addHandler(console)
-        if "PRODUCTION" in os.environ:
-            tg = TelegramHandler()
-            tg.setFormatter(formatter)
-            self.logger.addHandler(tg)
         return self.logger

@@ -32,6 +32,14 @@ from logging import LogRecord
 import requests
 
 
+def handle_exception(exc_type, exc_value, exc_traceback):
+    if issubclass(exc_type, KeyboardInterrupt):
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
+        return
+    logger = Logger().init()
+    logger.critical("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
+
+
 class TelegramHandler(Handler):
     def emit(self, record: LogRecord) -> None:
         log_entry = self.format(record)
@@ -92,14 +100,17 @@ class Logger:
         if self.logger.hasHandlers():
             self.logger.handlers.clear()
 
+        sys.excepthook = handle_exception
+
     def init(self):
         self.logger.setLevel("INFO")
         console = logging.StreamHandler()
-        formatter = TelegramFormatter()
-        console.setFormatter(formatter)
+        base_formatter = BaseFormatter()
+        console.setFormatter(base_formatter)
         self.logger.addHandler(console)
         if "PRODUCTION" in os.environ:
             tg = TelegramHandler()
-            tg.setFormatter(formatter)
+            md_formatter = MarkdownFormatter()
+            tg.setFormatter(md_formatter)
             self.logger.addHandler(tg)
         return self.logger

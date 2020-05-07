@@ -1,4 +1,5 @@
 import re
+import os
 import time
 from datetime import datetime
 from datetime import timedelta
@@ -10,6 +11,7 @@ from bs4 import BeautifulSoup
 
 from logger import Logger
 from bot import Bot
+from database import Database
 
 
 class Date:
@@ -163,8 +165,9 @@ def send():
     s = Schedule(d.tomorrow)
     s.get_raw()
     sch = s.generate()
-    bot.send_mailing(slug="schedule", text=sch)
-    bot.send_message(msg=sch, pid=bot.cid)
+    chat = bot.db.get_active_chat_id(group=109)
+    bot.send_mailing(m_id=2, text=sch, group=109)
+    bot.send_message(msg=sch, pid=chat)
 
 
 def listen():

@@ -54,22 +54,16 @@ class Bot(metaclass=SingletonMeta):
         self.token = os.environ["VK_TOKEN"]
         self.user_token = os.environ["VK_USER_TOKEN"]
         self.gid = os.environ["GROUP_ID"]
-        self.cid = os.environ["CHAT_ID"]
 
         self.kbs = Keyboards()
 
         self.db = Database(os.environ["DATABASE_URL"])
-        self.admins = os.environ["ADMINS_IDS"].split(",")
 
         self.bot_session = None
         self.user_session = None
         self.bot_vk = None
         self.user_vk = None
         self.longpoll = None
-
-        self.log.info(
-            f"Беседа..." f" {'Тестовая' if self.cid.endswith('1') else 'Основная'}"
-        )
 
         self.log.info("Инициализация завершена.")
 
@@ -131,16 +125,23 @@ class Bot(metaclass=SingletonMeta):
         except vk_api.exceptions.ApiError as e:
             self.log.exception(msg=e.__str__())
 
-    def send_mailing(self, slug: str, text: str, attach: str = ""):
+    def send_mailing(self, m_id: int, text: str, group: int, attach: str = ""):
         """Генерирует строку с упоминаниями из списка идентификаторов
 
         Arguments:
-            slug: Слаг рассылки
+            group: Номер группы для поиска подписчиков
+            m_id: Идентификатор рассылки
             text: Сообщение рассылки
             attach: Список вложений, прикрепляемых к рассылке
         """
-        subscribers = self.db.fetch_subcribers(slug)
-        self.send_message(msg=text, user_ids=subscribers, attachment=attach)
+        subscribers = self.db.fetch_subcribers(m_id, group).split(",")
+        for sub in subscribers:
+            self.send_message(
+                msg=text,
+                pid=int(sub),
+                attachment=attach,
+                keyboard=self.kbs.inline_unsubscribe(m_id, int(sub)),
+            )
 
     def generate_mentions(self, ids: str, names: bool) -> str:
         """Генерирует строку с упоминаниями из списка идентификаторов
@@ -172,7 +173,11 @@ class Bot(metaclass=SingletonMeta):
         Returns:
             bool: Флаг, указывающий на принадлежность текущего пользователя к касте Администраторов
         """
-        return str(_id) in self.admins
+        admins = self.db.get_list_of_administrators()
+        for admin in admins:
+            if _id == admin[0]:
+                return True
+        return False
 
     def send_gui(self, pid: int, text: str = "Привет!") -> NoReturn:
         """Отправляет клавиатуру главного меню

@@ -3,11 +3,11 @@ import json
 import os
 import re
 from enum import Enum
+from typing import Tuple
 
 import requests
 from psycopg2 import ProgrammingError
 from vk_api.bot_longpoll import VkBotEventType
-from googletrans import Translator
 
 from bot import Bot
 from database import Database
@@ -28,7 +28,9 @@ class EventTypes(Enum):
 
 
 def send_schedule(date: str):
-    s = Schedule(date)
+    group = db.get_group_of_user(event["message"]["from_id"])
+    gid = db.get_schedule_descriptor(group)
+    s = Schedule(date, gid)
     s.get_raw()
     if s.is_exist():
         sch = s.generate()
@@ -64,7 +66,7 @@ def generate_debtors_message():
 
 
 def send_call_confirm():
-    chat_id = int(str(db.get_conversation(event["message"]["from_id"]))[-1])
+    chat_id = db.get_conversation(event["message"]["from_id"])
     if db.get_session_state(event["message"]["from_id"]) == "debtors_forming":
         message = generate_debtors_message()
     else:
@@ -74,7 +76,7 @@ def send_call_confirm():
         atch = ""
     if message != "\n" or atch:
         bot.send_message(
-            msg=f"В {'тестовую ' if chat_id == 1 else 'основную '}"
+            msg=f"В {'основную ' if chat_id else 'тестовую '}"
             f"беседу будет отправлено сообщение:",
             pid=event["message"]["from_id"],
             keyboard=kbs.prompt(event["message"]["from_id"]),
@@ -113,12 +115,37 @@ def load_attachs():
         db.update_call_attaches(event["message"]["from_id"], atch)
 
 
+def invite_bot():
+    """Срабатывает, если текущее событие - приглашение бота в беседу
+    """
+    try:
+        if event["message"]["action"][
+            "type"
+        ] == "chat_invite_user" and event.object.message["action"]["member_id"] == -int(
+            bot.gid
+        ):
+            if (
+                event.objects.message["peer_id"] not in db.get_cached_chats()
+                and event.objects.message["peer_id"] not in db.get_registered_chats()
+            ):
+                db.add_cached_chat(event.objects.message["peer_id"])
+            bot.send_message(
+                msg="Привет! Для полноценной работы меня нужно сделать администратором",
+                pid=event.object.message["peer_id"],
+            )
+    except (KeyError, TypeError):
+        pass
+
+
 for event in bot.longpoll.listen():
     event = {
         "type": event.type,
         "client_info": event.object.client_info,
         "message": event.object.message,
     }
+
+    invite_bot()
+
     if (
         event["type"] == EventTypes.NEW_MESSAGE.value
         and (event["message"]["text"] or event["message"]["attachments"])
@@ -156,10 +183,11 @@ for event in bot.longpoll.listen():
                 keyboard=kbs.skip(),
             )
         elif payload["button"] == "letter":
+            group = db.get_group_of_user(event["message"]["from_id"])
             bot.send_message(
                 msg=f"Отправка клавиатуры с фамилиями на букву \"{payload['letter']}\"",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.generate_names_keyboard(payload["letter"]),
+                keyboard=kbs.generate_names_keyboard(payload["letter"], group),
             )
         elif (
             payload["button"] == "student"
@@ -187,17 +215,19 @@ for event in bot.longpoll.listen():
             payload["button"] == "back"
             and db.get_session_state(event["message"]["from_id"]) != "select_donater"
         ):
+            group = db.get_group_of_user(event["message"]["from_id"])
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.generate_call_prompt(),
+                keyboard=kbs.generate_call_prompt(group),
             )
         elif payload["button"] == "skip":
             db.update_session_state(event["message"]["from_id"], "call_configuring")
+            group = db.get_group_of_user(event["message"]["from_id"])
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.generate_call_prompt(),
+                keyboard=kbs.generate_call_prompt(group),
             )
         elif (
             db.get_session_state(event["message"]["from_id"]) == "ask_for_call_message"
@@ -207,14 +237,16 @@ for event in bot.longpoll.listen():
             )
             if event["message"]["attachments"]:
                 load_attachs()
+            group = db.get_group_of_user(event["message"]["from_id"])
             bot.send_message(
                 msg="Отправка клавиатуры призыва",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.generate_call_prompt(),
+                keyboard=kbs.generate_call_prompt(group),
             )
             db.update_session_state(event["message"]["from_id"], "call_configuring")
         elif payload["button"] == "send_to_all":
-            ids = ",".join(db.get_active_students_ids())
+            group = db.get_group_of_user(event["message"]["from_id"])
+            ids = ",".join(db.get_active_students_ids(group))
             db.update_call_ids(event["message"]["from_id"], ids)
             bot.send_message(
                 msg="Все студенты отмечены как получатели уведомления",
@@ -236,7 +268,9 @@ for event in bot.longpoll.listen():
             event["message"]["from_id"]
         ) in ["call_configuring", "debtors_forming"]:
             bot.log.info("Отправка призыва...")
-            cid = db.get_conversation(event["message"]["from_id"])
+            chat_type = db.get_conversation(event["message"]["from_id"])
+            group = db.get_group_of_user(event["message"]["from_id"])
+            cid = db.get_chat_id(group, chat_type)
             if db.get_session_state(event["message"]["from_id"]) == "debtors_forming":
                 text = generate_debtors_message()
             else:
@@ -259,12 +293,11 @@ for event in bot.longpoll.listen():
             )
         elif payload["button"] == "chconv_call":
             conv = db.get_conversation(event["message"]["from_id"])
-            chat = int(str(conv)[-1])
-            if chat == 1:
-                db.update_conversation(event["message"]["from_id"], 2000000002)
+            if conv == 0:
+                db.update_conversation(event["message"]["from_id"], 1)
                 chat = 2
-            elif chat == 2:
-                db.update_conversation(event["message"]["from_id"], 2000000001)
+            elif conv == 1:
+                db.update_conversation(event["message"]["from_id"], 0)
                 chat = 1
             send_call_confirm()
 
@@ -327,7 +360,8 @@ for event in bot.longpoll.listen():
                         pid=event["message"]["from_id"],
                     )
                 else:
-                    s = Schedule(d)
+                    group = db.get_group_of_user(event["message"]["from_id"])
+                    s = Schedule(d, group)
                     s.get_raw()
                     if s.is_exist():
                         schedule = s.generate()
@@ -355,45 +389,55 @@ for event in bot.longpoll.listen():
 
         # :blockstart: Рассылки
         elif payload["button"] == "mailings":
+            group = db.get_group_of_user(event["message"]["from_id"])
             bot.send_message(
                 msg="Отправка клавиатуры со списком рассылок.",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.generate_mailings_keyboard(),
+                keyboard=kbs.generate_mailings_keyboard(group),
             )
         elif payload["button"] == "mailing":
             if not db.mailing_session_exist(event["message"]["from_id"]):
                 db.create_mailing_session(event["message"]["from_id"])
-            db.update_mailing_session(event["message"]["from_id"], payload["slug"])
+            db.update_mailing_session(event["message"]["from_id"], payload["id"])
             bot.send_message(
                 msg=f"Меню управления рассылкой \"{payload['name']}\":",
                 pid=event["message"]["from_id"],
                 keyboard=kbs.generate_mailing_mgmt(
                     is_admin=bot.is_admin(event["message"]["from_id"]),
-                    slug=payload["slug"],
+                    m_id=payload["id"],
                     user_id=event["message"]["from_id"],
                 ),
             )
         elif payload["button"] == "subscribe":
-            db.update_subscribe_state(payload["slug"], payload["user_id"], 1)
+            u_id = db.get_user_id(payload["user_id"])
+            db.update_subscribe_state(payload["slug"], u_id, 1)
             bot.send_message(
                 msg="Вы были успешно подписаны на рассылку.",
                 pid=event["message"]["from_id"],
                 keyboard=kbs.generate_mailing_mgmt(
                     is_admin=bot.is_admin(event["message"]["from_id"]),
-                    slug=payload["slug"],
+                    m_id=payload["id"],
                     user_id=event["message"]["from_id"],
                 ),
             )
         elif payload["button"] == "unsubscribe":
-            db.update_subscribe_state(payload["slug"], payload["user_id"], 0)
+            u_id = db.get_user_id(payload["user_id"])
+            db.update_subscribe_state(payload["slug"], u_id, 0)
             bot.send_message(
                 msg="Вы были успешно отписаны от рассылки.",
                 pid=event["message"]["from_id"],
                 keyboard=kbs.generate_mailing_mgmt(
                     is_admin=bot.is_admin(event["message"]["from_id"]),
-                    slug=payload["slug"],
+                    m_id=payload["id"],
                     user_id=event["message"]["from_id"],
                 ),
+            )
+        elif payload["button"] == "inline_unsubscribe":
+            u_id = db.get_user_id(payload["user_id"])
+            db.update_subscribe_state(payload["slug"], u_id, 0)
+            bot.send_message(
+                msg="Вы были успешно отписаны от рассылки.",
+                pid=event["message"]["from_id"],
             )
         elif payload["button"] == "send_mailing":
             db.update_session_state(
@@ -415,7 +459,7 @@ for event in bot.longpoll.listen():
                 pid=event["message"]["from_id"],
                 keyboard=kbs.generate_mailing_mgmt(
                     is_admin=bot.is_admin(event["message"]["from_id"]),
-                    slug=db.get_mailing_session(event["message"]["from_id"]),
+                    m_id=db.get_mailing_session(event["message"]["from_id"]),
                     user_id=event["message"]["from_id"],
                 ),
             )
@@ -440,28 +484,33 @@ for event in bot.longpoll.listen():
             payload["button"] == "confirm"
             and db.get_session_state(event["message"]["from_id"]) == "prompt_mailing"
         ):
+            group = db.get_group_of_user(event["message"]["from_id"])
             attach = db.get_mailing_attaches(event["message"]["from_id"])
             if attach is None:
                 attach = ""
             bot.send_mailing(
-                slug=db.get_mailing_session(event["message"]["from_id"]),
+                m_id=db.get_mailing_session(event["message"]["from_id"]),
                 text=db.get_mailing_message(event["message"]["from_id"]),
                 attach=attach,
+                group=group,
             )
+            db.update_mailing_message(event["message"]["from_id"], "")
+            db.update_mailing_attaches(event["message"]["from_id"], "")
             bot.send_message(
                 msg="Рассылка отправлена.",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.generate_mailings_keyboard(),
+                keyboard=kbs.generate_mailings_keyboard(group),
             )
         elif (
             payload["button"] == "deny"
             and db.get_session_state(event["message"]["from_id"]) == "prompt_mailing"
         ):
+            group = db.get_group_of_user(event["message"]["from_id"])
             db.empty_mailing_storage(event["message"]["from_id"])
             bot.send_message(
                 msg="Отправка рассылки отменена.",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.generate_mailings_keyboard(),
+                keyboard=kbs.generate_mailings_keyboard(group),
             )
         # :blockend: Рассылки
 
@@ -472,39 +521,6 @@ for event in bot.longpoll.listen():
                 pid=event["message"]["from_id"],
                 keyboard=kbs.generate_prefs_keyboard(),
             )
-
-        elif payload["button"] == "chconv":
-            chat = db.get_conversation(event["message"]["from_id"])
-            if chat == 2000000001:
-                bot.send_message(
-                    msg="Тестовая беседа сейчас активна",
-                    pid=event["message"]["from_id"],
-                    keyboard=kbs.generate_conv_selector(chat),
-                )
-            elif chat == 2000000002:
-                bot.send_message(
-                    msg="Основная беседа сейчас активна",
-                    pid=event["message"]["from_id"],
-                    keyboard=kbs.generate_conv_selector(chat),
-                )
-
-        elif payload["button"] == "select_main_conv":
-            chat = 2000000002
-            db.update_conversation(event["message"]["from_id"], chat)
-            bot.send_message(
-                msg="Основная беседа активна.",
-                pid=event["message"]["from_id"],
-                keyboard=kbs.generate_conv_selector(chat),
-            )
-        elif payload["button"] == "select_test_conv":
-            chat = 2000000001
-            db.update_conversation(event["message"]["from_id"], chat)
-            bot.send_message(
-                msg="Тестовая беседа активна.",
-                pid=event["message"]["from_id"],
-                keyboard=kbs.generate_conv_selector(chat),
-            )
-
         elif payload["button"] == "names":
             status = db.get_names_using_status(event["message"]["from_id"])
             msg = (
@@ -533,25 +549,156 @@ for event in bot.longpoll.listen():
                 pid=event["message"]["from_id"],
                 keyboard=kbs.generate_names_selector(bool(status)),
             )
+
+        elif payload["button"] == "chats":
+            bot.send_message(
+                msg="Настройки чатов",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_chat_prefs(),
+            )
+
+        elif payload["button"] == "local_chat":
+            chat = db.get_conversation(event["message"]["from_id"])
+            bot.send_message(
+                msg="Локальная настройка чатов",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_local_chat_prefs(chat),
+            )
+
+        elif payload["button"] == "activate_test_chat":
+            chat = db.update_conversation(event["message"]["from_id"], 0)
+            bot.send_message(
+                msg="Тестовая беседа активирована",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_local_chat_prefs(chat),
+            )
+
+        elif payload["button"] == "activate_main_chat":
+            chat = db.update_conversation(event["message"]["from_id"], 1)
+            bot.send_message(
+                msg="Основная беседа активирована",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_local_chat_prefs(chat),
+            )
+
+        elif payload["button"] == "global_chat":
+            group = db.get_group_of_user(event["message"]["from_id"])
+
+            bot.send_message(
+                msg="Глобальная настройка чатов",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_global_chat_prefs(group),
+            )
+
+        elif payload["button"] == "configure_chat":
+            chat = bot.bot_vk.messages.getConversationsById(
+                peer_ids=payload["chat_id"], group_id=bot.gid
+            )
+            status = ""
+            if not chat["items"]:
+                status = (
+                    "Бот не администратор в этом чате. Это может мешать "
+                    "корректной работе"
+                )
+            if payload["chat_type"]:
+                chat_type = "основного"
+            else:
+                chat_type = "тестового"
+            bot.send_message(
+                msg=f"Настройки {chat_type} чата\n{status}",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.configure_chat(
+                    payload["group"], payload["chat_type"], payload["chat_id"]
+                ),
+            )
+
+        elif payload["button"] == "reg_chat":
+            chats: Tuple[int] = db.get_cached_chats()
+            chats_info: str = bot.bot_vk.messages.getConversationsById(
+                peer_ids=",".join(map(str, chats)), group_id=bot.gid
+            )
+            bot.send_message(
+                msg="Выберите чат для регистрации\n(Если вы видите кнопки в названии "
+                "которых вопросительные знаки, значит в этом чате бот не является администратором,"
+                "что недопустимо для нормальной работы бота. Проверьте права доступа и вернитесь)",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.reg_chat(chats, chats_info),
+            )
+
+        elif payload["button"] == "add_chat":
+            group = db.get_group_of_user(event["message"]["from_id"])
+            bot.send_message(
+                msg="Выберите тип регистрируемого чата",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_available_chat_types(payload["chat_id"], group),
+            )
+
+        elif payload["button"] == "reg_as_main":
+            group = db.get_group_of_user(event["message"]["from_id"])
+            db.remove_cached_chat(payload["chat_id"])
+            db.registrate_chat(payload["chat_id"], 1, group)
+            bot.send_message(
+                msg="Чат зарегистрирован как основной",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_global_chat_prefs(group),
+            )
+
+        elif payload["button"] == "reg_as_test":
+            group = db.get_group_of_user(event["message"]["from_id"])
+            db.remove_cached_chat(payload["chat_id"])
+            db.registrate_chat(payload["chat_id"], 0, group)
+            bot.send_message(
+                msg="Чат зарегистрирован как тестовый",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_global_chat_prefs(group),
+            )
+
+        elif payload["button"] == "activate_chat":
+            if payload["chat_type"]:
+                db.update_chat_activity(payload["group"], 1, 1)
+                db.update_chat_activity(payload["group"], 0, 0)
+                chat_type = "Основной"
+            else:
+                db.update_chat_activity(payload["group"], 1, 0)
+                db.update_chat_activity(payload["group"], 0, 1)
+                chat_type = "Тестовый"
+            bot.send_message(
+                msg=f"{chat_type} чат выбран для отправки рассылок",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.configure_chat(
+                    payload["group"], payload["chat_type"], payload["chat_id"]
+                ),
+            )
+
+        elif payload["button"] == "unpin_chat":
+            db.unpin_chat(payload["group"], payload["chat_type"])
+            db.add_cached_chat(payload["chat_id"])
+            bot.send_message(
+                msg="Чат откреплен",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_global_chat_prefs(payload["group"]),
+            )
+
         # :blockend: Параметры
 
         # :blockstart: Финансы
 
         elif payload["button"] == "finances":
+            group = db.get_group_of_user(event["message"]["from_id"])
             bot.send_message(
                 msg="Меню финансов",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.finances_main(),
+                keyboard=kbs.finances_main(group),
             )
 
         elif payload["button"] == "fin_category":
-            if "slug" not in payload and "name" not in payload:
-                slug = db.get_active_expenses_category(event["message"]["from_id"])
+            if "id" not in payload and "name" not in payload:
+                e_id = db.get_active_expenses_category(event["message"]["from_id"])
                 payload.update(
-                    {"slug": slug, "name": db.get_expense_category_by_slug(slug),}
+                    {"id": e_id, "name": db.get_expense_category_by_slug(e_id),}
                 )
             db.update_active_expenses_category(
-                event["message"]["from_id"], payload["slug"]
+                event["message"]["from_id"], payload["id"]
             )
             bot.send_message(
                 msg=f"Меню управления статьей {payload['name']}.",
@@ -583,11 +730,12 @@ for event in bot.longpoll.listen():
             == "ask_for_new_expenses_cat_prefs"
             and payload["button"] == "cancel"
         ):
+            group = db.get_group_of_user(event["message"]["from_id"])
             db.update_session_state(event["message"]["from_id"], "main")
             bot.send_message(
                 msg="Операция отменена.",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.finances_main(),
+                keyboard=kbs.finances_main(group),
             )
         elif (
             db.get_session_state(event["message"]["from_id"])
@@ -596,25 +744,20 @@ for event in bot.longpoll.listen():
             if re.match(r"^.*,.*\d+$", event["message"]["text"]):
                 parsed = event["message"]["text"].split(",")
                 name, summ = parsed
-                slug = (
-                    Translator()
-                    .translate(name)
-                    .text.lower()
-                    .replace(" ", "-")
-                    .replace("'", "")
-                )
-                db.add_expences_category(name, slug, summ)
+                group = db.get_group_of_user(event["message"]["from_id"])
+                db.add_expences_category(name, summ, group)
                 bot.send_message(
                     msg=f'Новая статья "{name}" с суммой сборов {summ} р. успешно создана.',
                     pid=event["message"]["from_id"],
-                    keyboard=kbs.finances_main(),
+                    keyboard=kbs.finances_main(group),
                 )
                 db.update_session_state(event["message"]["from_id"], "main")
             else:
+                group = db.get_group_of_user(event["message"]["from_id"])
                 bot.send_message(
                     msg=f"Неверный формат сообщения.",
                     pid=event["message"]["from_id"],
-                    keyboard=kbs.finances_main(),
+                    keyboard=kbs.finances_main(group),
                 )
 
         elif payload["button"] == "fin_prefs":
@@ -731,15 +874,16 @@ for event in bot.longpoll.listen():
             and db.get_session_state(event["message"]["from_id"])
             == "confirm_delete_expense"
         ):
-            slug = db.get_active_expenses_category(event["message"]["from_id"])
-            name = db.get_expense_category_by_slug(slug)
-            db.delete_expense_catgory(slug)
+            exp_id = db.get_active_expenses_category(event["message"]["from_id"])
+            name = db.get_expense_category_by_slug(exp_id)
+            db.delete_expense_catgory(exp_id)
             db.update_active_expenses_category(event["message"]["from_id"], "none")
             db.update_session_state(event["message"]["from_id"], "main")
+            group = db.get_group_of_user(event["message"]["from_id"])
             bot.send_message(
                 msg=f"Категория {name} удалена.",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.finances_main(),
+                keyboard=kbs.finances_main(group),
             )
 
         elif (
@@ -759,24 +903,25 @@ for event in bot.longpoll.listen():
                 db.update_session_state(event["message"]["from_id"], "select_donater")
             except ProgrammingError:
                 pass
+            group = db.get_group_of_user(event["message"]["from_id"])
             bot.send_message(
                 msg="Выберите внесшего деньги:",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.generate_finances_prompt(),
+                keyboard=kbs.generate_finances_prompt(group),
             )
 
         elif (
             payload["button"] == "student"
             and db.get_session_state(event["message"]["from_id"]) == "select_donater"
         ):
-            slug = db.get_active_expenses_category(event["message"]["from_id"])
-            summ = db.get_expense_summ(slug)
-            d_list = db.get_list_of_donaters_by_slug(slug)
+            exp_id = db.get_active_expenses_category(event["message"]["from_id"])
+            summ = db.get_expense_summ(exp_id)
+            d_list = db.get_list_of_donaters_by_slug(exp_id)
             if payload["id"] in d_list:
-                d_id = db.get_id_of_donate_record(payload["id"], slug)
+                d_id = db.get_id_of_donate_record(payload["id"], exp_id)
                 db.set_current_date_as_update(d_id)
             else:
-                d_id = db.create_donate(payload["id"], slug)
+                d_id = db.create_donate(payload["id"], exp_id)
             db.update_donate_id(event["message"]["from_id"], d_id)
             db.update_session_state(event["message"]["from_id"], "ask_for_donate_summ")
             bot.send_message(
@@ -824,10 +969,11 @@ for event in bot.longpoll.listen():
             payload["button"] == "back"
             and db.get_session_state(event["message"]["from_id"]) == "select_donater"
         ):
+            group = db.get_group_of_user(event["message"]["from_id"])
             bot.send_message(
                 msg="Отправка клавиатуры с алфавитом.",
                 pid=event["message"]["from_id"],
-                keyboard=kbs.generate_finances_prompt(),
+                keyboard=kbs.generate_finances_prompt(group),
             )
 
         elif (
@@ -844,21 +990,24 @@ for event in bot.longpoll.listen():
 
             bot.send_message(msg="Вычисляю...", pid=event["message"]["from_id"])
 
-            slug = db.get_active_expenses_category(event["message"]["from_id"])
-            summ = db.get_expense_summ(slug)
-            d_ids = db.get_list_of_donaters_by_slug(slug, summ)
-            s_ids = db.get_active_students_ids()
-            name = db.get_expense_category_by_slug(slug)
+            group = db.get_group_of_user(event["message"]["from_id"])
+            exp_id = db.get_active_expenses_category(event["message"]["from_id"])
+            wasted = sum(db.get_all_expenses_in_category(exp_id))
+            summ = db.get_expense_summ(exp_id)
+            d_ids = db.get_list_of_donaters_by_slug(exp_id, summ)
+            s_ids = db.get_active_students_ids(group)
+            name = db.get_expense_category_by_slug(exp_id)
 
             donated = len(d_ids)
             not_donated = len(s_ids) - donated
-            collected = sum(db.get_all_donates_in_category(slug))
+            collected = sum(db.get_all_donates_in_category(exp_id))
 
             bot.send_message(
                 msg=f'Статистика по статье "{name}":\n'
                 f"Всего сдали: {donated} человек;\n"
                 f"Всего не сдали: {not_donated} человек;\n"
-                f"Всего собрано: {collected} руб.",
+                f"Всего собрано: {collected} руб.\n"
+                f"Всего потрачено: {wasted} руб.",
                 pid=event["message"]["from_id"],
             )
 
@@ -886,8 +1035,8 @@ for event in bot.longpoll.listen():
             db.get_session_state(event["message"]["from_id"]) == "ask_for_expense_summ"
         ):
             if re.match(r"^\d+$", event["message"]["text"]):
-                slug = db.get_active_expenses_category(event["message"]["from_id"])
-                db.add_expense(slug, event["message"]["text"])
+                exp_id = db.get_active_expenses_category(event["message"]["from_id"])
+                db.add_expense(exp_id, event["message"]["text"])
                 bot.send_message(
                     msg="Запись создана.",
                     pid=event["message"]["from_id"],
@@ -906,13 +1055,46 @@ for event in bot.longpoll.listen():
                 pid=event["message"]["from_id"],
             )
             db.update_session_state(event["message"]["from_id"], "debtors_forming")
-            slug = db.get_active_expenses_category(event["message"]["from_id"])
-            summ = db.get_expense_summ(slug)
-            d_s_ids = db.get_list_of_donaters_by_slug(slug, summ)
+            exp_id = db.get_active_expenses_category(event["message"]["from_id"])
+            summ = db.get_expense_summ(exp_id)
+            d_s_ids = db.get_list_of_donaters_by_slug(exp_id, summ)
             d_ids = set([str(db.get_vk_id(i)) for i in d_s_ids])
-            s_ids = set(db.get_active_students_ids())
+            group = db.get_group_of_user(event["message"]["from_id"])
+            s_ids = set(db.get_active_students_ids(group))
             debtors = ",".join(s_ids.difference(d_ids))
             db.update_call_ids(event["message"]["from_id"], debtors)
             send_call_confirm()
 
         # :blockend: Финансы
+
+        # :blockstart: Веб-интерфейс
+
+        elif payload["button"] == "web":
+            bot.send_message(
+                msg="Выберите группу для получения ссылки авторизации",
+                pid=event["message"]["from_id"],
+                keyboard=kbs.generate_administrating_groups(
+                    event["message"]["from_id"]
+                ),
+            )
+
+        elif payload["button"] == "get_auth_link":
+            domain = "https://ralph-cms.herokuapp.com"
+            url = domain + f"/api/auth/{payload['group']}"
+            request = requests.get(url)
+            if request.status_code == 200:
+                arg = request.json()["result"]["link"]
+                bot.send_message(
+                    msg="Ваша одноразовая ссылка для авторизации под именем "
+                    f"администратора группы {payload['group']}:\n"
+                    f"{domain + arg}\nОна действительна в течении 5 минут.\nТак как "
+                    f"панель управления находится на бесплатном хостинге, "
+                    f"при открытии ссылки с компьютера могут возникнуть "
+                    f"проблемы\nПохоже, (без костылей) это никак не решается.",
+                    pid=event["message"]["from_id"],
+                    keyboard=kbs.generate_main_menu(
+                        bot.is_admin(event["message"]["from_id"])
+                    ),
+                )
+
+        # :blockend: Веб-интерфейс

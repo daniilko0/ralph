@@ -46,9 +46,9 @@ Ralph - бот ВКонтакте, упрощающий рутинные зад�
    :maxdepth: 4
    :hidden:
 
-   manuals/admin
-   manuals/user
-   manuals/contrib
-   manuals/adopt/index
+   Администратору <manuals/admin>
+   Пользователю <manuals/user>
+   Внесение вклада <manuals/contrib>
+   Адаптация <manuals/adopt/index>
 
-   code/index
+   Документация к коду <code/index>

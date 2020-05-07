@@ -19,11 +19,15 @@ continue running.
 """
 
 import logging
+import os
+import sys
+import traceback
+from datetime import datetime
+from datetime import timedelta
+from datetime import timezone
+from logging import Formatter
 from logging import Handler
 from logging import LogRecord
-from logging import Formatter
-import os
-from datetime import datetime, timezone, timedelta
 
 import requests
 

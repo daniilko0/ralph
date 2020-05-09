@@ -61,36 +61,41 @@ class TelegramHandler(Handler):
 
 
 class BaseFormatter(Formatter):
-    def format(self, record: LogRecord) -> str:
-        message = record.msg
-        levelname = record.levelname
-        module = record.module
+    @staticmethod
+    def construct_format(record: LogRecord) -> dict:
+        msg = record.msg
+        ln = record.levelname
+        mdl = record.module
         timestamp = datetime.utcfromtimestamp(record.created)
         ts = (
             timestamp.replace(tzinfo=timezone.utc)
             .astimezone(tz=timezone(timedelta(hours=3)))
             .strftime("%d.%m.%Y %H:%M:%S")
         )
-        fmt = f"[{levelname}] ({module}): {ts} {message}"
         if record.exc_info:
-            fmt += f"\n{''.join(traceback.format_exception(*record.exc_info))}"
+            trs = traceback.format_exception(*record.exc_info)
+        else:
+            trs = None
+        return {"msg": msg, "ln": ln, "mdl": mdl, "ts": ts, "trs": trs}
+
+    def format(self, record: LogRecord) -> str:
+        data = self.construct_format(record)
+        fmt = f"[{data['ln']}] ({data['mdl']}): {data['ts']} {data['msg']}"
+        if record.exc_info:
+            fmt += f"\n{''.join(data['trs'])}"
         return fmt
 
 
-class MarkdownFormatter(Formatter):
+class MarkdownFormatter(BaseFormatter):
     def format(self, record: LogRecord) -> str:
-        message = record.msg
-        levelname = record.levelname
-        module = record.module
-        timestamp = datetime.utcfromtimestamp(record.created)
-        ts = (
-            timestamp.replace(tzinfo=timezone.utc)
-            .astimezone(tz=timezone(timedelta(hours=3)))
-            .strftime("%d.%m.%Y %H:%M:%S")
-        )
-        fmt = f"*[{levelname}]* ({module}): {ts} {message}"
+        data = self.construct_format(record)
+        fmt = f"*[{data['ln']}]* (`{data['mdl']}`): {data['ts']} {data['msg']}"
         if record.exc_info:
-            fmt += f"\n```{''.join(traceback.format_exception(*record.exc_info))}```"
+            fmt += f"""
+                    ```python
+{''.join(data['trs'])}
+                    ```
+                    """
         return fmt
 
 

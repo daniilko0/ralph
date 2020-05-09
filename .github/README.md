@@ -50,3 +50,5 @@ RALPH - это платформа, созданная для того, чтоб�
     <td align="center"><a href="https://github.com/6a16ec"><img src="https://avatars3.githubusercontent.com/u/26770482?v=" width="60"><br><sub><b>Никита Семаев</b></sub></a></td>
   </tr>
 </table>
+
+[ ~ Dependencies scanned by PyUp.io ~ ]
